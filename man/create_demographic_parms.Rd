@@ -4,12 +4,22 @@
 \alias{create_demographic_parms}
 \title{TODO}
 \usage{
-create_demographic_parms(tc = 1970:2020, propinitnat = 1, verbose = FALSE)
+create_demographic_parms(
+  tc = 1970:2020,
+  propinitnat = 1,
+  propinitrisk = 1,
+  birthrisk = 1,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{tc}{TODO}
 
 \item{propinitnat}{vector of length nnat with initial proportions}
+
+\item{propinitrisk}{vector of length nrisk with initial proportions}
+
+\item{birthrisk}{where to births go in risk?}
 
 \item{verbose}{give more feedback}
 }

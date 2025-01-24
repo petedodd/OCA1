@@ -74,6 +74,13 @@ out
 plt_DemoGrowth(out)
 plt_DemoSnapshots(out)
 
+## version with 2 static nativity classes and 2 static risk classes
+pms <- create_demographic_parms(propinitnat = c(0.9,0.1),propinitrisk = c(0.9,0.1))
+out <- runmodel(pms)
+out
+
+plt_DemoGrowth(out)
+
 ```
 
 

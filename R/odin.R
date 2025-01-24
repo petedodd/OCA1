@@ -18,8 +18,8 @@ ocaode_ <- R6::R6Class(
       rhs_desolve = "ocaode_rhs_desolve",
       initmod_desolve = "ocaode_initmod_desolve"),
     dll = "OCA1",
-    user = c("BF", "BM", "nage", "nnat", "popdatF", "popdatM", "popinitF",
-             "popinitM", "r", "ttp"),
+    user = c("BF", "birthrisk", "BM", "nage", "nnat", "nrisk", "popdatF",
+             "popdatM", "popinitF", "popinitM", "r", "ttp"),
 
     ## This is never called, but is used to ensure that R finds our
     ## symbols that we will use from the package; without this they
