@@ -26,7 +26,8 @@ plt_DemoGrowth <- function(outdat) {
     ggplot2::ylab("Population (in thousands)") +
     ggplot2::ggtitle(cntry) +
     ggplot2::scale_y_continuous(labels = absspace) +
-    ggplot2::theme_minimal()
+    ggplot2::theme_minimal()+
+    ggplot2::expand_limits(y=c(0,NA))
 }
 
 ##' .. content for \description{} (no empty lines) ..TODO
@@ -44,7 +45,7 @@ plt_DemoSnapshots <- function(outdat) {
   cntry <- "GBR"
   N <- OCA1::UKdemo$N
   tmz <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 5)
-  PL <- list()
+  tmpo <- outdat[, .(value = sum(value)), by = .(t, sex, AgeGrp)]
   PL <- list()
   for (i in 1:length(tmz)) {
     YR <- tmz[i]
@@ -57,8 +58,8 @@ plt_DemoSnapshots <- function(outdat) {
     PL[[i]] <- ggplot2::ggplot(tmp, aes(x = AgeGrp, col = sex, shape = sex)) +
       ggplot2::geom_point(data = tmp[sex == "M"], aes(y = -value), size = 2) +
       ggplot2::geom_point(data = tmp[sex == "F"], aes(y = value), size = 2) +
-      ggplot2::geom_line(data = outdat[t == cly & sex == "M"], aes(y = -value, group = 1), alpha = .5) +
-      ggplot2::geom_line(data = outdat[t == cly & sex == "F"], aes(y = value, group = 1), alpha = .5) +
+      ggplot2::geom_line(data = tmpo[t == cly & sex == "M"],aes(y = -value, group = 1), alpha = .5) +
+      ggplot2::geom_line(data = tmpo[t == cly & sex == "F"],aes(y = value, group = 1), alpha = .5) +
       ggplot2::coord_flip() +
       ggplot2::ylab("Population (in thousands)") +
       ggplot2::xlab("Age group") +

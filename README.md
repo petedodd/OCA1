@@ -57,14 +57,23 @@ NOTE need to redo with explicit migration at some point in any case
 ##load
 library(OCA1)
 
-##run
+## example without nativity class used
 pms <- create_demographic_parms() #create UK parameters
 out <- runmodel(pms)              #run model with these
 out                               #inspect
 
-##visualize
+## visualize
 plt_DemoGrowth(out)               #total population over time
 plt_DemoSnapshots(out)            #snapshots
+
+## version with 2 static nativity classes
+pms <- create_demographic_parms(propinitnat = c(0.9,0.1))
+out <- runmodel(pms,raw=FALSE)
+out
+
+plt_DemoGrowth(out)
+plt_DemoSnapshots(out)
+
 ```
 
 

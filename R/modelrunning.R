@@ -24,10 +24,20 @@ runmodel <- function(p, times, raw = FALSE) {
   ans <- mdl$run(times)
   if (!raw) { # convert to data.table
     ans <- data.table::as.data.table(ans)
-    names(ans) <- c("t",t(outer(c("M_", "F_"), OCA1::agz, paste0)))
-    ans <- data.table::melt(ans,id="t")
-    ans[,c("sex","AgeGrp"):=data.table::tstrsplit(variable,split="_")]
-    ans[,variable:=NULL]
+    ## names(ans) <- c("t",t(outer(c("M_", "F_"), OCA1::agz, paste0)))
+    ## ans <- data.table::melt(ans,id="t")
+    ## ans[,c("sex","AgeGrp"):=data.table::tstrsplit(variable,split="_")]
+    ## ans[,variable:=NULL]
+    ans <- data.table::melt(ans, id = "t")
+    ans[, variable := gsub("\\[|\\]|N", "", variable)]
+    ans[, c("astring", "sexstring", "natstring") := data.table::tstrsplit(variable, split = ",")]
+    ans[, c("AgeGrp", "sex", "natcat") := .(
+            OCA1::agz[as.integer(astring)],
+            c("M", "F")[as.integer(sexstring)],
+            as.integer(natstring)
+          )]
+    ans[, c("astring", "sexstring", "natstring", "variable") := NULL]
+    ## as before
     ans$sex <- factor(ans$sex,levels=c("M","F"))
     ans$AgeGrp <- factor(ans$AgeGrp,levels=OCA1::agz)
   }

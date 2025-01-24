@@ -4,10 +4,14 @@
 \alias{create_demographic_parms}
 \title{TODO}
 \usage{
-create_demographic_parms(tc = 1970:2020)
+create_demographic_parms(tc = 1970:2020, propinitnat = 1, verbose = FALSE)
 }
 \arguments{
-\item{tc}{}
+\item{tc}{TODO}
+
+\item{propinitnat}{vector of length nnat with initial proportions}
+
+\item{verbose}{give more feedback}
 }
 \value{
 list of parameters to run odin model
