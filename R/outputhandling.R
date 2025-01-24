@@ -15,7 +15,7 @@ absspace <- function(x, ...) {
 ##' @export
 plt_DemoGrowth <- function(outdat) {
   cntry <- "GBR"
-  N <- OCA::UKdemo$N
+  N <- OCA1::UKdemo$N
   tc <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 1)
   ggplot2::ggplot(
     N[iso3 == cntry & Year %in% tc, .(pop = sum(PopTotal)), by = Year],
@@ -42,7 +42,7 @@ plt_DemoGrowth <- function(outdat) {
 ##' @export
 plt_DemoSnapshots <- function(outdat) {
   cntry <- "GBR"
-  N <- OCA::UKdemo$N
+  N <- OCA1::UKdemo$N
   tmz <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 5)
   PL <- list()
   PL <- list()
