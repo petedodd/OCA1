@@ -83,9 +83,15 @@ typedef struct ocaode_internal {
   int dim_N_1;
   int dim_N_12;
   int dim_N_123;
+  int dim_N_1234;
+  int dim_N_12345;
+  int dim_N_123456;
   int dim_N_2;
   int dim_N_3;
   int dim_N_4;
+  int dim_N_5;
+  int dim_N_6;
+  int dim_N_7;
   int dim_native;
   int dim_omegaF;
   int dim_omegaM;
@@ -98,14 +104,31 @@ typedef struct ocaode_internal {
   int dim_popinitF;
   int dim_popinitF_1;
   int dim_popinitF_12;
+  int dim_popinitF_123;
+  int dim_popinitF_1234;
+  int dim_popinitF_12345;
   int dim_popinitF_2;
   int dim_popinitF_3;
+  int dim_popinitF_4;
+  int dim_popinitF_5;
+  int dim_popinitF_6;
   int dim_popinitM;
   int dim_popinitM_1;
   int dim_popinitM_12;
+  int dim_popinitM_123;
+  int dim_popinitM_1234;
+  int dim_popinitM_12345;
   int dim_popinitM_2;
   int dim_popinitM_3;
+  int dim_popinitM_4;
+  int dim_popinitM_5;
+  int dim_popinitM_6;
   int dim_r;
+  int dim_tbbottom;
+  int dim_tbbottom_1;
+  int dim_tbbottom_12;
+  int dim_tbbottom_2;
+  int dim_tbbottom_3;
   int dim_ttp;
   double *initial_N;
   void *interpolate_bzf;
@@ -116,7 +139,10 @@ typedef struct ocaode_internal {
   int nage;
   double *native;
   int nnat;
+  int npost;
+  int nprot;
   int nrisk;
+  int nstrain;
   double *omegaF;
   double *omegaM;
   double *popdatF;
@@ -124,6 +150,7 @@ typedef struct ocaode_internal {
   double *popinitF;
   double *popinitM;
   double *r;
+  double *tbbottom;
   double *ttp;
 } ocaode_internal;
 ocaode_internal* ocaode_get_internal(SEXP internal_p, int closed_error);
@@ -197,6 +224,7 @@ void ocaode_finalise(SEXP internal_p) {
     R_Free(internal->popinitF);
     R_Free(internal->popinitM);
     R_Free(internal->r);
+    R_Free(internal->tbbottom);
     R_Free(internal->ttp);
     R_Free(internal);
     R_ClearExternalPtr(internal_p);
@@ -218,13 +246,17 @@ SEXP ocaode_create(SEXP user) {
   internal->popinitF = NULL;
   internal->popinitM = NULL;
   internal->r = NULL;
+  internal->tbbottom = NULL;
   internal->ttp = NULL;
   internal->BF = NULL;
   internal->birthrisk = NULL;
   internal->BM = NULL;
   internal->nage = NA_INTEGER;
   internal->nnat = NA_INTEGER;
+  internal->npost = NA_INTEGER;
+  internal->nprot = NA_INTEGER;
   internal->nrisk = NA_INTEGER;
+  internal->nstrain = NA_INTEGER;
   internal->popdatF = NULL;
   internal->popdatM = NULL;
   internal->popinitF = NULL;
@@ -247,7 +279,7 @@ void ocaode_initmod_desolve(void(* odeparms) (int *, double *)) {
 }
 SEXP ocaode_contents(SEXP internal_p) {
   ocaode_internal *internal = ocaode_get_internal(internal_p, 1);
-  SEXP contents = PROTECT(allocVector(VECSXP, 52));
+  SEXP contents = PROTECT(allocVector(VECSXP, 79));
   SEXP BF = PROTECT(allocVector(REALSXP, internal->dim_BF));
   memcpy(REAL(BF), internal->BF, internal->dim_BF * sizeof(double));
   SET_VECTOR_ELT(contents, 0, BF);
@@ -264,70 +296,100 @@ SEXP ocaode_contents(SEXP internal_p) {
   SET_VECTOR_ELT(contents, 7, ScalarInteger(internal->dim_N_1));
   SET_VECTOR_ELT(contents, 8, ScalarInteger(internal->dim_N_12));
   SET_VECTOR_ELT(contents, 9, ScalarInteger(internal->dim_N_123));
-  SET_VECTOR_ELT(contents, 10, ScalarInteger(internal->dim_N_2));
-  SET_VECTOR_ELT(contents, 11, ScalarInteger(internal->dim_N_3));
-  SET_VECTOR_ELT(contents, 12, ScalarInteger(internal->dim_N_4));
-  SET_VECTOR_ELT(contents, 13, ScalarInteger(internal->dim_native));
-  SET_VECTOR_ELT(contents, 14, ScalarInteger(internal->dim_omegaF));
-  SET_VECTOR_ELT(contents, 15, ScalarInteger(internal->dim_omegaM));
-  SET_VECTOR_ELT(contents, 16, ScalarInteger(internal->dim_popdatF));
-  SET_VECTOR_ELT(contents, 17, ScalarInteger(internal->dim_popdatF_1));
-  SET_VECTOR_ELT(contents, 18, ScalarInteger(internal->dim_popdatF_2));
-  SET_VECTOR_ELT(contents, 19, ScalarInteger(internal->dim_popdatM));
-  SET_VECTOR_ELT(contents, 20, ScalarInteger(internal->dim_popdatM_1));
-  SET_VECTOR_ELT(contents, 21, ScalarInteger(internal->dim_popdatM_2));
-  SET_VECTOR_ELT(contents, 22, ScalarInteger(internal->dim_popinitF));
-  SET_VECTOR_ELT(contents, 23, ScalarInteger(internal->dim_popinitF_1));
-  SET_VECTOR_ELT(contents, 24, ScalarInteger(internal->dim_popinitF_12));
-  SET_VECTOR_ELT(contents, 25, ScalarInteger(internal->dim_popinitF_2));
-  SET_VECTOR_ELT(contents, 26, ScalarInteger(internal->dim_popinitF_3));
-  SET_VECTOR_ELT(contents, 27, ScalarInteger(internal->dim_popinitM));
-  SET_VECTOR_ELT(contents, 28, ScalarInteger(internal->dim_popinitM_1));
-  SET_VECTOR_ELT(contents, 29, ScalarInteger(internal->dim_popinitM_12));
-  SET_VECTOR_ELT(contents, 30, ScalarInteger(internal->dim_popinitM_2));
-  SET_VECTOR_ELT(contents, 31, ScalarInteger(internal->dim_popinitM_3));
-  SET_VECTOR_ELT(contents, 32, ScalarInteger(internal->dim_r));
-  SET_VECTOR_ELT(contents, 33, ScalarInteger(internal->dim_ttp));
+  SET_VECTOR_ELT(contents, 10, ScalarInteger(internal->dim_N_1234));
+  SET_VECTOR_ELT(contents, 11, ScalarInteger(internal->dim_N_12345));
+  SET_VECTOR_ELT(contents, 12, ScalarInteger(internal->dim_N_123456));
+  SET_VECTOR_ELT(contents, 13, ScalarInteger(internal->dim_N_2));
+  SET_VECTOR_ELT(contents, 14, ScalarInteger(internal->dim_N_3));
+  SET_VECTOR_ELT(contents, 15, ScalarInteger(internal->dim_N_4));
+  SET_VECTOR_ELT(contents, 16, ScalarInteger(internal->dim_N_5));
+  SET_VECTOR_ELT(contents, 17, ScalarInteger(internal->dim_N_6));
+  SET_VECTOR_ELT(contents, 18, ScalarInteger(internal->dim_N_7));
+  SET_VECTOR_ELT(contents, 19, ScalarInteger(internal->dim_native));
+  SET_VECTOR_ELT(contents, 20, ScalarInteger(internal->dim_omegaF));
+  SET_VECTOR_ELT(contents, 21, ScalarInteger(internal->dim_omegaM));
+  SET_VECTOR_ELT(contents, 22, ScalarInteger(internal->dim_popdatF));
+  SET_VECTOR_ELT(contents, 23, ScalarInteger(internal->dim_popdatF_1));
+  SET_VECTOR_ELT(contents, 24, ScalarInteger(internal->dim_popdatF_2));
+  SET_VECTOR_ELT(contents, 25, ScalarInteger(internal->dim_popdatM));
+  SET_VECTOR_ELT(contents, 26, ScalarInteger(internal->dim_popdatM_1));
+  SET_VECTOR_ELT(contents, 27, ScalarInteger(internal->dim_popdatM_2));
+  SET_VECTOR_ELT(contents, 28, ScalarInteger(internal->dim_popinitF));
+  SET_VECTOR_ELT(contents, 29, ScalarInteger(internal->dim_popinitF_1));
+  SET_VECTOR_ELT(contents, 30, ScalarInteger(internal->dim_popinitF_12));
+  SET_VECTOR_ELT(contents, 31, ScalarInteger(internal->dim_popinitF_123));
+  SET_VECTOR_ELT(contents, 32, ScalarInteger(internal->dim_popinitF_1234));
+  SET_VECTOR_ELT(contents, 33, ScalarInteger(internal->dim_popinitF_12345));
+  SET_VECTOR_ELT(contents, 34, ScalarInteger(internal->dim_popinitF_2));
+  SET_VECTOR_ELT(contents, 35, ScalarInteger(internal->dim_popinitF_3));
+  SET_VECTOR_ELT(contents, 36, ScalarInteger(internal->dim_popinitF_4));
+  SET_VECTOR_ELT(contents, 37, ScalarInteger(internal->dim_popinitF_5));
+  SET_VECTOR_ELT(contents, 38, ScalarInteger(internal->dim_popinitF_6));
+  SET_VECTOR_ELT(contents, 39, ScalarInteger(internal->dim_popinitM));
+  SET_VECTOR_ELT(contents, 40, ScalarInteger(internal->dim_popinitM_1));
+  SET_VECTOR_ELT(contents, 41, ScalarInteger(internal->dim_popinitM_12));
+  SET_VECTOR_ELT(contents, 42, ScalarInteger(internal->dim_popinitM_123));
+  SET_VECTOR_ELT(contents, 43, ScalarInteger(internal->dim_popinitM_1234));
+  SET_VECTOR_ELT(contents, 44, ScalarInteger(internal->dim_popinitM_12345));
+  SET_VECTOR_ELT(contents, 45, ScalarInteger(internal->dim_popinitM_2));
+  SET_VECTOR_ELT(contents, 46, ScalarInteger(internal->dim_popinitM_3));
+  SET_VECTOR_ELT(contents, 47, ScalarInteger(internal->dim_popinitM_4));
+  SET_VECTOR_ELT(contents, 48, ScalarInteger(internal->dim_popinitM_5));
+  SET_VECTOR_ELT(contents, 49, ScalarInteger(internal->dim_popinitM_6));
+  SET_VECTOR_ELT(contents, 50, ScalarInteger(internal->dim_r));
+  SET_VECTOR_ELT(contents, 51, ScalarInteger(internal->dim_tbbottom));
+  SET_VECTOR_ELT(contents, 52, ScalarInteger(internal->dim_tbbottom_1));
+  SET_VECTOR_ELT(contents, 53, ScalarInteger(internal->dim_tbbottom_12));
+  SET_VECTOR_ELT(contents, 54, ScalarInteger(internal->dim_tbbottom_2));
+  SET_VECTOR_ELT(contents, 55, ScalarInteger(internal->dim_tbbottom_3));
+  SET_VECTOR_ELT(contents, 56, ScalarInteger(internal->dim_ttp));
   SEXP initial_N = PROTECT(allocVector(REALSXP, internal->dim_N));
   memcpy(REAL(initial_N), internal->initial_N, internal->dim_N * sizeof(double));
-  odin_set_dim(initial_N, 4, internal->dim_N_1, internal->dim_N_2, internal->dim_N_3, internal->dim_N_4);
-  SET_VECTOR_ELT(contents, 34, initial_N);
-  SET_VECTOR_ELT(contents, 39, ScalarInteger(internal->lttp));
-  SET_VECTOR_ELT(contents, 40, ScalarInteger(internal->nage));
+  odin_set_dim(initial_N, 7, internal->dim_N_1, internal->dim_N_2, internal->dim_N_3, internal->dim_N_4, internal->dim_N_5, internal->dim_N_6, internal->dim_N_7);
+  SET_VECTOR_ELT(contents, 57, initial_N);
+  SET_VECTOR_ELT(contents, 62, ScalarInteger(internal->lttp));
+  SET_VECTOR_ELT(contents, 63, ScalarInteger(internal->nage));
   SEXP native = PROTECT(allocVector(REALSXP, internal->dim_native));
   memcpy(REAL(native), internal->native, internal->dim_native * sizeof(double));
-  SET_VECTOR_ELT(contents, 41, native);
-  SET_VECTOR_ELT(contents, 42, ScalarInteger(internal->nnat));
-  SET_VECTOR_ELT(contents, 43, ScalarInteger(internal->nrisk));
+  SET_VECTOR_ELT(contents, 64, native);
+  SET_VECTOR_ELT(contents, 65, ScalarInteger(internal->nnat));
+  SET_VECTOR_ELT(contents, 66, ScalarInteger(internal->npost));
+  SET_VECTOR_ELT(contents, 67, ScalarInteger(internal->nprot));
+  SET_VECTOR_ELT(contents, 68, ScalarInteger(internal->nrisk));
+  SET_VECTOR_ELT(contents, 69, ScalarInteger(internal->nstrain));
   SEXP omegaF = PROTECT(allocVector(REALSXP, internal->dim_omegaF));
   memcpy(REAL(omegaF), internal->omegaF, internal->dim_omegaF * sizeof(double));
-  SET_VECTOR_ELT(contents, 44, omegaF);
+  SET_VECTOR_ELT(contents, 70, omegaF);
   SEXP omegaM = PROTECT(allocVector(REALSXP, internal->dim_omegaM));
   memcpy(REAL(omegaM), internal->omegaM, internal->dim_omegaM * sizeof(double));
-  SET_VECTOR_ELT(contents, 45, omegaM);
+  SET_VECTOR_ELT(contents, 71, omegaM);
   SEXP popdatF = PROTECT(allocVector(REALSXP, internal->dim_popdatF));
   memcpy(REAL(popdatF), internal->popdatF, internal->dim_popdatF * sizeof(double));
   odin_set_dim(popdatF, 2, internal->dim_popdatF_1, internal->dim_popdatF_2);
-  SET_VECTOR_ELT(contents, 46, popdatF);
+  SET_VECTOR_ELT(contents, 72, popdatF);
   SEXP popdatM = PROTECT(allocVector(REALSXP, internal->dim_popdatM));
   memcpy(REAL(popdatM), internal->popdatM, internal->dim_popdatM * sizeof(double));
   odin_set_dim(popdatM, 2, internal->dim_popdatM_1, internal->dim_popdatM_2);
-  SET_VECTOR_ELT(contents, 47, popdatM);
+  SET_VECTOR_ELT(contents, 73, popdatM);
   SEXP popinitF = PROTECT(allocVector(REALSXP, internal->dim_popinitF));
   memcpy(REAL(popinitF), internal->popinitF, internal->dim_popinitF * sizeof(double));
-  odin_set_dim(popinitF, 3, internal->dim_popinitF_1, internal->dim_popinitF_2, internal->dim_popinitF_3);
-  SET_VECTOR_ELT(contents, 48, popinitF);
+  odin_set_dim(popinitF, 6, internal->dim_popinitF_1, internal->dim_popinitF_2, internal->dim_popinitF_3, internal->dim_popinitF_4, internal->dim_popinitF_5, internal->dim_popinitF_6);
+  SET_VECTOR_ELT(contents, 74, popinitF);
   SEXP popinitM = PROTECT(allocVector(REALSXP, internal->dim_popinitM));
   memcpy(REAL(popinitM), internal->popinitM, internal->dim_popinitM * sizeof(double));
-  odin_set_dim(popinitM, 3, internal->dim_popinitM_1, internal->dim_popinitM_2, internal->dim_popinitM_3);
-  SET_VECTOR_ELT(contents, 49, popinitM);
+  odin_set_dim(popinitM, 6, internal->dim_popinitM_1, internal->dim_popinitM_2, internal->dim_popinitM_3, internal->dim_popinitM_4, internal->dim_popinitM_5, internal->dim_popinitM_6);
+  SET_VECTOR_ELT(contents, 75, popinitM);
   SEXP r = PROTECT(allocVector(REALSXP, internal->dim_r));
   memcpy(REAL(r), internal->r, internal->dim_r * sizeof(double));
-  SET_VECTOR_ELT(contents, 50, r);
+  SET_VECTOR_ELT(contents, 76, r);
+  SEXP tbbottom = PROTECT(allocVector(REALSXP, internal->dim_tbbottom));
+  memcpy(REAL(tbbottom), internal->tbbottom, internal->dim_tbbottom * sizeof(double));
+  odin_set_dim(tbbottom, 3, internal->dim_tbbottom_1, internal->dim_tbbottom_2, internal->dim_tbbottom_3);
+  SET_VECTOR_ELT(contents, 77, tbbottom);
   SEXP ttp = PROTECT(allocVector(REALSXP, internal->dim_ttp));
   memcpy(REAL(ttp), internal->ttp, internal->dim_ttp * sizeof(double));
-  SET_VECTOR_ELT(contents, 51, ttp);
-  SEXP nms = PROTECT(allocVector(STRSXP, 52));
+  SET_VECTOR_ELT(contents, 78, ttp);
+  SEXP nms = PROTECT(allocVector(STRSXP, 79));
   SET_STRING_ELT(nms, 0, mkChar("BF"));
   SET_STRING_ELT(nms, 1, mkChar("birthrisk"));
   SET_STRING_ELT(nms, 2, mkChar("BM"));
@@ -338,73 +400,115 @@ SEXP ocaode_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 7, mkChar("dim_N_1"));
   SET_STRING_ELT(nms, 8, mkChar("dim_N_12"));
   SET_STRING_ELT(nms, 9, mkChar("dim_N_123"));
-  SET_STRING_ELT(nms, 10, mkChar("dim_N_2"));
-  SET_STRING_ELT(nms, 11, mkChar("dim_N_3"));
-  SET_STRING_ELT(nms, 12, mkChar("dim_N_4"));
-  SET_STRING_ELT(nms, 13, mkChar("dim_native"));
-  SET_STRING_ELT(nms, 14, mkChar("dim_omegaF"));
-  SET_STRING_ELT(nms, 15, mkChar("dim_omegaM"));
-  SET_STRING_ELT(nms, 16, mkChar("dim_popdatF"));
-  SET_STRING_ELT(nms, 17, mkChar("dim_popdatF_1"));
-  SET_STRING_ELT(nms, 18, mkChar("dim_popdatF_2"));
-  SET_STRING_ELT(nms, 19, mkChar("dim_popdatM"));
-  SET_STRING_ELT(nms, 20, mkChar("dim_popdatM_1"));
-  SET_STRING_ELT(nms, 21, mkChar("dim_popdatM_2"));
-  SET_STRING_ELT(nms, 22, mkChar("dim_popinitF"));
-  SET_STRING_ELT(nms, 23, mkChar("dim_popinitF_1"));
-  SET_STRING_ELT(nms, 24, mkChar("dim_popinitF_12"));
-  SET_STRING_ELT(nms, 25, mkChar("dim_popinitF_2"));
-  SET_STRING_ELT(nms, 26, mkChar("dim_popinitF_3"));
-  SET_STRING_ELT(nms, 27, mkChar("dim_popinitM"));
-  SET_STRING_ELT(nms, 28, mkChar("dim_popinitM_1"));
-  SET_STRING_ELT(nms, 29, mkChar("dim_popinitM_12"));
-  SET_STRING_ELT(nms, 30, mkChar("dim_popinitM_2"));
-  SET_STRING_ELT(nms, 31, mkChar("dim_popinitM_3"));
-  SET_STRING_ELT(nms, 32, mkChar("dim_r"));
-  SET_STRING_ELT(nms, 33, mkChar("dim_ttp"));
-  SET_STRING_ELT(nms, 34, mkChar("initial_N"));
-  SET_STRING_ELT(nms, 35, mkChar("interpolate_bzf"));
-  SET_STRING_ELT(nms, 36, mkChar("interpolate_bzm"));
-  SET_STRING_ELT(nms, 37, mkChar("interpolate_omegaF"));
-  SET_STRING_ELT(nms, 38, mkChar("interpolate_omegaM"));
-  SET_STRING_ELT(nms, 39, mkChar("lttp"));
-  SET_STRING_ELT(nms, 40, mkChar("nage"));
-  SET_STRING_ELT(nms, 41, mkChar("native"));
-  SET_STRING_ELT(nms, 42, mkChar("nnat"));
-  SET_STRING_ELT(nms, 43, mkChar("nrisk"));
-  SET_STRING_ELT(nms, 44, mkChar("omegaF"));
-  SET_STRING_ELT(nms, 45, mkChar("omegaM"));
-  SET_STRING_ELT(nms, 46, mkChar("popdatF"));
-  SET_STRING_ELT(nms, 47, mkChar("popdatM"));
-  SET_STRING_ELT(nms, 48, mkChar("popinitF"));
-  SET_STRING_ELT(nms, 49, mkChar("popinitM"));
-  SET_STRING_ELT(nms, 50, mkChar("r"));
-  SET_STRING_ELT(nms, 51, mkChar("ttp"));
+  SET_STRING_ELT(nms, 10, mkChar("dim_N_1234"));
+  SET_STRING_ELT(nms, 11, mkChar("dim_N_12345"));
+  SET_STRING_ELT(nms, 12, mkChar("dim_N_123456"));
+  SET_STRING_ELT(nms, 13, mkChar("dim_N_2"));
+  SET_STRING_ELT(nms, 14, mkChar("dim_N_3"));
+  SET_STRING_ELT(nms, 15, mkChar("dim_N_4"));
+  SET_STRING_ELT(nms, 16, mkChar("dim_N_5"));
+  SET_STRING_ELT(nms, 17, mkChar("dim_N_6"));
+  SET_STRING_ELT(nms, 18, mkChar("dim_N_7"));
+  SET_STRING_ELT(nms, 19, mkChar("dim_native"));
+  SET_STRING_ELT(nms, 20, mkChar("dim_omegaF"));
+  SET_STRING_ELT(nms, 21, mkChar("dim_omegaM"));
+  SET_STRING_ELT(nms, 22, mkChar("dim_popdatF"));
+  SET_STRING_ELT(nms, 23, mkChar("dim_popdatF_1"));
+  SET_STRING_ELT(nms, 24, mkChar("dim_popdatF_2"));
+  SET_STRING_ELT(nms, 25, mkChar("dim_popdatM"));
+  SET_STRING_ELT(nms, 26, mkChar("dim_popdatM_1"));
+  SET_STRING_ELT(nms, 27, mkChar("dim_popdatM_2"));
+  SET_STRING_ELT(nms, 28, mkChar("dim_popinitF"));
+  SET_STRING_ELT(nms, 29, mkChar("dim_popinitF_1"));
+  SET_STRING_ELT(nms, 30, mkChar("dim_popinitF_12"));
+  SET_STRING_ELT(nms, 31, mkChar("dim_popinitF_123"));
+  SET_STRING_ELT(nms, 32, mkChar("dim_popinitF_1234"));
+  SET_STRING_ELT(nms, 33, mkChar("dim_popinitF_12345"));
+  SET_STRING_ELT(nms, 34, mkChar("dim_popinitF_2"));
+  SET_STRING_ELT(nms, 35, mkChar("dim_popinitF_3"));
+  SET_STRING_ELT(nms, 36, mkChar("dim_popinitF_4"));
+  SET_STRING_ELT(nms, 37, mkChar("dim_popinitF_5"));
+  SET_STRING_ELT(nms, 38, mkChar("dim_popinitF_6"));
+  SET_STRING_ELT(nms, 39, mkChar("dim_popinitM"));
+  SET_STRING_ELT(nms, 40, mkChar("dim_popinitM_1"));
+  SET_STRING_ELT(nms, 41, mkChar("dim_popinitM_12"));
+  SET_STRING_ELT(nms, 42, mkChar("dim_popinitM_123"));
+  SET_STRING_ELT(nms, 43, mkChar("dim_popinitM_1234"));
+  SET_STRING_ELT(nms, 44, mkChar("dim_popinitM_12345"));
+  SET_STRING_ELT(nms, 45, mkChar("dim_popinitM_2"));
+  SET_STRING_ELT(nms, 46, mkChar("dim_popinitM_3"));
+  SET_STRING_ELT(nms, 47, mkChar("dim_popinitM_4"));
+  SET_STRING_ELT(nms, 48, mkChar("dim_popinitM_5"));
+  SET_STRING_ELT(nms, 49, mkChar("dim_popinitM_6"));
+  SET_STRING_ELT(nms, 50, mkChar("dim_r"));
+  SET_STRING_ELT(nms, 51, mkChar("dim_tbbottom"));
+  SET_STRING_ELT(nms, 52, mkChar("dim_tbbottom_1"));
+  SET_STRING_ELT(nms, 53, mkChar("dim_tbbottom_12"));
+  SET_STRING_ELT(nms, 54, mkChar("dim_tbbottom_2"));
+  SET_STRING_ELT(nms, 55, mkChar("dim_tbbottom_3"));
+  SET_STRING_ELT(nms, 56, mkChar("dim_ttp"));
+  SET_STRING_ELT(nms, 57, mkChar("initial_N"));
+  SET_STRING_ELT(nms, 58, mkChar("interpolate_bzf"));
+  SET_STRING_ELT(nms, 59, mkChar("interpolate_bzm"));
+  SET_STRING_ELT(nms, 60, mkChar("interpolate_omegaF"));
+  SET_STRING_ELT(nms, 61, mkChar("interpolate_omegaM"));
+  SET_STRING_ELT(nms, 62, mkChar("lttp"));
+  SET_STRING_ELT(nms, 63, mkChar("nage"));
+  SET_STRING_ELT(nms, 64, mkChar("native"));
+  SET_STRING_ELT(nms, 65, mkChar("nnat"));
+  SET_STRING_ELT(nms, 66, mkChar("npost"));
+  SET_STRING_ELT(nms, 67, mkChar("nprot"));
+  SET_STRING_ELT(nms, 68, mkChar("nrisk"));
+  SET_STRING_ELT(nms, 69, mkChar("nstrain"));
+  SET_STRING_ELT(nms, 70, mkChar("omegaF"));
+  SET_STRING_ELT(nms, 71, mkChar("omegaM"));
+  SET_STRING_ELT(nms, 72, mkChar("popdatF"));
+  SET_STRING_ELT(nms, 73, mkChar("popdatM"));
+  SET_STRING_ELT(nms, 74, mkChar("popinitF"));
+  SET_STRING_ELT(nms, 75, mkChar("popinitM"));
+  SET_STRING_ELT(nms, 76, mkChar("r"));
+  SET_STRING_ELT(nms, 77, mkChar("tbbottom"));
+  SET_STRING_ELT(nms, 78, mkChar("ttp"));
   setAttrib(contents, R_NamesSymbol, nms);
-  UNPROTECT(15);
+  UNPROTECT(16);
   return contents;
 }
 SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   ocaode_internal *internal = ocaode_get_internal(internal_p, 1);
   internal->nage = user_get_scalar_int(user, "nage", internal->nage, NA_REAL, NA_REAL);
   internal->nnat = user_get_scalar_int(user, "nnat", internal->nnat, NA_REAL, NA_REAL);
+  internal->npost = user_get_scalar_int(user, "npost", internal->npost, NA_REAL, NA_REAL);
+  internal->nprot = user_get_scalar_int(user, "nprot", internal->nprot, NA_REAL, NA_REAL);
   internal->nrisk = user_get_scalar_int(user, "nrisk", internal->nrisk, NA_REAL, NA_REAL);
+  internal->nstrain = user_get_scalar_int(user, "nstrain", internal->nstrain, NA_REAL, NA_REAL);
   internal->ttp = (double*) user_get_array_dim(user, false, internal->ttp, "ttp", 1, NA_REAL, NA_REAL, &internal->dim_ttp);
   internal->dim_birthrisk = internal->nrisk;
   internal->dim_N_1 = internal->nage;
   internal->dim_N_2 = 2;
   internal->dim_N_3 = internal->nnat;
   internal->dim_N_4 = internal->nrisk;
+  internal->dim_N_5 = internal->npost;
+  internal->dim_N_6 = internal->nstrain;
+  internal->dim_N_7 = internal->nprot;
   internal->dim_native = internal->nnat;
   internal->dim_omegaF = internal->nage;
   internal->dim_omegaM = internal->nage;
   internal->dim_popinitF_1 = internal->nage;
   internal->dim_popinitF_2 = internal->nnat;
   internal->dim_popinitF_3 = internal->nrisk;
+  internal->dim_popinitF_4 = internal->npost;
+  internal->dim_popinitF_5 = internal->nstrain;
+  internal->dim_popinitF_6 = internal->nprot;
   internal->dim_popinitM_1 = internal->nage;
   internal->dim_popinitM_2 = internal->nnat;
   internal->dim_popinitM_3 = internal->nrisk;
+  internal->dim_popinitM_4 = internal->npost;
+  internal->dim_popinitM_5 = internal->nstrain;
+  internal->dim_popinitM_6 = internal->nprot;
   internal->dim_r = internal->nage;
+  internal->dim_tbbottom_1 = internal->npost;
+  internal->dim_tbbottom_2 = internal->nstrain;
+  internal->dim_tbbottom_3 = internal->nprot;
   R_Free(internal->native);
   internal->native = (double*) R_Calloc(internal->dim_native, double);
   R_Free(internal->omegaF);
@@ -412,17 +516,30 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   R_Free(internal->omegaM);
   internal->omegaM = (double*) R_Calloc(internal->dim_omegaM, double);
   internal->birthrisk = (double*) user_get_array(user, false, internal->birthrisk, "birthrisk", NA_REAL, NA_REAL, 1, internal->dim_birthrisk);
-  internal->dim_N = internal->dim_N_1 * internal->dim_N_2 * internal->dim_N_3 * internal->dim_N_4;
+  internal->dim_N = internal->dim_N_1 * internal->dim_N_2 * internal->dim_N_3 * internal->dim_N_4 * internal->dim_N_5 * internal->dim_N_6 * internal->dim_N_7;
   internal->dim_N_12 = internal->dim_N_1 * internal->dim_N_2;
   internal->dim_N_123 = internal->dim_N_1 * internal->dim_N_2 * internal->dim_N_3;
-  internal->dim_popinitF = internal->dim_popinitF_1 * internal->dim_popinitF_2 * internal->dim_popinitF_3;
+  internal->dim_N_1234 = internal->dim_N_1 * internal->dim_N_2 * internal->dim_N_3 * internal->dim_N_4;
+  internal->dim_N_12345 = internal->dim_N_1 * internal->dim_N_2 * internal->dim_N_3 * internal->dim_N_4 * internal->dim_N_5;
+  internal->dim_N_123456 = internal->dim_N_1 * internal->dim_N_2 * internal->dim_N_3 * internal->dim_N_4 * internal->dim_N_5 * internal->dim_N_6;
+  internal->dim_popinitF = internal->dim_popinitF_1 * internal->dim_popinitF_2 * internal->dim_popinitF_3 * internal->dim_popinitF_4 * internal->dim_popinitF_5 * internal->dim_popinitF_6;
   internal->dim_popinitF_12 = internal->dim_popinitF_1 * internal->dim_popinitF_2;
-  internal->dim_popinitM = internal->dim_popinitM_1 * internal->dim_popinitM_2 * internal->dim_popinitM_3;
+  internal->dim_popinitF_123 = internal->dim_popinitF_1 * internal->dim_popinitF_2 * internal->dim_popinitF_3;
+  internal->dim_popinitF_1234 = internal->dim_popinitF_1 * internal->dim_popinitF_2 * internal->dim_popinitF_3 * internal->dim_popinitF_4;
+  internal->dim_popinitF_12345 = internal->dim_popinitF_1 * internal->dim_popinitF_2 * internal->dim_popinitF_3 * internal->dim_popinitF_4 * internal->dim_popinitF_5;
+  internal->dim_popinitM = internal->dim_popinitM_1 * internal->dim_popinitM_2 * internal->dim_popinitM_3 * internal->dim_popinitM_4 * internal->dim_popinitM_5 * internal->dim_popinitM_6;
   internal->dim_popinitM_12 = internal->dim_popinitM_1 * internal->dim_popinitM_2;
+  internal->dim_popinitM_123 = internal->dim_popinitM_1 * internal->dim_popinitM_2 * internal->dim_popinitM_3;
+  internal->dim_popinitM_1234 = internal->dim_popinitM_1 * internal->dim_popinitM_2 * internal->dim_popinitM_3 * internal->dim_popinitM_4;
+  internal->dim_popinitM_12345 = internal->dim_popinitM_1 * internal->dim_popinitM_2 * internal->dim_popinitM_3 * internal->dim_popinitM_4 * internal->dim_popinitM_5;
+  internal->dim_tbbottom = internal->dim_tbbottom_1 * internal->dim_tbbottom_2 * internal->dim_tbbottom_3;
+  internal->dim_tbbottom_12 = internal->dim_tbbottom_1 * internal->dim_tbbottom_2;
   internal->lttp = internal->dim_ttp;
   internal->r = (double*) user_get_array(user, false, internal->r, "r", NA_REAL, NA_REAL, 1, internal->dim_r);
   R_Free(internal->initial_N);
   internal->initial_N = (double*) R_Calloc(internal->dim_N, double);
+  R_Free(internal->tbbottom);
+  internal->tbbottom = (double*) R_Calloc(internal->dim_tbbottom, double);
   internal->dim_BF = internal->lttp;
   internal->dim_BM = internal->lttp;
   internal->dim_popdatF_1 = internal->lttp;
@@ -436,8 +553,8 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   for (int i = 2; i <= internal->nnat; ++i) {
     internal->native[i - 1] = 0;
   }
-  internal->popinitF = (double*) user_get_array(user, false, internal->popinitF, "popinitF", NA_REAL, NA_REAL, 3, internal->dim_popinitF_1, internal->dim_popinitF_2, internal->dim_popinitF_3);
-  internal->popinitM = (double*) user_get_array(user, false, internal->popinitM, "popinitM", NA_REAL, NA_REAL, 3, internal->dim_popinitM_1, internal->dim_popinitM_2, internal->dim_popinitM_3);
+  internal->popinitF = (double*) user_get_array(user, false, internal->popinitF, "popinitF", NA_REAL, NA_REAL, 6, internal->dim_popinitF_1, internal->dim_popinitF_2, internal->dim_popinitF_3, internal->dim_popinitF_4, internal->dim_popinitF_5, internal->dim_popinitF_6);
+  internal->popinitM = (double*) user_get_array(user, false, internal->popinitM, "popinitM", NA_REAL, NA_REAL, 6, internal->dim_popinitM_1, internal->dim_popinitM_2, internal->dim_popinitM_3, internal->dim_popinitM_4, internal->dim_popinitM_5, internal->dim_popinitM_6);
   internal->BF = (double*) user_get_array(user, false, internal->BF, "BF", NA_REAL, NA_REAL, 1, internal->dim_BF);
   internal->BM = (double*) user_get_array(user, false, internal->BM, "BM", NA_REAL, NA_REAL, 1, internal->dim_BM);
   internal->dim_popdatF = internal->dim_popdatF_1 * internal->dim_popdatF_2;
@@ -446,7 +563,13 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
     int j = 1;
     for (int k = 1; k <= internal->nnat; ++k) {
       for (int l = 1; l <= internal->nrisk; ++l) {
-        internal->initial_N[i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1)] = internal->popinitM[internal->dim_popinitM_12 * (l - 1) + internal->dim_popinitM_1 * (k - 1) + i - 1];
+        for (int i5 = 1; i5 <= internal->npost; ++i5) {
+          for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
+            for (int i7 = 1; i7 <= internal->nprot; ++i7) {
+              internal->initial_N[i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = internal->popinitM[internal->dim_popinitM_12345 * (i7 - 1) + internal->dim_popinitM_1234 * (i6 - 1) + internal->dim_popinitM_123 * (i5 - 1) + internal->dim_popinitM_12 * (l - 1) + internal->dim_popinitM_1 * (k - 1) + i - 1];
+            }
+          }
+        }
       }
     }
   }
@@ -454,9 +577,28 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
     int j = 2;
     for (int k = 1; k <= internal->nnat; ++k) {
       for (int l = 1; l <= internal->nrisk; ++l) {
-        internal->initial_N[i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1)] = internal->popinitF[internal->dim_popinitF_12 * (l - 1) + internal->dim_popinitF_1 * (k - 1) + i - 1];
+        for (int i5 = 1; i5 <= internal->npost; ++i5) {
+          for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
+            for (int i7 = 1; i7 <= internal->nprot; ++i7) {
+              internal->initial_N[i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = internal->popinitF[internal->dim_popinitF_12345 * (i7 - 1) + internal->dim_popinitF_1234 * (i6 - 1) + internal->dim_popinitF_123 * (i5 - 1) + internal->dim_popinitF_12 * (l - 1) + internal->dim_popinitF_1 * (k - 1) + i - 1];
+            }
+          }
+        }
       }
     }
+  }
+  for (int i = 1; i <= internal->npost; ++i) {
+    for (int j = 1; j <= internal->nstrain; ++j) {
+      for (int k = 1; k <= internal->nprot; ++k) {
+        internal->tbbottom[i - 1 + internal->dim_tbbottom_1 * (j - 1) + internal->dim_tbbottom_12 * (k - 1)] = 0;
+      }
+    }
+  }
+  {
+     int i = 1;
+     int j = 1;
+     int k = 1;
+     internal->tbbottom[i - 1 + internal->dim_tbbottom_1 * (j - 1) + internal->dim_tbbottom_12 * (k - 1)] = 1;
   }
   interpolate_check_y(internal->dim_ttp, internal->dim_BF, 0, "BF", "bzf");
   cinterpolate_free(internal->interpolate_bzf);
@@ -491,12 +633,15 @@ SEXP ocaode_metadata(SEXP internal_p) {
   SEXP variable_length = PROTECT(allocVector(VECSXP, 1));
   SEXP variable_names = PROTECT(allocVector(STRSXP, 1));
   setAttrib(variable_length, R_NamesSymbol, variable_names);
-  SET_VECTOR_ELT(variable_length, 0, allocVector(INTSXP, 4));
+  SET_VECTOR_ELT(variable_length, 0, allocVector(INTSXP, 7));
   int * dim_N = INTEGER(VECTOR_ELT(variable_length, 0));
   dim_N[0] = internal->dim_N_1;
   dim_N[1] = internal->dim_N_2;
   dim_N[2] = internal->dim_N_3;
   dim_N[3] = internal->dim_N_4;
+  dim_N[4] = internal->dim_N_5;
+  dim_N[5] = internal->dim_N_6;
+  dim_N[6] = internal->dim_N_7;
   SET_STRING_ELT(variable_names, 0, mkChar("N"));
   SET_VECTOR_ELT(ret, 0, variable_length);
   UNPROTECT(2);
@@ -535,7 +680,13 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
      int j = 1;
      for (int k = 1; k <= internal->nnat; ++k) {
        for (int l = 1; l <= internal->nrisk; ++l) {
-         dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1)] = bzm * internal->native[k - 1] * internal->birthrisk[l - 1] - internal->omegaM[0] * N[internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + 0];
+         for (int i5 = 1; i5 <= internal->npost; ++i5) {
+           for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
+             for (int i7 = 1; i7 <= internal->nprot; ++i7) {
+               dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = bzm * internal->native[k - 1] * internal->birthrisk[l - 1] * internal->tbbottom[internal->dim_tbbottom_12 * (i7 - 1) + internal->dim_tbbottom_1 * (i6 - 1) + i5 - 1] - internal->omegaM[0] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + 0];
+             }
+           }
+         }
        }
      }
   }
@@ -543,7 +694,13 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
     int j = 1;
     for (int k = 1; k <= internal->nnat; ++k) {
       for (int l = 1; l <= internal->nrisk; ++l) {
-        dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1)] = internal->r[i - 1 - 1] * N[internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + i - 1 - 1] - internal->omegaM[i - 1] * N[internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + i - 1];
+        for (int i5 = 1; i5 <= internal->npost; ++i5) {
+          for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
+            for (int i7 = 1; i7 <= internal->nprot; ++i7) {
+              dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = internal->r[i - 1 - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + i - 1 - 1] - internal->omegaM[i - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + i - 1];
+            }
+          }
+        }
       }
     }
   }
@@ -552,7 +709,13 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
      int j = 2;
      for (int k = 1; k <= internal->nnat; ++k) {
        for (int l = 1; l <= internal->nrisk; ++l) {
-         dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1)] = bzf * internal->native[k - 1] * internal->birthrisk[l - 1] - internal->omegaF[0] * N[internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + 0];
+         for (int i5 = 1; i5 <= internal->npost; ++i5) {
+           for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
+             for (int i7 = 1; i7 <= internal->nprot; ++i7) {
+               dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = bzf * internal->native[k - 1] * internal->birthrisk[l - 1] * internal->tbbottom[internal->dim_tbbottom_12 * (i7 - 1) + internal->dim_tbbottom_1 * (i6 - 1) + i5 - 1] - internal->omegaF[0] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + 0];
+             }
+           }
+         }
        }
      }
   }
@@ -560,7 +723,13 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
     int j = 2;
     for (int k = 1; k <= internal->nnat; ++k) {
       for (int l = 1; l <= internal->nrisk; ++l) {
-        dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1)] = internal->r[i - 1 - 1] * N[internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + i - 1 - 1] - internal->omegaF[i - 1] * N[internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + i - 1];
+        for (int i5 = 1; i5 <= internal->npost; ++i5) {
+          for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
+            for (int i7 = 1; i7 <= internal->nprot; ++i7) {
+              dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = internal->r[i - 1 - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + i - 1 - 1] - internal->omegaF[i - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + i - 1];
+            }
+          }
+        }
       }
     }
   }

@@ -9,6 +9,9 @@ create_demographic_parms(
   propinitnat = 1,
   propinitrisk = 1,
   birthrisk = 1,
+  propinitpost = 1,
+  propinitstrain = 1,
+  propinitprot = 1,
   verbose = FALSE
 )
 }
@@ -20,6 +23,12 @@ create_demographic_parms(
 \item{propinitrisk}{vector of length nrisk with initial proportions}
 
 \item{birthrisk}{where to births go in risk?}
+
+\item{propinitpost}{initial post-TB proportions}
+
+\item{propinitstrain}{initial TB strain proportions}
+
+\item{propinitprot}{initial TB protection proportions}
 
 \item{verbose}{give more feedback}
 }

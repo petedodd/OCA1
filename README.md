@@ -81,6 +81,22 @@ out
 
 plt_DemoGrowth(out)
 
+
+## go big version with all strata to some degree:
+pms <- create_demographic_parms(propinitnat = c(0.9,0.1),
+                                propinitrisk = c(0.9,0.1),
+                                propinitpost = c(0.9,0.1),
+                                propinitstrain = c(0.9,0.1),
+                                propinitprot = c(0.9,0.1),
+                                verbose=TRUE)
+                                
+## NOTE needs to work harder:
+out <- runmodel(pms)
+out
+
+plt_DemoGrowth(out) #still stable
+
+
 ```
 
 

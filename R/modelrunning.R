@@ -30,15 +30,19 @@ runmodel <- function(p, times, raw = FALSE) {
     ## ans[,variable:=NULL]
     ans <- data.table::melt(ans, id = "t")
     ans[, variable := gsub("\\[|\\]|N", "", variable)]
-    ans[, c("astring", "sexstring", "natstring","rskstring") :=
+    ans[, c("astring", "sexstring", "natstring","rskstring","poststring","strainstring","protstring") :=
             data.table::tstrsplit(variable, split = ",")]
-    ans[, c("AgeGrp", "sex", "natcat","risk") := .(
+    ans[, c("AgeGrp", "sex", "natcat","risk","post","strain","prot") := .(
             OCA1::agz[as.integer(astring)],
             c("M", "F")[as.integer(sexstring)],
             as.integer(natstring),
-            as.integer(rskstring)
+            as.integer(rskstring),
+            as.integer(poststring),
+            as.integer(strainstring),
+            as.integer(protstring)
           )]
-    ans[, c("astring", "sexstring", "natstring","rskstring","variable") := NULL]
+    ans[, c("astring", "sexstring", "natstring", "rskstring", "variable",
+            "poststring", "strainstring", "protstring") := NULL]
     ## as before
     ans$sex <- factor(ans$sex,levels=c("M","F"))
     ans$AgeGrp <- factor(ans$AgeGrp,levels=OCA1::agz)
