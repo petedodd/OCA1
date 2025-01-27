@@ -47,13 +47,68 @@ tbbottom[1,1,1] <- 1 #CHECK overwrite works : only 1 for tb indices = 1
 initial(N[1:nage,1,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- popinitM[i,k,l,i5,i6,i7]
 initial(N[1:nage,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- popinitF[i,k,l,i5,i6,i7]
 
-## == dynamics
+## == model dynamics
 ## male
-deriv(N[1,1,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- bzm * native[k] * birthrisk[l] * tbbottom[i5,i6,i7] - omegaM[1] * N[1,1,k,l,i5,i6,i7]
-deriv(N[2:nage,1,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- r[i-1] * N[i-1,1,k,l,i5,i6,i7] - omegaM[i] * N[i,1,k,l,i5,i6,i7]
+deriv(N[1,1,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- bzm * native[k] * birthrisk[l] * tbbottom[i5,i6,i7] - omegaM[1] * N[1,1,k,l,i5,i6,i7] + migrM[1,k,l,i5,i6,i7] + migrMagein[1,k,l,i5,i6,i7] - migrMageout[1,k,l,i5,i6,i7]
+deriv(N[2:nage,1,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- r[i-1] * N[i-1,1,k,l,i5,i6,i7] - omegaM[i] * N[i,1,k,l,i5,i6,i7] + migrM[i,k,l,i5,i6,i7] + migrMagein[i,k,l,i5,i6,i7] - migrMageout[i,k,l,i5,i6,i7]
 ## female
-deriv(N[1,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- bzf * native[k] * birthrisk[l] * tbbottom[i5,i6,i7] - omegaF[1] * N[1,2,k,l,i5,i6,i7]
-deriv(N[2:nage,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- r[i-1] * N[i-1,2,k,l,i5,i6,i7] - omegaF[i] * N[i,2,k,l,i5,i6,i7]
+deriv(N[1,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- bzf * native[k] * birthrisk[l] * tbbottom[i5,i6,i7] - omegaF[1] * N[1,2,k,l,i5,i6,i7] + migrF[1,k,l,i5,i6,i7] + migrFagein[1,k,l,i5,i6,i7] - migrFageout[1,k,l,i5,i6,i7]
+deriv(N[2:nage,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- r[i-1] * N[i-1,2,k,l,i5,i6,i7] - omegaF[i] * N[i,2,k,l,i5,i6,i7] + migrF[i,k,l,i5,i6,i7] + migrFagein[i,k,l,i5,i6,i7] - migrFageout[i,k,l,i5,i6,i7]
+
+
+## -- migration dynamics
+## outside of model need to correct omega -> omega + Ipc where Ipc is In migration per capita
+migrage[] <- user() #migration ageing rate
+InM[] <- interpolate(ttp,immigration_male,'linear')
+InF[] <- interpolate(ttp,immigration_female,'linear')
+## where to migrants flow into
+## M
+PmigrM_risk[] <- user()
+PmigrM_post[] <- user()
+PmigrM_strain[] <- user()
+PmigrM_prot[] <- user()
+immigration_male[,] <- user()
+## F
+PmigrF_risk[] <- user()
+PmigrF_post[] <- user()
+PmigrF_strain[] <- user()
+PmigrF_prot[] <- user()
+immigration_female[,] <- user()
+
+## where to migrants flow into
+Pmigr_nat[1:nnat] <- if(i==2) 1 else 0
+migrM[1:nage,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- InM[i] * Pmigr_nat[j] * PmigrM_risk[k] * PmigrM_post[l] * PmigrM_strain[i5] * PmigrM_prot[i6]
+migrF[1:nage,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- InF[i] * Pmigr_nat[j] * PmigrF_risk[k] * PmigrF_post[l] * PmigrF_strain[i5] * PmigrF_prot[i6]
+
+## migration ageing
+migrMagein[1:nage,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(j>2) N[i,1,j-1,k,l,i5,i6] * migrage[j-1] else 0
+migrMageout[1:nage,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(j>1 && j<nnat) N[i,1,j,k,l,i5,i6] * migrage[j] else 0
+migrFagein[1:nage,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(j>2) N[i,2,j-1,k,l,i5,i6] * migrage[j-1] else 0
+migrFageout[1:nage,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(j>1 && j<nnat) N[i,2,j,k,l,i5,i6] * migrage[j] else 0
+
+## dimensions for migration dynamics
+dim(migrage) <- nnat
+dim(Pmigr_nat) <- nnat
+## M
+dim(PmigrM_risk) <- nrisk
+dim(PmigrM_post) <- npost
+dim(PmigrM_strain) <- nstrain
+dim(PmigrM_prot) <- nprot
+dim(immigration_male) <- c(lttp,nage)
+dim(InM) <- nage
+dim(migrM) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
+dim(migrMagein) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
+dim(migrMageout) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
+## F
+dim(PmigrF_risk) <- nrisk
+dim(PmigrF_post) <- npost
+dim(PmigrF_strain) <- nstrain
+dim(PmigrF_prot) <- nprot
+dim(immigration_female) <- c(lttp,nage)
+dim(InF) <- nage
+dim(migrF) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
+dim(migrFagein) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
+dim(migrFageout) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
 
 ## == dims
 dim(ttp) <- user()                    #note need this before length() use

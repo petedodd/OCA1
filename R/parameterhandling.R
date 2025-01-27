@@ -46,6 +46,7 @@ create_demographic_baseparms <- function(tc = 1970:2020) {
 ##' @param propinitpost initial post-TB proportions
 ##' @param propinitstrain initial TB strain proportions
 ##' @param propinitprot initial TB protection proportions
+##' @param migrationdata list of migration data see details
 ##' @param verbose give more feedback
 ##' @return list of parameters to run odin model
 ##' @author Pete Dodd
@@ -58,6 +59,7 @@ create_demographic_parms <- function(tc = 1970:2020,
                                      propinitpost = 1,
                                      propinitstrain = 1,
                                      propinitprot = 1,
+                                     migrationdata,
                                      verbose=FALSE) {
   ## --- checks TODO write some functions to simplify these:
   if (abs(sum(propinitnat)-1)>1e-15) stop("sum(propinitnat) must be 1!")
@@ -120,7 +122,7 @@ create_demographic_parms <- function(tc = 1970:2020,
                     )
     )
 
-  if (verbose) cat("NOTE: this will use ", 2*prod(dim(popinitM)), " strata!\n")
+  if (verbose) cat("*** NOTE: this will use ", 2*prod(dim(popinitM)), " strata! ***\n")
   if (verbose) cat("The total number of ODEs will be (the number of strata) x (the number of TB states).\n")
 
   ## multiply nativity/risk by proportions (done like this to avoid nested loops)
@@ -145,6 +147,37 @@ create_demographic_parms <- function(tc = 1970:2020,
     popinitF[, , , , , i7] <- popinitF[, , , , , i7] * propinitprot[i7]
   }
 
+  ## migration data
+  if(missing(migrationdata)){
+    if (verbose & nnat>1) cat("Multiple nativity classes, but no migration dynamics data supplied: using static defaults.\n")
+    migrage <- rep(0,nnat) #rates of moving between categories
+    ## plumbing for where new migrants go in strata:
+    ## M & F
+    PmigrF_risk <- PmigrM_risk <- rep(0, nrisk)
+    PmigrF_post <- PmigrM_post <- rep(0, npost)
+    PmigrF_strain <- PmigrM_strain <- rep(0, nstrain)
+    PmigrF_prot <- PmigrM_prot <- rep(0, nprot)
+    ## default to bottom:
+    PmigrF_risk[1] <- PmigrM_risk[1] <- 1
+    PmigrF_post[1] <- PmigrM_post[1] <- 1
+    PmigrF_strain[1] <- PmigrM_strain[1] <- 1
+    PmigrF_prot[1] <- PmigrM_prot[1] <- 1
+    ## migration flow
+    immigration_female <- immigration_male <- matrix(0, nrow = length(tc), ncol = length(OCA1::agz))
+  } else {
+    ## TODO checks
+    ## relevant data in migrationdata list
+    ## dims all consistent
+    ## probabilities all valid
+    ## migration data >=0
+    list2env(migrationdata, envir = environment())
+
+    ## correct omegaF and omegaM:
+    ## TODO create IpcM[age] = IM[age] / N[M,age] & for F
+    ## omegaM -> omegaM + IpcM & for F
+
+  }
+
   ## make parameter object
   list(
     nage = nage,
@@ -160,7 +193,19 @@ create_demographic_parms <- function(tc = 1970:2020,
     popdatM = omegaM,
     BF = bzf, BM = bzm,
     popinitM = popinitM,
-    popinitF = popinitF
+    popinitF = popinitF,
+    ## migration data:
+    migrage = migrage,
+    PmigrF_risk = PmigrF_risk,
+    PmigrM_risk = PmigrM_risk,
+    PmigrF_post = PmigrF_post,
+    PmigrM_post = PmigrM_post,
+    PmigrF_strain = PmigrF_strain,
+    PmigrM_strain = PmigrM_strain,
+    PmigrF_prot = PmigrF_prot,
+    PmigrM_prot = PmigrM_prot,
+    immigration_female = immigration_female,
+    immigration_male = immigration_male
   )
 }
 
