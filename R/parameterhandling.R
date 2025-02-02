@@ -1,6 +1,9 @@
 ## internal package function aimed at simplifying additional layers of parameter customization
 create_demographic_baseparms <- function(tc = 1970:2020) {
   r <- OCA1::UKdemo$r
+  
+  if(min(tc) < min(OCA1::UKdemo$omega$Year) | max(tc) > max(OCA1::UKdemo$omega$Year)) stop("Range of tc must between 1950 and 2100")
+  
   ## men
   omegaL <- OCA1::UKdemo$omega[Year %in% tc, .(Year, AgeGrp, omegaM)]
   omegaW <- data.table::dcast(omegaL, Year ~ AgeGrp, value.var = "omegaM")
@@ -34,6 +37,29 @@ create_demographic_baseparms <- function(tc = 1970:2020) {
 
 
 
+check_probabilities <- function(params) {
+
+  # 1. Check for numeric type:
+  if (!all(is.numeric(params))) {
+    message("All parameters must be numeric.")
+    return(FALSE)
+  }
+  
+  # 2. Check for values between 0 and 1 (inclusive):
+  if (!all(params >= 0 & params <= 1)) {
+    message("All parameters must be probabilities between 0 and 1.")
+    return(FALSE)
+  }
+  
+  # 3. Check if the sum is (approximately) equal to 1 (important for discrete distributions):
+  if (abs(sum(params) - 1) > .Machine$double.eps^0.5) { # Using tolerance for floating point comparison
+    message("The sum of parameters must be approximately equal to 1.")
+    return(FALSE)
+  }
+  
+  return(TRUE) # Return TRUE if all checks pass (implicitly returns NULL if stop is called)
+}
+
 
 ##' .. content for \description{} (no empty lines) ..TODO
 ##'
@@ -61,21 +87,23 @@ create_demographic_parms <- function(tc = 1970:2020,
                                      propinitprot = 1,
                                      migrationdata,
                                      verbose=FALSE) {
-  ## --- checks TODO write some functions to simplify these:
-  if (abs(sum(propinitnat)-1)>1e-15) stop("sum(propinitnat) must be 1!")
-  if (any(propinitnat < 0) | any(propinitnat > 1)) stop("propinitnat elements must be valid probabilities!")
-  if (abs(sum(propinitrisk) - 1) > 1e-15) stop("sum(propinitrisk) must be 1!")
-  if (any(propinitrisk < 0) | any(propinitrisk > 1)) stop("propinitrisk elements must be valid probabilities!")
-  if (abs(sum(propinitpost) - 1) > 1e-15) stop("sum(propinitpost) must be 1!")
-  if (any(propinitpost < 0) | any(propinitpost > 1)) stop("propinitpost elements must be valid probabilities!")
-  if (abs(sum(propinitstrain) - 1) > 1e-15) stop("sum(propinitstrain) must be 1!")
-  if (any(propinitstrain < 0) | any(propinitstrain > 1)) stop("propinitstrain elements must be valid probabilities!")
-  if (abs(sum(propinitprot) - 1) > 1e-15) stop("sum(propinitprot) must be 1!")
-  if (any(propinitprot < 0) | any(propinitprot > 1)) stop("propinitprot elements must be valid probabilities!")
-  if (abs(sum(birthrisk) - 1) > 1e-15) stop("sum(birthrisk) must be 1!")
-  if (any(birthrisk < 0) | any(birthrisk > 1)) stop("birthrisk elements must be valid probabilities!")
+  param_list <- list("propinitnat"=propinitnat,
+                     "propinitnat"=propinitrisk,
+                     "birthrisk"=birthrisk,
+                     "propinitpost"=propinitpost,
+                     "propinitstrain"=propinitstrain,
+                     "propinitprot"=propinitprot)
+    
+  checks <- sapply(param_list,check_probabilities)
+
+  if(all(checks)){
+    if(verbose) message("All parameters containing probabilities were correct\n")
+  }  else {
+    message("Parameters with problems:", paste(names(param_list)[!checks]))
+  }
+  
   if(length(birthrisk)!=length(propinitrisk)){
-    cat("Creating a birthrisk with the same length as propinitisk!\n")
+    message("Creating a birthrisk with the same length as propinitisk!\n")
     birthrisk <- rep(0, length(propinitrisk))
     birthrisk[1] <- 1
   }
@@ -87,16 +115,16 @@ create_demographic_parms <- function(tc = 1970:2020,
   ## now promote the initial states to arrays:
   nnat <- length(propinitnat) #number of nativity classes
   nrisk <- length(propinitrisk) # number of nativity classes
-  if (verbose) cat("Using ", nnat, " nativity classes...\n")
-  if (verbose) cat("Using ", nrisk, " risk classes...\n")
+  if (verbose) message("Using ", nnat, " nativity classes...\n")
+  if (verbose) message("Using ", nrisk, " risk classes...\n")
 
   ## TB
   npost <- length(propinitpost) #number of post TB
   nstrain <- length(propinitstrain) #number of TB strains
   nprot <- length(propinitprot)     #number of TB protection strata
-  if (verbose) cat("Using ", npost, " post-TB classes (1=none)...\n")
-  if (verbose) cat("Using ", nstrain, " TB strains...\n")
-  if (verbose) cat("Using ", nprot, " TB protection classes (1=none)...\n")
+  if (verbose) message("Using ", npost, " post-TB classes (1=none)...\n")
+  if (verbose) message("Using ", nstrain, " TB strains...\n")
+  if (verbose) message("Using ", nprot, " TB protection classes (1=none)...\n")
 
   ## promote to array
   popinitF <- array(popinitF,
@@ -122,8 +150,8 @@ create_demographic_parms <- function(tc = 1970:2020,
                     )
     )
 
-  if (verbose) cat("*** NOTE: this will use ", 2*prod(dim(popinitM)), " strata! ***\n")
-  if (verbose) cat("The total number of ODEs will be (the number of strata) x (the number of TB states).\n")
+  if (verbose) message("*** NOTE: this will use ", 2*prod(dim(popinitM)), " strata! ***\n")
+  if (verbose) message("The total number of ODEs will be (the number of strata) x (the number of TB states).\n")
 
   ## multiply nativity/risk by proportions (done like this to avoid nested loops)
   for (k in 1:nnat) {
@@ -149,7 +177,7 @@ create_demographic_parms <- function(tc = 1970:2020,
 
   ## migration data
   if(missing(migrationdata)){
-    if (verbose & nnat>1) cat("Multiple nativity classes, but no migration dynamics data supplied: using static defaults.\n")
+    if (verbose & nnat>1) message("Multiple nativity classes, but no migration dynamics data supplied: using static defaults.\n")
     migrage <- rep(0,nnat) #rates of moving between categories
     ## plumbing for where new migrants go in strata:
     ## M & F
