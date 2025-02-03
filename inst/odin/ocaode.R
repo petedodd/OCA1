@@ -12,7 +12,7 @@
 ##  (i8 = spare)
 ## optional => needs to work with dim = 1 so can be turned off
 
-## == inputs & interpolation
+## == inputs & interpolation for demography
 nage <- user()                            #number age cats
 nnat <- user()                            #number of nativity cats
 nrisk <- user()                           #number of risk cats
@@ -32,10 +32,10 @@ BF[] <- user()
 BM[] <- user()
 ttp[] <- user()
 ## interpolation
-omegaF[] <- interpolate(ttp,popdatF,'linear')
-omegaM[] <- interpolate(ttp,popdatM,'linear')
-bzf <- interpolate(ttp,BF,'linear')
-bzm <- interpolate(ttp,BM,'linear')
+omegaF[] <- interpolate(ttp,popdatF,"linear")
+omegaM[] <- interpolate(ttp,popdatM,"linear")
+bzf <- interpolate(ttp,BF,"linear")
+bzm <- interpolate(ttp,BM,"linear")
 ## useful masks:
 native[1] <- 1
 native[2:nnat] <- 0
@@ -50,17 +50,38 @@ initial(N[1:nage,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- popinitF[i,k,l,
 ## == model dynamics
 ## male
 deriv(N[1,1,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- bzm * native[k] * birthrisk[l] * tbbottom[i5,i6,i7] - omegaM[1] * N[1,1,k,l,i5,i6,i7] + migrM[1,k,l,i5,i6,i7] + migrMagein[1,k,l,i5,i6,i7] - migrMageout[1,k,l,i5,i6,i7]
-deriv(N[2:nage,1,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- r[i-1] * N[i-1,1,k,l,i5,i6,i7] - omegaM[i] * N[i,1,k,l,i5,i6,i7] + migrM[i,k,l,i5,i6,i7] + migrMagein[i,k,l,i5,i6,i7] - migrMageout[i,k,l,i5,i6,i7]
+deriv(N[2:nage,1,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- r[i-1] * N[i-1,1,k,l,i5,i6,i7] - omegaM[i] * N[i,1,k,l,i5,i6,i7] + migrM[i,k,l,i5,i6,i7] + migrMagein[i,k,l,i5,i6,i7] - migrMageout[i,k,l,i5,i6,i7] + RiskChange[i,1,k,l,i5,i6,i7]
 ## female
 deriv(N[1,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- bzf * native[k] * birthrisk[l] * tbbottom[i5,i6,i7] - omegaF[1] * N[1,2,k,l,i5,i6,i7] + migrF[1,k,l,i5,i6,i7] + migrFagein[1,k,l,i5,i6,i7] - migrFageout[1,k,l,i5,i6,i7]
-deriv(N[2:nage,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- r[i-1] * N[i-1,2,k,l,i5,i6,i7] - omegaF[i] * N[i,2,k,l,i5,i6,i7] + migrF[i,k,l,i5,i6,i7] + migrFagein[i,k,l,i5,i6,i7] - migrFageout[i,k,l,i5,i6,i7]
+deriv(N[2:nage,2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- r[i-1] * N[i-1,2,k,l,i5,i6,i7] - omegaF[i] * N[i,2,k,l,i5,i6,i7] + migrF[i,k,l,i5,i6,i7] + migrFagein[i,k,l,i5,i6,i7] - migrFageout[i,k,l,i5,i6,i7] + RiskChange[i,2,k,l,i5,i6,i7]
 
+
+## == dims for demography
+dim(ttp) <- user()                    #note need this before length() use
+lttp <- length(ttp)
+dim(popdatF) <- c(lttp,nage)
+dim(popdatM) <- c(lttp,nage)
+dim(popinitF) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
+dim(popinitM) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
+dim(BF) <- lttp
+dim(BM) <- lttp
+dim(omegaF) <- nage
+dim(omegaM) <- nage
+## dim(firstage) <- nage
+dim(native) <- nnat
+## dim(lorisk) <- nrisk
+dim(birthrisk) <- nrisk
+dim(N) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(r) <- nage
+dim(tbbottom) <- c(npost,nstrain,nprot)
+
+## == specific additional aspects:
 
 ## -- migration dynamics
 ## outside of model need to correct omega -> omega + Ipc where Ipc is In migration per capita
 migrage[] <- user() #migration ageing rate
-InM[] <- interpolate(ttp,immigration_male,'linear')
-InF[] <- interpolate(ttp,immigration_female,'linear')
+InM[] <- interpolate(ttp,immigration_male,"linear")
+InF[] <- interpolate(ttp,immigration_female,"linear")
 ## where to migrants flow into
 ## M
 PmigrM_risk[] <- user()
@@ -110,21 +131,11 @@ dim(migrF) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
 dim(migrFagein) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
 dim(migrFageout) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
 
-## == dims
-dim(ttp) <- user()                    #note need this before length() use
-lttp <- length(ttp)
-dim(popdatF) <- c(lttp,nage)
-dim(popdatM) <- c(lttp,nage)
-dim(popinitF) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
-dim(popinitM) <- c(nage,nnat,nrisk,npost,nstrain,nprot)
-dim(BF) <- lttp
-dim(BM) <- lttp
-dim(omegaF) <- nage
-dim(omegaM) <- nage
-## dim(firstage) <- nage
-dim(native) <- nnat
-## dim(lorisk) <- nrisk
-dim(birthrisk) <- nrisk
-dim(N) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
-dim(r) <- nage
-dim(tbbottom) <- c(npost,nstrain,nprot)
+## -- risk strata dynamics
+RiskHazardData[,,,] <- user()
+RiskHazard[,,] <- interpolate(ttp,RiskHazardData,"linear")
+RiskChange[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(l>1) RiskHazard[i,j,l-1] * N[i,j,k,l-1,i5,i6,i7]-RiskHazard[i,j,l] * N[i,j,k,l,i5,i6,i7] else -RiskHazard[i,j,l] * N[i,j,k,l,i5,i6,i7]
+dim(RiskHazardData) <- c(lttp,nage,2,nrisk)
+dim(RiskHazard) <-  c(nage,2,nrisk)
+dim(RiskChange) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+

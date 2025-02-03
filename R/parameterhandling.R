@@ -47,6 +47,7 @@ create_demographic_baseparms <- function(tc = 1970:2020) {
 ##' @param propinitstrain initial TB strain proportions
 ##' @param propinitprot initial TB protection proportions
 ##' @param migrationdata list of migration data see details
+##' @param riskdata list of risk data see details
 ##' @param verbose give more feedback
 ##' @return list of parameters to run odin model
 ##' @author Pete Dodd
@@ -60,6 +61,7 @@ create_demographic_parms <- function(tc = 1970:2020,
                                      propinitstrain = 1,
                                      propinitprot = 1,
                                      migrationdata,
+                                     riskdata,
                                      verbose=FALSE) {
   ## --- checks TODO write some functions to simplify these:
   if (abs(sum(propinitnat)-1)>1e-15) stop("sum(propinitnat) must be 1!")
@@ -178,6 +180,23 @@ create_demographic_parms <- function(tc = 1970:2020,
 
   }
 
+  if (missing(riskdata)) {
+    if (verbose & nrisk > 1) cat("Multiple risk classes, but no dynamics data supplied: using static defaults.\n")
+    ## zeros all the way:
+    RiskHazardData <- array(0,
+      dim = c(length(ttp), length(OCA1::agz), 2, nrisk),
+      dimnames = list(
+        tindex = 1:length(ttp),
+        acat = OCA1::agz,
+        sex = c("M", "F"),
+        risk = 1:nrisk
+      )
+    )
+
+  } else {
+    ## TODO checks
+  }
+
   ## make parameter object
   list(
     nage = nage,
@@ -205,7 +224,9 @@ create_demographic_parms <- function(tc = 1970:2020,
     PmigrF_prot = PmigrF_prot,
     PmigrM_prot = PmigrM_prot,
     immigration_female = immigration_female,
-    immigration_male = immigration_male
+    immigration_male = immigration_male,
+    ## risk dynamics
+    RiskHazardData = RiskHazardData
   )
 }
 

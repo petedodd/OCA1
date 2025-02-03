@@ -208,6 +208,31 @@ typedef struct ocaode_internal {
   int dim_popinitM_5;
   int dim_popinitM_6;
   int dim_r;
+  int dim_RiskChange;
+  int dim_RiskChange_1;
+  int dim_RiskChange_12;
+  int dim_RiskChange_123;
+  int dim_RiskChange_1234;
+  int dim_RiskChange_12345;
+  int dim_RiskChange_123456;
+  int dim_RiskChange_2;
+  int dim_RiskChange_3;
+  int dim_RiskChange_4;
+  int dim_RiskChange_5;
+  int dim_RiskChange_6;
+  int dim_RiskChange_7;
+  int dim_RiskHazard;
+  int dim_RiskHazard_1;
+  int dim_RiskHazard_12;
+  int dim_RiskHazard_2;
+  int dim_RiskHazard_3;
+  int dim_RiskHazardData;
+  int dim_RiskHazardData_1;
+  int dim_RiskHazardData_12;
+  int dim_RiskHazardData_123;
+  int dim_RiskHazardData_2;
+  int dim_RiskHazardData_3;
+  int dim_RiskHazardData_4;
   int dim_tbbottom;
   int dim_tbbottom_1;
   int dim_tbbottom_12;
@@ -225,6 +250,7 @@ typedef struct ocaode_internal {
   void *interpolate_InM;
   void *interpolate_omegaF;
   void *interpolate_omegaM;
+  void *interpolate_RiskHazard;
   int lttp;
   double *migrage;
   double *migrF;
@@ -256,6 +282,9 @@ typedef struct ocaode_internal {
   double *popinitF;
   double *popinitM;
   double *r;
+  double *RiskChange;
+  double *RiskHazard;
+  double *RiskHazardData;
   double *tbbottom;
   double *ttp;
 } ocaode_internal;
@@ -316,12 +345,14 @@ void ocaode_finalise(SEXP internal_p) {
     cinterpolate_free(internal->interpolate_InM);
     cinterpolate_free(internal->interpolate_omegaF);
     cinterpolate_free(internal->interpolate_omegaM);
+    cinterpolate_free(internal->interpolate_RiskHazard);
     internal->interpolate_bzf = NULL;
     internal->interpolate_bzm = NULL;
     internal->interpolate_InF = NULL;
     internal->interpolate_InM = NULL;
     internal->interpolate_omegaF = NULL;
     internal->interpolate_omegaM = NULL;
+    internal->interpolate_RiskHazard = NULL;
     R_Free(internal->BF);
     R_Free(internal->birthrisk);
     R_Free(internal->BM);
@@ -354,6 +385,9 @@ void ocaode_finalise(SEXP internal_p) {
     R_Free(internal->popinitF);
     R_Free(internal->popinitM);
     R_Free(internal->r);
+    R_Free(internal->RiskChange);
+    R_Free(internal->RiskHazard);
+    R_Free(internal->RiskHazardData);
     R_Free(internal->tbbottom);
     R_Free(internal->ttp);
     R_Free(internal);
@@ -374,6 +408,7 @@ SEXP ocaode_create(SEXP user) {
   internal->interpolate_InM = NULL;
   internal->interpolate_omegaF = NULL;
   internal->interpolate_omegaM = NULL;
+  internal->interpolate_RiskHazard = NULL;
   internal->migrage = NULL;
   internal->migrF = NULL;
   internal->migrFagein = NULL;
@@ -398,6 +433,9 @@ SEXP ocaode_create(SEXP user) {
   internal->popinitF = NULL;
   internal->popinitM = NULL;
   internal->r = NULL;
+  internal->RiskChange = NULL;
+  internal->RiskHazard = NULL;
+  internal->RiskHazardData = NULL;
   internal->tbbottom = NULL;
   internal->ttp = NULL;
   internal->BF = NULL;
@@ -425,6 +463,7 @@ SEXP ocaode_create(SEXP user) {
   internal->popinitF = NULL;
   internal->popinitM = NULL;
   internal->r = NULL;
+  internal->RiskHazardData = NULL;
   internal->ttp = NULL;
   SEXP ptr = PROTECT(R_MakeExternalPtr(internal, R_NilValue, R_NilValue));
   R_RegisterCFinalizer(ptr, ocaode_finalise);
@@ -442,7 +481,7 @@ void ocaode_initmod_desolve(void(* odeparms) (int *, double *)) {
 }
 SEXP ocaode_contents(SEXP internal_p) {
   ocaode_internal *internal = ocaode_get_internal(internal_p, 1);
-  SEXP contents = PROTECT(allocVector(VECSXP, 185));
+  SEXP contents = PROTECT(allocVector(VECSXP, 214));
   SEXP BF = PROTECT(allocVector(REALSXP, internal->dim_BF));
   memcpy(REAL(BF), internal->BF, internal->dim_BF * sizeof(double));
   SET_VECTOR_ELT(contents, 0, BF);
@@ -584,127 +623,164 @@ SEXP ocaode_contents(SEXP internal_p) {
   SET_VECTOR_ELT(contents, 132, ScalarInteger(internal->dim_popinitM_5));
   SET_VECTOR_ELT(contents, 133, ScalarInteger(internal->dim_popinitM_6));
   SET_VECTOR_ELT(contents, 134, ScalarInteger(internal->dim_r));
-  SET_VECTOR_ELT(contents, 135, ScalarInteger(internal->dim_tbbottom));
-  SET_VECTOR_ELT(contents, 136, ScalarInteger(internal->dim_tbbottom_1));
-  SET_VECTOR_ELT(contents, 137, ScalarInteger(internal->dim_tbbottom_12));
-  SET_VECTOR_ELT(contents, 138, ScalarInteger(internal->dim_tbbottom_2));
-  SET_VECTOR_ELT(contents, 139, ScalarInteger(internal->dim_tbbottom_3));
-  SET_VECTOR_ELT(contents, 140, ScalarInteger(internal->dim_ttp));
+  SET_VECTOR_ELT(contents, 135, ScalarInteger(internal->dim_RiskChange));
+  SET_VECTOR_ELT(contents, 136, ScalarInteger(internal->dim_RiskChange_1));
+  SET_VECTOR_ELT(contents, 137, ScalarInteger(internal->dim_RiskChange_12));
+  SET_VECTOR_ELT(contents, 138, ScalarInteger(internal->dim_RiskChange_123));
+  SET_VECTOR_ELT(contents, 139, ScalarInteger(internal->dim_RiskChange_1234));
+  SET_VECTOR_ELT(contents, 140, ScalarInteger(internal->dim_RiskChange_12345));
+  SET_VECTOR_ELT(contents, 141, ScalarInteger(internal->dim_RiskChange_123456));
+  SET_VECTOR_ELT(contents, 142, ScalarInteger(internal->dim_RiskChange_2));
+  SET_VECTOR_ELT(contents, 143, ScalarInteger(internal->dim_RiskChange_3));
+  SET_VECTOR_ELT(contents, 144, ScalarInteger(internal->dim_RiskChange_4));
+  SET_VECTOR_ELT(contents, 145, ScalarInteger(internal->dim_RiskChange_5));
+  SET_VECTOR_ELT(contents, 146, ScalarInteger(internal->dim_RiskChange_6));
+  SET_VECTOR_ELT(contents, 147, ScalarInteger(internal->dim_RiskChange_7));
+  SET_VECTOR_ELT(contents, 148, ScalarInteger(internal->dim_RiskHazard));
+  SET_VECTOR_ELT(contents, 149, ScalarInteger(internal->dim_RiskHazard_1));
+  SET_VECTOR_ELT(contents, 150, ScalarInteger(internal->dim_RiskHazard_12));
+  SET_VECTOR_ELT(contents, 151, ScalarInteger(internal->dim_RiskHazard_2));
+  SET_VECTOR_ELT(contents, 152, ScalarInteger(internal->dim_RiskHazard_3));
+  SET_VECTOR_ELT(contents, 153, ScalarInteger(internal->dim_RiskHazardData));
+  SET_VECTOR_ELT(contents, 154, ScalarInteger(internal->dim_RiskHazardData_1));
+  SET_VECTOR_ELT(contents, 155, ScalarInteger(internal->dim_RiskHazardData_12));
+  SET_VECTOR_ELT(contents, 156, ScalarInteger(internal->dim_RiskHazardData_123));
+  SET_VECTOR_ELT(contents, 157, ScalarInteger(internal->dim_RiskHazardData_2));
+  SET_VECTOR_ELT(contents, 158, ScalarInteger(internal->dim_RiskHazardData_3));
+  SET_VECTOR_ELT(contents, 159, ScalarInteger(internal->dim_RiskHazardData_4));
+  SET_VECTOR_ELT(contents, 160, ScalarInteger(internal->dim_tbbottom));
+  SET_VECTOR_ELT(contents, 161, ScalarInteger(internal->dim_tbbottom_1));
+  SET_VECTOR_ELT(contents, 162, ScalarInteger(internal->dim_tbbottom_12));
+  SET_VECTOR_ELT(contents, 163, ScalarInteger(internal->dim_tbbottom_2));
+  SET_VECTOR_ELT(contents, 164, ScalarInteger(internal->dim_tbbottom_3));
+  SET_VECTOR_ELT(contents, 165, ScalarInteger(internal->dim_ttp));
   SEXP immigration_female = PROTECT(allocVector(REALSXP, internal->dim_immigration_female));
   memcpy(REAL(immigration_female), internal->immigration_female, internal->dim_immigration_female * sizeof(double));
   odin_set_dim(immigration_female, 2, internal->dim_immigration_female_1, internal->dim_immigration_female_2);
-  SET_VECTOR_ELT(contents, 141, immigration_female);
+  SET_VECTOR_ELT(contents, 166, immigration_female);
   SEXP immigration_male = PROTECT(allocVector(REALSXP, internal->dim_immigration_male));
   memcpy(REAL(immigration_male), internal->immigration_male, internal->dim_immigration_male * sizeof(double));
   odin_set_dim(immigration_male, 2, internal->dim_immigration_male_1, internal->dim_immigration_male_2);
-  SET_VECTOR_ELT(contents, 142, immigration_male);
+  SET_VECTOR_ELT(contents, 167, immigration_male);
   SEXP InF = PROTECT(allocVector(REALSXP, internal->dim_InF));
   memcpy(REAL(InF), internal->InF, internal->dim_InF * sizeof(double));
-  SET_VECTOR_ELT(contents, 143, InF);
+  SET_VECTOR_ELT(contents, 168, InF);
   SEXP initial_N = PROTECT(allocVector(REALSXP, internal->dim_N));
   memcpy(REAL(initial_N), internal->initial_N, internal->dim_N * sizeof(double));
   odin_set_dim(initial_N, 7, internal->dim_N_1, internal->dim_N_2, internal->dim_N_3, internal->dim_N_4, internal->dim_N_5, internal->dim_N_6, internal->dim_N_7);
-  SET_VECTOR_ELT(contents, 144, initial_N);
+  SET_VECTOR_ELT(contents, 169, initial_N);
   SEXP InM = PROTECT(allocVector(REALSXP, internal->dim_InM));
   memcpy(REAL(InM), internal->InM, internal->dim_InM * sizeof(double));
-  SET_VECTOR_ELT(contents, 145, InM);
-  SET_VECTOR_ELT(contents, 152, ScalarInteger(internal->lttp));
+  SET_VECTOR_ELT(contents, 170, InM);
+  SET_VECTOR_ELT(contents, 178, ScalarInteger(internal->lttp));
   SEXP migrage = PROTECT(allocVector(REALSXP, internal->dim_migrage));
   memcpy(REAL(migrage), internal->migrage, internal->dim_migrage * sizeof(double));
-  SET_VECTOR_ELT(contents, 153, migrage);
+  SET_VECTOR_ELT(contents, 179, migrage);
   SEXP migrF = PROTECT(allocVector(REALSXP, internal->dim_migrF));
   memcpy(REAL(migrF), internal->migrF, internal->dim_migrF * sizeof(double));
   odin_set_dim(migrF, 6, internal->dim_migrF_1, internal->dim_migrF_2, internal->dim_migrF_3, internal->dim_migrF_4, internal->dim_migrF_5, internal->dim_migrF_6);
-  SET_VECTOR_ELT(contents, 154, migrF);
+  SET_VECTOR_ELT(contents, 180, migrF);
   SEXP migrFagein = PROTECT(allocVector(REALSXP, internal->dim_migrFagein));
   memcpy(REAL(migrFagein), internal->migrFagein, internal->dim_migrFagein * sizeof(double));
   odin_set_dim(migrFagein, 6, internal->dim_migrFagein_1, internal->dim_migrFagein_2, internal->dim_migrFagein_3, internal->dim_migrFagein_4, internal->dim_migrFagein_5, internal->dim_migrFagein_6);
-  SET_VECTOR_ELT(contents, 155, migrFagein);
+  SET_VECTOR_ELT(contents, 181, migrFagein);
   SEXP migrFageout = PROTECT(allocVector(REALSXP, internal->dim_migrFageout));
   memcpy(REAL(migrFageout), internal->migrFageout, internal->dim_migrFageout * sizeof(double));
   odin_set_dim(migrFageout, 6, internal->dim_migrFageout_1, internal->dim_migrFageout_2, internal->dim_migrFageout_3, internal->dim_migrFageout_4, internal->dim_migrFageout_5, internal->dim_migrFageout_6);
-  SET_VECTOR_ELT(contents, 156, migrFageout);
+  SET_VECTOR_ELT(contents, 182, migrFageout);
   SEXP migrM = PROTECT(allocVector(REALSXP, internal->dim_migrM));
   memcpy(REAL(migrM), internal->migrM, internal->dim_migrM * sizeof(double));
   odin_set_dim(migrM, 6, internal->dim_migrM_1, internal->dim_migrM_2, internal->dim_migrM_3, internal->dim_migrM_4, internal->dim_migrM_5, internal->dim_migrM_6);
-  SET_VECTOR_ELT(contents, 157, migrM);
+  SET_VECTOR_ELT(contents, 183, migrM);
   SEXP migrMagein = PROTECT(allocVector(REALSXP, internal->dim_migrMagein));
   memcpy(REAL(migrMagein), internal->migrMagein, internal->dim_migrMagein * sizeof(double));
   odin_set_dim(migrMagein, 6, internal->dim_migrMagein_1, internal->dim_migrMagein_2, internal->dim_migrMagein_3, internal->dim_migrMagein_4, internal->dim_migrMagein_5, internal->dim_migrMagein_6);
-  SET_VECTOR_ELT(contents, 158, migrMagein);
+  SET_VECTOR_ELT(contents, 184, migrMagein);
   SEXP migrMageout = PROTECT(allocVector(REALSXP, internal->dim_migrMageout));
   memcpy(REAL(migrMageout), internal->migrMageout, internal->dim_migrMageout * sizeof(double));
   odin_set_dim(migrMageout, 6, internal->dim_migrMageout_1, internal->dim_migrMageout_2, internal->dim_migrMageout_3, internal->dim_migrMageout_4, internal->dim_migrMageout_5, internal->dim_migrMageout_6);
-  SET_VECTOR_ELT(contents, 159, migrMageout);
-  SET_VECTOR_ELT(contents, 160, ScalarInteger(internal->nage));
+  SET_VECTOR_ELT(contents, 185, migrMageout);
+  SET_VECTOR_ELT(contents, 186, ScalarInteger(internal->nage));
   SEXP native = PROTECT(allocVector(REALSXP, internal->dim_native));
   memcpy(REAL(native), internal->native, internal->dim_native * sizeof(double));
-  SET_VECTOR_ELT(contents, 161, native);
-  SET_VECTOR_ELT(contents, 162, ScalarInteger(internal->nnat));
-  SET_VECTOR_ELT(contents, 163, ScalarInteger(internal->npost));
-  SET_VECTOR_ELT(contents, 164, ScalarInteger(internal->nprot));
-  SET_VECTOR_ELT(contents, 165, ScalarInteger(internal->nrisk));
-  SET_VECTOR_ELT(contents, 166, ScalarInteger(internal->nstrain));
+  SET_VECTOR_ELT(contents, 187, native);
+  SET_VECTOR_ELT(contents, 188, ScalarInteger(internal->nnat));
+  SET_VECTOR_ELT(contents, 189, ScalarInteger(internal->npost));
+  SET_VECTOR_ELT(contents, 190, ScalarInteger(internal->nprot));
+  SET_VECTOR_ELT(contents, 191, ScalarInteger(internal->nrisk));
+  SET_VECTOR_ELT(contents, 192, ScalarInteger(internal->nstrain));
   SEXP omegaF = PROTECT(allocVector(REALSXP, internal->dim_omegaF));
   memcpy(REAL(omegaF), internal->omegaF, internal->dim_omegaF * sizeof(double));
-  SET_VECTOR_ELT(contents, 167, omegaF);
+  SET_VECTOR_ELT(contents, 193, omegaF);
   SEXP omegaM = PROTECT(allocVector(REALSXP, internal->dim_omegaM));
   memcpy(REAL(omegaM), internal->omegaM, internal->dim_omegaM * sizeof(double));
-  SET_VECTOR_ELT(contents, 168, omegaM);
+  SET_VECTOR_ELT(contents, 194, omegaM);
   SEXP Pmigr_nat = PROTECT(allocVector(REALSXP, internal->dim_Pmigr_nat));
   memcpy(REAL(Pmigr_nat), internal->Pmigr_nat, internal->dim_Pmigr_nat * sizeof(double));
-  SET_VECTOR_ELT(contents, 169, Pmigr_nat);
+  SET_VECTOR_ELT(contents, 195, Pmigr_nat);
   SEXP PmigrF_post = PROTECT(allocVector(REALSXP, internal->dim_PmigrF_post));
   memcpy(REAL(PmigrF_post), internal->PmigrF_post, internal->dim_PmigrF_post * sizeof(double));
-  SET_VECTOR_ELT(contents, 170, PmigrF_post);
+  SET_VECTOR_ELT(contents, 196, PmigrF_post);
   SEXP PmigrF_prot = PROTECT(allocVector(REALSXP, internal->dim_PmigrF_prot));
   memcpy(REAL(PmigrF_prot), internal->PmigrF_prot, internal->dim_PmigrF_prot * sizeof(double));
-  SET_VECTOR_ELT(contents, 171, PmigrF_prot);
+  SET_VECTOR_ELT(contents, 197, PmigrF_prot);
   SEXP PmigrF_risk = PROTECT(allocVector(REALSXP, internal->dim_PmigrF_risk));
   memcpy(REAL(PmigrF_risk), internal->PmigrF_risk, internal->dim_PmigrF_risk * sizeof(double));
-  SET_VECTOR_ELT(contents, 172, PmigrF_risk);
+  SET_VECTOR_ELT(contents, 198, PmigrF_risk);
   SEXP PmigrF_strain = PROTECT(allocVector(REALSXP, internal->dim_PmigrF_strain));
   memcpy(REAL(PmigrF_strain), internal->PmigrF_strain, internal->dim_PmigrF_strain * sizeof(double));
-  SET_VECTOR_ELT(contents, 173, PmigrF_strain);
+  SET_VECTOR_ELT(contents, 199, PmigrF_strain);
   SEXP PmigrM_post = PROTECT(allocVector(REALSXP, internal->dim_PmigrM_post));
   memcpy(REAL(PmigrM_post), internal->PmigrM_post, internal->dim_PmigrM_post * sizeof(double));
-  SET_VECTOR_ELT(contents, 174, PmigrM_post);
+  SET_VECTOR_ELT(contents, 200, PmigrM_post);
   SEXP PmigrM_prot = PROTECT(allocVector(REALSXP, internal->dim_PmigrM_prot));
   memcpy(REAL(PmigrM_prot), internal->PmigrM_prot, internal->dim_PmigrM_prot * sizeof(double));
-  SET_VECTOR_ELT(contents, 175, PmigrM_prot);
+  SET_VECTOR_ELT(contents, 201, PmigrM_prot);
   SEXP PmigrM_risk = PROTECT(allocVector(REALSXP, internal->dim_PmigrM_risk));
   memcpy(REAL(PmigrM_risk), internal->PmigrM_risk, internal->dim_PmigrM_risk * sizeof(double));
-  SET_VECTOR_ELT(contents, 176, PmigrM_risk);
+  SET_VECTOR_ELT(contents, 202, PmigrM_risk);
   SEXP PmigrM_strain = PROTECT(allocVector(REALSXP, internal->dim_PmigrM_strain));
   memcpy(REAL(PmigrM_strain), internal->PmigrM_strain, internal->dim_PmigrM_strain * sizeof(double));
-  SET_VECTOR_ELT(contents, 177, PmigrM_strain);
+  SET_VECTOR_ELT(contents, 203, PmigrM_strain);
   SEXP popdatF = PROTECT(allocVector(REALSXP, internal->dim_popdatF));
   memcpy(REAL(popdatF), internal->popdatF, internal->dim_popdatF * sizeof(double));
   odin_set_dim(popdatF, 2, internal->dim_popdatF_1, internal->dim_popdatF_2);
-  SET_VECTOR_ELT(contents, 178, popdatF);
+  SET_VECTOR_ELT(contents, 204, popdatF);
   SEXP popdatM = PROTECT(allocVector(REALSXP, internal->dim_popdatM));
   memcpy(REAL(popdatM), internal->popdatM, internal->dim_popdatM * sizeof(double));
   odin_set_dim(popdatM, 2, internal->dim_popdatM_1, internal->dim_popdatM_2);
-  SET_VECTOR_ELT(contents, 179, popdatM);
+  SET_VECTOR_ELT(contents, 205, popdatM);
   SEXP popinitF = PROTECT(allocVector(REALSXP, internal->dim_popinitF));
   memcpy(REAL(popinitF), internal->popinitF, internal->dim_popinitF * sizeof(double));
   odin_set_dim(popinitF, 6, internal->dim_popinitF_1, internal->dim_popinitF_2, internal->dim_popinitF_3, internal->dim_popinitF_4, internal->dim_popinitF_5, internal->dim_popinitF_6);
-  SET_VECTOR_ELT(contents, 180, popinitF);
+  SET_VECTOR_ELT(contents, 206, popinitF);
   SEXP popinitM = PROTECT(allocVector(REALSXP, internal->dim_popinitM));
   memcpy(REAL(popinitM), internal->popinitM, internal->dim_popinitM * sizeof(double));
   odin_set_dim(popinitM, 6, internal->dim_popinitM_1, internal->dim_popinitM_2, internal->dim_popinitM_3, internal->dim_popinitM_4, internal->dim_popinitM_5, internal->dim_popinitM_6);
-  SET_VECTOR_ELT(contents, 181, popinitM);
+  SET_VECTOR_ELT(contents, 207, popinitM);
   SEXP r = PROTECT(allocVector(REALSXP, internal->dim_r));
   memcpy(REAL(r), internal->r, internal->dim_r * sizeof(double));
-  SET_VECTOR_ELT(contents, 182, r);
+  SET_VECTOR_ELT(contents, 208, r);
+  SEXP RiskChange = PROTECT(allocVector(REALSXP, internal->dim_RiskChange));
+  memcpy(REAL(RiskChange), internal->RiskChange, internal->dim_RiskChange * sizeof(double));
+  odin_set_dim(RiskChange, 7, internal->dim_RiskChange_1, internal->dim_RiskChange_2, internal->dim_RiskChange_3, internal->dim_RiskChange_4, internal->dim_RiskChange_5, internal->dim_RiskChange_6, internal->dim_RiskChange_7);
+  SET_VECTOR_ELT(contents, 209, RiskChange);
+  SEXP RiskHazard = PROTECT(allocVector(REALSXP, internal->dim_RiskHazard));
+  memcpy(REAL(RiskHazard), internal->RiskHazard, internal->dim_RiskHazard * sizeof(double));
+  odin_set_dim(RiskHazard, 3, internal->dim_RiskHazard_1, internal->dim_RiskHazard_2, internal->dim_RiskHazard_3);
+  SET_VECTOR_ELT(contents, 210, RiskHazard);
+  SEXP RiskHazardData = PROTECT(allocVector(REALSXP, internal->dim_RiskHazardData));
+  memcpy(REAL(RiskHazardData), internal->RiskHazardData, internal->dim_RiskHazardData * sizeof(double));
+  odin_set_dim(RiskHazardData, 4, internal->dim_RiskHazardData_1, internal->dim_RiskHazardData_2, internal->dim_RiskHazardData_3, internal->dim_RiskHazardData_4);
+  SET_VECTOR_ELT(contents, 211, RiskHazardData);
   SEXP tbbottom = PROTECT(allocVector(REALSXP, internal->dim_tbbottom));
   memcpy(REAL(tbbottom), internal->tbbottom, internal->dim_tbbottom * sizeof(double));
   odin_set_dim(tbbottom, 3, internal->dim_tbbottom_1, internal->dim_tbbottom_2, internal->dim_tbbottom_3);
-  SET_VECTOR_ELT(contents, 183, tbbottom);
+  SET_VECTOR_ELT(contents, 212, tbbottom);
   SEXP ttp = PROTECT(allocVector(REALSXP, internal->dim_ttp));
   memcpy(REAL(ttp), internal->ttp, internal->dim_ttp * sizeof(double));
-  SET_VECTOR_ELT(contents, 184, ttp);
-  SEXP nms = PROTECT(allocVector(STRSXP, 185));
+  SET_VECTOR_ELT(contents, 213, ttp);
+  SEXP nms = PROTECT(allocVector(STRSXP, 214));
   SET_STRING_ELT(nms, 0, mkChar("BF"));
   SET_STRING_ELT(nms, 1, mkChar("birthrisk"));
   SET_STRING_ELT(nms, 2, mkChar("BM"));
@@ -840,58 +916,87 @@ SEXP ocaode_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 132, mkChar("dim_popinitM_5"));
   SET_STRING_ELT(nms, 133, mkChar("dim_popinitM_6"));
   SET_STRING_ELT(nms, 134, mkChar("dim_r"));
-  SET_STRING_ELT(nms, 135, mkChar("dim_tbbottom"));
-  SET_STRING_ELT(nms, 136, mkChar("dim_tbbottom_1"));
-  SET_STRING_ELT(nms, 137, mkChar("dim_tbbottom_12"));
-  SET_STRING_ELT(nms, 138, mkChar("dim_tbbottom_2"));
-  SET_STRING_ELT(nms, 139, mkChar("dim_tbbottom_3"));
-  SET_STRING_ELT(nms, 140, mkChar("dim_ttp"));
-  SET_STRING_ELT(nms, 141, mkChar("immigration_female"));
-  SET_STRING_ELT(nms, 142, mkChar("immigration_male"));
-  SET_STRING_ELT(nms, 143, mkChar("InF"));
-  SET_STRING_ELT(nms, 144, mkChar("initial_N"));
-  SET_STRING_ELT(nms, 145, mkChar("InM"));
-  SET_STRING_ELT(nms, 146, mkChar("interpolate_bzf"));
-  SET_STRING_ELT(nms, 147, mkChar("interpolate_bzm"));
-  SET_STRING_ELT(nms, 148, mkChar("interpolate_InF"));
-  SET_STRING_ELT(nms, 149, mkChar("interpolate_InM"));
-  SET_STRING_ELT(nms, 150, mkChar("interpolate_omegaF"));
-  SET_STRING_ELT(nms, 151, mkChar("interpolate_omegaM"));
-  SET_STRING_ELT(nms, 152, mkChar("lttp"));
-  SET_STRING_ELT(nms, 153, mkChar("migrage"));
-  SET_STRING_ELT(nms, 154, mkChar("migrF"));
-  SET_STRING_ELT(nms, 155, mkChar("migrFagein"));
-  SET_STRING_ELT(nms, 156, mkChar("migrFageout"));
-  SET_STRING_ELT(nms, 157, mkChar("migrM"));
-  SET_STRING_ELT(nms, 158, mkChar("migrMagein"));
-  SET_STRING_ELT(nms, 159, mkChar("migrMageout"));
-  SET_STRING_ELT(nms, 160, mkChar("nage"));
-  SET_STRING_ELT(nms, 161, mkChar("native"));
-  SET_STRING_ELT(nms, 162, mkChar("nnat"));
-  SET_STRING_ELT(nms, 163, mkChar("npost"));
-  SET_STRING_ELT(nms, 164, mkChar("nprot"));
-  SET_STRING_ELT(nms, 165, mkChar("nrisk"));
-  SET_STRING_ELT(nms, 166, mkChar("nstrain"));
-  SET_STRING_ELT(nms, 167, mkChar("omegaF"));
-  SET_STRING_ELT(nms, 168, mkChar("omegaM"));
-  SET_STRING_ELT(nms, 169, mkChar("Pmigr_nat"));
-  SET_STRING_ELT(nms, 170, mkChar("PmigrF_post"));
-  SET_STRING_ELT(nms, 171, mkChar("PmigrF_prot"));
-  SET_STRING_ELT(nms, 172, mkChar("PmigrF_risk"));
-  SET_STRING_ELT(nms, 173, mkChar("PmigrF_strain"));
-  SET_STRING_ELT(nms, 174, mkChar("PmigrM_post"));
-  SET_STRING_ELT(nms, 175, mkChar("PmigrM_prot"));
-  SET_STRING_ELT(nms, 176, mkChar("PmigrM_risk"));
-  SET_STRING_ELT(nms, 177, mkChar("PmigrM_strain"));
-  SET_STRING_ELT(nms, 178, mkChar("popdatF"));
-  SET_STRING_ELT(nms, 179, mkChar("popdatM"));
-  SET_STRING_ELT(nms, 180, mkChar("popinitF"));
-  SET_STRING_ELT(nms, 181, mkChar("popinitM"));
-  SET_STRING_ELT(nms, 182, mkChar("r"));
-  SET_STRING_ELT(nms, 183, mkChar("tbbottom"));
-  SET_STRING_ELT(nms, 184, mkChar("ttp"));
+  SET_STRING_ELT(nms, 135, mkChar("dim_RiskChange"));
+  SET_STRING_ELT(nms, 136, mkChar("dim_RiskChange_1"));
+  SET_STRING_ELT(nms, 137, mkChar("dim_RiskChange_12"));
+  SET_STRING_ELT(nms, 138, mkChar("dim_RiskChange_123"));
+  SET_STRING_ELT(nms, 139, mkChar("dim_RiskChange_1234"));
+  SET_STRING_ELT(nms, 140, mkChar("dim_RiskChange_12345"));
+  SET_STRING_ELT(nms, 141, mkChar("dim_RiskChange_123456"));
+  SET_STRING_ELT(nms, 142, mkChar("dim_RiskChange_2"));
+  SET_STRING_ELT(nms, 143, mkChar("dim_RiskChange_3"));
+  SET_STRING_ELT(nms, 144, mkChar("dim_RiskChange_4"));
+  SET_STRING_ELT(nms, 145, mkChar("dim_RiskChange_5"));
+  SET_STRING_ELT(nms, 146, mkChar("dim_RiskChange_6"));
+  SET_STRING_ELT(nms, 147, mkChar("dim_RiskChange_7"));
+  SET_STRING_ELT(nms, 148, mkChar("dim_RiskHazard"));
+  SET_STRING_ELT(nms, 149, mkChar("dim_RiskHazard_1"));
+  SET_STRING_ELT(nms, 150, mkChar("dim_RiskHazard_12"));
+  SET_STRING_ELT(nms, 151, mkChar("dim_RiskHazard_2"));
+  SET_STRING_ELT(nms, 152, mkChar("dim_RiskHazard_3"));
+  SET_STRING_ELT(nms, 153, mkChar("dim_RiskHazardData"));
+  SET_STRING_ELT(nms, 154, mkChar("dim_RiskHazardData_1"));
+  SET_STRING_ELT(nms, 155, mkChar("dim_RiskHazardData_12"));
+  SET_STRING_ELT(nms, 156, mkChar("dim_RiskHazardData_123"));
+  SET_STRING_ELT(nms, 157, mkChar("dim_RiskHazardData_2"));
+  SET_STRING_ELT(nms, 158, mkChar("dim_RiskHazardData_3"));
+  SET_STRING_ELT(nms, 159, mkChar("dim_RiskHazardData_4"));
+  SET_STRING_ELT(nms, 160, mkChar("dim_tbbottom"));
+  SET_STRING_ELT(nms, 161, mkChar("dim_tbbottom_1"));
+  SET_STRING_ELT(nms, 162, mkChar("dim_tbbottom_12"));
+  SET_STRING_ELT(nms, 163, mkChar("dim_tbbottom_2"));
+  SET_STRING_ELT(nms, 164, mkChar("dim_tbbottom_3"));
+  SET_STRING_ELT(nms, 165, mkChar("dim_ttp"));
+  SET_STRING_ELT(nms, 166, mkChar("immigration_female"));
+  SET_STRING_ELT(nms, 167, mkChar("immigration_male"));
+  SET_STRING_ELT(nms, 168, mkChar("InF"));
+  SET_STRING_ELT(nms, 169, mkChar("initial_N"));
+  SET_STRING_ELT(nms, 170, mkChar("InM"));
+  SET_STRING_ELT(nms, 171, mkChar("interpolate_bzf"));
+  SET_STRING_ELT(nms, 172, mkChar("interpolate_bzm"));
+  SET_STRING_ELT(nms, 173, mkChar("interpolate_InF"));
+  SET_STRING_ELT(nms, 174, mkChar("interpolate_InM"));
+  SET_STRING_ELT(nms, 175, mkChar("interpolate_omegaF"));
+  SET_STRING_ELT(nms, 176, mkChar("interpolate_omegaM"));
+  SET_STRING_ELT(nms, 177, mkChar("interpolate_RiskHazard"));
+  SET_STRING_ELT(nms, 178, mkChar("lttp"));
+  SET_STRING_ELT(nms, 179, mkChar("migrage"));
+  SET_STRING_ELT(nms, 180, mkChar("migrF"));
+  SET_STRING_ELT(nms, 181, mkChar("migrFagein"));
+  SET_STRING_ELT(nms, 182, mkChar("migrFageout"));
+  SET_STRING_ELT(nms, 183, mkChar("migrM"));
+  SET_STRING_ELT(nms, 184, mkChar("migrMagein"));
+  SET_STRING_ELT(nms, 185, mkChar("migrMageout"));
+  SET_STRING_ELT(nms, 186, mkChar("nage"));
+  SET_STRING_ELT(nms, 187, mkChar("native"));
+  SET_STRING_ELT(nms, 188, mkChar("nnat"));
+  SET_STRING_ELT(nms, 189, mkChar("npost"));
+  SET_STRING_ELT(nms, 190, mkChar("nprot"));
+  SET_STRING_ELT(nms, 191, mkChar("nrisk"));
+  SET_STRING_ELT(nms, 192, mkChar("nstrain"));
+  SET_STRING_ELT(nms, 193, mkChar("omegaF"));
+  SET_STRING_ELT(nms, 194, mkChar("omegaM"));
+  SET_STRING_ELT(nms, 195, mkChar("Pmigr_nat"));
+  SET_STRING_ELT(nms, 196, mkChar("PmigrF_post"));
+  SET_STRING_ELT(nms, 197, mkChar("PmigrF_prot"));
+  SET_STRING_ELT(nms, 198, mkChar("PmigrF_risk"));
+  SET_STRING_ELT(nms, 199, mkChar("PmigrF_strain"));
+  SET_STRING_ELT(nms, 200, mkChar("PmigrM_post"));
+  SET_STRING_ELT(nms, 201, mkChar("PmigrM_prot"));
+  SET_STRING_ELT(nms, 202, mkChar("PmigrM_risk"));
+  SET_STRING_ELT(nms, 203, mkChar("PmigrM_strain"));
+  SET_STRING_ELT(nms, 204, mkChar("popdatF"));
+  SET_STRING_ELT(nms, 205, mkChar("popdatM"));
+  SET_STRING_ELT(nms, 206, mkChar("popinitF"));
+  SET_STRING_ELT(nms, 207, mkChar("popinitM"));
+  SET_STRING_ELT(nms, 208, mkChar("r"));
+  SET_STRING_ELT(nms, 209, mkChar("RiskChange"));
+  SET_STRING_ELT(nms, 210, mkChar("RiskHazard"));
+  SET_STRING_ELT(nms, 211, mkChar("RiskHazardData"));
+  SET_STRING_ELT(nms, 212, mkChar("tbbottom"));
+  SET_STRING_ELT(nms, 213, mkChar("ttp"));
   setAttrib(contents, R_NamesSymbol, nms);
-  UNPROTECT(36);
+  UNPROTECT(39);
   return contents;
 }
 SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
@@ -975,6 +1080,16 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   internal->dim_popinitM_5 = internal->nstrain;
   internal->dim_popinitM_6 = internal->nprot;
   internal->dim_r = internal->nage;
+  internal->dim_RiskChange_1 = internal->nage;
+  internal->dim_RiskChange_2 = 2;
+  internal->dim_RiskChange_3 = internal->nnat;
+  internal->dim_RiskChange_4 = internal->nrisk;
+  internal->dim_RiskChange_5 = internal->npost;
+  internal->dim_RiskChange_6 = internal->nstrain;
+  internal->dim_RiskChange_7 = internal->nprot;
+  internal->dim_RiskHazard_1 = internal->nage;
+  internal->dim_RiskHazard_2 = 2;
+  internal->dim_RiskHazard_3 = internal->nrisk;
   internal->dim_tbbottom_1 = internal->npost;
   internal->dim_tbbottom_2 = internal->nstrain;
   internal->dim_tbbottom_3 = internal->nprot;
@@ -1037,6 +1152,14 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   internal->dim_popinitM_123 = internal->dim_popinitM_1 * internal->dim_popinitM_2 * internal->dim_popinitM_3;
   internal->dim_popinitM_1234 = internal->dim_popinitM_1 * internal->dim_popinitM_2 * internal->dim_popinitM_3 * internal->dim_popinitM_4;
   internal->dim_popinitM_12345 = internal->dim_popinitM_1 * internal->dim_popinitM_2 * internal->dim_popinitM_3 * internal->dim_popinitM_4 * internal->dim_popinitM_5;
+  internal->dim_RiskChange = internal->dim_RiskChange_1 * internal->dim_RiskChange_2 * internal->dim_RiskChange_3 * internal->dim_RiskChange_4 * internal->dim_RiskChange_5 * internal->dim_RiskChange_6 * internal->dim_RiskChange_7;
+  internal->dim_RiskChange_12 = internal->dim_RiskChange_1 * internal->dim_RiskChange_2;
+  internal->dim_RiskChange_123 = internal->dim_RiskChange_1 * internal->dim_RiskChange_2 * internal->dim_RiskChange_3;
+  internal->dim_RiskChange_1234 = internal->dim_RiskChange_1 * internal->dim_RiskChange_2 * internal->dim_RiskChange_3 * internal->dim_RiskChange_4;
+  internal->dim_RiskChange_12345 = internal->dim_RiskChange_1 * internal->dim_RiskChange_2 * internal->dim_RiskChange_3 * internal->dim_RiskChange_4 * internal->dim_RiskChange_5;
+  internal->dim_RiskChange_123456 = internal->dim_RiskChange_1 * internal->dim_RiskChange_2 * internal->dim_RiskChange_3 * internal->dim_RiskChange_4 * internal->dim_RiskChange_5 * internal->dim_RiskChange_6;
+  internal->dim_RiskHazard = internal->dim_RiskHazard_1 * internal->dim_RiskHazard_2 * internal->dim_RiskHazard_3;
+  internal->dim_RiskHazard_12 = internal->dim_RiskHazard_1 * internal->dim_RiskHazard_2;
   internal->dim_tbbottom = internal->dim_tbbottom_1 * internal->dim_tbbottom_2 * internal->dim_tbbottom_3;
   internal->dim_tbbottom_12 = internal->dim_tbbottom_1 * internal->dim_tbbottom_2;
   internal->lttp = internal->dim_ttp;
@@ -1064,6 +1187,10 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   internal->migrMagein = (double*) R_Calloc(internal->dim_migrMagein, double);
   R_Free(internal->migrMageout);
   internal->migrMageout = (double*) R_Calloc(internal->dim_migrMageout, double);
+  R_Free(internal->RiskChange);
+  internal->RiskChange = (double*) R_Calloc(internal->dim_RiskChange, double);
+  R_Free(internal->RiskHazard);
+  internal->RiskHazard = (double*) R_Calloc(internal->dim_RiskHazard, double);
   R_Free(internal->tbbottom);
   internal->tbbottom = (double*) R_Calloc(internal->dim_tbbottom, double);
   internal->dim_BF = internal->lttp;
@@ -1076,6 +1203,10 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   internal->dim_popdatF_2 = internal->nage;
   internal->dim_popdatM_1 = internal->lttp;
   internal->dim_popdatM_2 = internal->nage;
+  internal->dim_RiskHazardData_1 = internal->lttp;
+  internal->dim_RiskHazardData_2 = internal->nage;
+  internal->dim_RiskHazardData_3 = 2;
+  internal->dim_RiskHazardData_4 = internal->nrisk;
   {
      int i = 1;
      internal->native[i - 1] = 1;
@@ -1094,6 +1225,9 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   internal->dim_immigration_male = internal->dim_immigration_male_1 * internal->dim_immigration_male_2;
   internal->dim_popdatF = internal->dim_popdatF_1 * internal->dim_popdatF_2;
   internal->dim_popdatM = internal->dim_popdatM_1 * internal->dim_popdatM_2;
+  internal->dim_RiskHazardData = internal->dim_RiskHazardData_1 * internal->dim_RiskHazardData_2 * internal->dim_RiskHazardData_3 * internal->dim_RiskHazardData_4;
+  internal->dim_RiskHazardData_12 = internal->dim_RiskHazardData_1 * internal->dim_RiskHazardData_2;
+  internal->dim_RiskHazardData_123 = internal->dim_RiskHazardData_1 * internal->dim_RiskHazardData_2 * internal->dim_RiskHazardData_3;
   for (int i = 1; i <= internal->nage; ++i) {
     int j = 1;
     for (int k = 1; k <= internal->nnat; ++k) {
@@ -1145,6 +1279,7 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   internal->interpolate_bzm = cinterpolate_alloc("linear", internal->dim_ttp, 1, internal->ttp, internal->BM, true, false);
   internal->popdatF = (double*) user_get_array(user, false, internal->popdatF, "popdatF", NA_REAL, NA_REAL, 2, internal->dim_popdatF_1, internal->dim_popdatF_2);
   internal->popdatM = (double*) user_get_array(user, false, internal->popdatM, "popdatM", NA_REAL, NA_REAL, 2, internal->dim_popdatM_1, internal->dim_popdatM_2);
+  internal->RiskHazardData = (double*) user_get_array(user, false, internal->RiskHazardData, "RiskHazardData", NA_REAL, NA_REAL, 4, internal->dim_RiskHazardData_1, internal->dim_RiskHazardData_2, internal->dim_RiskHazardData_3, internal->dim_RiskHazardData_4);
   interpolate_check_y(internal->dim_ttp, internal->dim_immigration_female_1, 1, "immigration_female", "InF");
   interpolate_check_y(internal->dim_InF, internal->dim_immigration_female_2, 2, "immigration_female", "InF");
   cinterpolate_free(internal->interpolate_InF);
@@ -1161,6 +1296,12 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   interpolate_check_y(internal->dim_omegaM, internal->dim_popdatM_2, 2, "popdatM", "omegaM");
   cinterpolate_free(internal->interpolate_omegaM);
   internal->interpolate_omegaM = cinterpolate_alloc("linear", internal->dim_ttp, internal->dim_omegaM, internal->ttp, internal->popdatM, true, false);
+  interpolate_check_y(internal->dim_ttp, internal->dim_RiskHazardData_1, 1, "RiskHazardData", "RiskHazard");
+  interpolate_check_y(internal->dim_RiskHazard_1, internal->dim_RiskHazardData_2, 2, "RiskHazardData", "RiskHazard");
+  interpolate_check_y(internal->dim_RiskHazard_2, internal->dim_RiskHazardData_3, 3, "RiskHazardData", "RiskHazard");
+  interpolate_check_y(internal->dim_RiskHazard_3, internal->dim_RiskHazardData_4, 4, "RiskHazardData", "RiskHazard");
+  cinterpolate_free(internal->interpolate_RiskHazard);
+  internal->interpolate_RiskHazard = cinterpolate_alloc("linear", internal->dim_ttp, internal->dim_RiskHazard, internal->ttp, internal->RiskHazardData, true, false);
   return R_NilValue;
 }
 SEXP ocaode_set_initial(SEXP internal_p, SEXP t_ptr, SEXP state_ptr, SEXP ocaode_use_dde_ptr) {
@@ -1274,6 +1415,7 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
   cinterpolate_eval(t, internal->interpolate_InM, internal->InM);
   cinterpolate_eval(t, internal->interpolate_omegaF, internal->omegaF);
   cinterpolate_eval(t, internal->interpolate_omegaM, internal->omegaM);
+  cinterpolate_eval(t, internal->interpolate_RiskHazard, internal->RiskHazard);
   for (int i = 1; i <= internal->nage; ++i) {
     for (int j = 1; j <= internal->nnat; ++j) {
       for (int k = 1; k <= internal->nrisk; ++k) {
@@ -1294,6 +1436,21 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
           for (int i5 = 1; i5 <= internal->nstrain; ++i5) {
             for (int i6 = 1; i6 <= internal->nprot; ++i6) {
               internal->migrM[i - 1 + internal->dim_migrM_1 * (j - 1) + internal->dim_migrM_12 * (k - 1) + internal->dim_migrM_123 * (l - 1) + internal->dim_migrM_1234 * (i5 - 1) + internal->dim_migrM_12345 * (i6 - 1)] = internal->InM[i - 1] * internal->Pmigr_nat[j - 1] * internal->PmigrM_risk[k - 1] * internal->PmigrM_post[l - 1] * internal->PmigrM_strain[i5 - 1] * internal->PmigrM_prot[i6 - 1];
+            }
+          }
+        }
+      }
+    }
+  }
+  for (int i = 1; i <= internal->nage; ++i) {
+    for (int j = 1; j <= 2; ++j) {
+      for (int k = 1; k <= internal->nnat; ++k) {
+        for (int l = 1; l <= internal->nrisk; ++l) {
+          for (int i5 = 1; i5 <= internal->npost; ++i5) {
+            for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
+              for (int i7 = 1; i7 <= internal->nprot; ++i7) {
+                internal->RiskChange[i - 1 + internal->dim_RiskChange_1 * (j - 1) + internal->dim_RiskChange_12 * (k - 1) + internal->dim_RiskChange_123 * (l - 1) + internal->dim_RiskChange_1234 * (i5 - 1) + internal->dim_RiskChange_12345 * (i6 - 1) + internal->dim_RiskChange_123456 * (i7 - 1)] = (l > 1 ? internal->RiskHazard[internal->dim_RiskHazard_12 * (l - 1 - 1) + internal->dim_RiskHazard_1 * (j - 1) + i - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1 - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * (j - 1) + i - 1] - internal->RiskHazard[internal->dim_RiskHazard_12 * (l - 1) + internal->dim_RiskHazard_1 * (j - 1) + i - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * (j - 1) + i - 1] : -(internal->RiskHazard[internal->dim_RiskHazard_12 * (l - 1) + internal->dim_RiskHazard_1 * (j - 1) + i - 1]) * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * (j - 1) + i - 1]);
+              }
             }
           }
         }
@@ -1322,7 +1479,7 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
         for (int i5 = 1; i5 <= internal->npost; ++i5) {
           for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
             for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-              dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = internal->r[i - 1 - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + i - 1 - 1] - internal->omegaM[i - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + i - 1] + internal->migrM[internal->dim_migrM_12345 * (i7 - 1) + internal->dim_migrM_1234 * (i6 - 1) + internal->dim_migrM_123 * (i5 - 1) + internal->dim_migrM_12 * (l - 1) + internal->dim_migrM_1 * (k - 1) + i - 1] + internal->migrMagein[internal->dim_migrMagein_12345 * (i7 - 1) + internal->dim_migrMagein_1234 * (i6 - 1) + internal->dim_migrMagein_123 * (i5 - 1) + internal->dim_migrMagein_12 * (l - 1) + internal->dim_migrMagein_1 * (k - 1) + i - 1] - internal->migrMageout[internal->dim_migrMageout_12345 * (i7 - 1) + internal->dim_migrMageout_1234 * (i6 - 1) + internal->dim_migrMageout_123 * (i5 - 1) + internal->dim_migrMageout_12 * (l - 1) + internal->dim_migrMageout_1 * (k - 1) + i - 1];
+              dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = internal->r[i - 1 - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + i - 1 - 1] - internal->omegaM[i - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 0 + i - 1] + internal->migrM[internal->dim_migrM_12345 * (i7 - 1) + internal->dim_migrM_1234 * (i6 - 1) + internal->dim_migrM_123 * (i5 - 1) + internal->dim_migrM_12 * (l - 1) + internal->dim_migrM_1 * (k - 1) + i - 1] + internal->migrMagein[internal->dim_migrMagein_12345 * (i7 - 1) + internal->dim_migrMagein_1234 * (i6 - 1) + internal->dim_migrMagein_123 * (i5 - 1) + internal->dim_migrMagein_12 * (l - 1) + internal->dim_migrMagein_1 * (k - 1) + i - 1] - internal->migrMageout[internal->dim_migrMageout_12345 * (i7 - 1) + internal->dim_migrMageout_1234 * (i6 - 1) + internal->dim_migrMageout_123 * (i5 - 1) + internal->dim_migrMageout_12 * (l - 1) + internal->dim_migrMageout_1 * (k - 1) + i - 1] + internal->RiskChange[internal->dim_RiskChange_123456 * (i7 - 1) + internal->dim_RiskChange_12345 * (i6 - 1) + internal->dim_RiskChange_1234 * (i5 - 1) + internal->dim_RiskChange_123 * (l - 1) + internal->dim_RiskChange_12 * (k - 1) + internal->dim_RiskChange_1 * 0 + i - 1];
             }
           }
         }
@@ -1351,7 +1508,7 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
         for (int i5 = 1; i5 <= internal->npost; ++i5) {
           for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
             for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-              dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = internal->r[i - 1 - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + i - 1 - 1] - internal->omegaF[i - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + i - 1] + internal->migrF[internal->dim_migrF_12345 * (i7 - 1) + internal->dim_migrF_1234 * (i6 - 1) + internal->dim_migrF_123 * (i5 - 1) + internal->dim_migrF_12 * (l - 1) + internal->dim_migrF_1 * (k - 1) + i - 1] + internal->migrFagein[internal->dim_migrFagein_12345 * (i7 - 1) + internal->dim_migrFagein_1234 * (i6 - 1) + internal->dim_migrFagein_123 * (i5 - 1) + internal->dim_migrFagein_12 * (l - 1) + internal->dim_migrFagein_1 * (k - 1) + i - 1] - internal->migrFageout[internal->dim_migrFageout_12345 * (i7 - 1) + internal->dim_migrFageout_1234 * (i6 - 1) + internal->dim_migrFageout_123 * (i5 - 1) + internal->dim_migrFageout_12 * (l - 1) + internal->dim_migrFageout_1 * (k - 1) + i - 1];
+              dstatedt[0 + i - 1 + internal->dim_N_1 * (j - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_123456 * (i7 - 1)] = internal->r[i - 1 - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + i - 1 - 1] - internal->omegaF[i - 1] * N[internal->dim_N_123456 * (i7 - 1) + internal->dim_N_12345 * (i6 - 1) + internal->dim_N_1234 * (i5 - 1) + internal->dim_N_123 * (l - 1) + internal->dim_N_12 * (k - 1) + internal->dim_N_1 * 1 + i - 1] + internal->migrF[internal->dim_migrF_12345 * (i7 - 1) + internal->dim_migrF_1234 * (i6 - 1) + internal->dim_migrF_123 * (i5 - 1) + internal->dim_migrF_12 * (l - 1) + internal->dim_migrF_1 * (k - 1) + i - 1] + internal->migrFagein[internal->dim_migrFagein_12345 * (i7 - 1) + internal->dim_migrFagein_1234 * (i6 - 1) + internal->dim_migrFagein_123 * (i5 - 1) + internal->dim_migrFagein_12 * (l - 1) + internal->dim_migrFagein_1 * (k - 1) + i - 1] - internal->migrFageout[internal->dim_migrFageout_12345 * (i7 - 1) + internal->dim_migrFageout_1234 * (i6 - 1) + internal->dim_migrFageout_123 * (i5 - 1) + internal->dim_migrFageout_12 * (l - 1) + internal->dim_migrFageout_1 * (k - 1) + i - 1] + internal->RiskChange[internal->dim_RiskChange_123456 * (i7 - 1) + internal->dim_RiskChange_12345 * (i6 - 1) + internal->dim_RiskChange_1234 * (i5 - 1) + internal->dim_RiskChange_123 * (l - 1) + internal->dim_RiskChange_12 * (k - 1) + internal->dim_RiskChange_1 * 1 + i - 1];
             }
           }
         }

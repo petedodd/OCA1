@@ -23,7 +23,7 @@ ocaode_ <- R6::R6Class(
              "nrisk", "nstrain", "PmigrF_post", "PmigrF_prot", "PmigrF_risk",
              "PmigrF_strain", "PmigrM_post", "PmigrM_prot", "PmigrM_risk",
              "PmigrM_strain", "popdatF", "popdatM", "popinitF", "popinitM",
-             "r", "ttp"),
+             "r", "RiskHazardData", "ttp"),
 
     ## This is never called, but is used to ensure that R finds our
     ## symbols that we will use from the package; without this they

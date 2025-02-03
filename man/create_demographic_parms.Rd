@@ -13,6 +13,7 @@ create_demographic_parms(
   propinitstrain = 1,
   propinitprot = 1,
   migrationdata,
+  riskdata,
   verbose = FALSE
 )
 }
@@ -32,6 +33,8 @@ create_demographic_parms(
 \item{propinitprot}{initial TB protection proportions}
 
 \item{migrationdata}{list of migration data see details}
+
+\item{riskdata}{list of risk data see details}
 
 \item{verbose}{give more feedback}
 }
