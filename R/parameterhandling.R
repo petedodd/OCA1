@@ -1,9 +1,7 @@
 ## internal package function aimed at simplifying additional layers of parameter customization
 create_demographic_baseparms <- function(tc = 1970:2020) {
   r <- OCA1::UKdemo$r
-  
   if(min(tc) < min(OCA1::UKdemo$omega$Year) | max(tc) > max(OCA1::UKdemo$omega$Year)) stop("Range of tc must between 1950 and 2100")
-  
   ## men
   omegaL <- OCA1::UKdemo$omega[Year %in% tc, .(Year, AgeGrp, omegaM)]
   omegaW <- data.table::dcast(omegaL, Year ~ AgeGrp, value.var = "omegaM")
@@ -36,7 +34,7 @@ create_demographic_baseparms <- function(tc = 1970:2020) {
 }
 
 
-
+## a utility to check probabilities are valid
 check_probabilities <- function(params) {
 
   # 1. Check for numeric type:
@@ -44,90 +42,235 @@ check_probabilities <- function(params) {
     message("All parameters must be numeric.")
     return(FALSE)
   }
-  
+
   # 2. Check for values between 0 and 1 (inclusive):
   if (!all(params >= 0 & params <= 1)) {
     message("All parameters must be probabilities between 0 and 1.")
     return(FALSE)
   }
-  
+
   # 3. Check if the sum is (approximately) equal to 1 (important for discrete distributions):
   if (abs(sum(params) - 1) > .Machine$double.eps^0.5) { # Using tolerance for floating point comparison
     message("The sum of parameters must be approximately equal to 1.")
     return(FALSE)
   }
-  
+
   return(TRUE) # Return TRUE if all checks pass (implicitly returns NULL if stop is called)
 }
 
+
+## utility to check lengths
+check_dims <- function(parlist, dms){
+  parnames <- names(parlist)
+  ans <- list()
+  for(pname in parnames){
+    ans[[pname]] <- FALSE
+    if(pname %in% c("migrage","propinitnat")){
+      ans[[pname]] <- (length(parlist[[pname]])==dms[2]) #nnat
+    }
+    if(pname %in% c("PmigrF_risk","PmigrF_risk","propinitrisk","birthrisk")){
+      ans[[pname]] <- (length(parlist[[pname]])==dms[3]) #nrisk
+    }
+    if(pname %in% c("PmigrF_post","PmigrM_post","propinitpost")){
+      ans[[pname]] <- (length(parlist[[pname]])==dms[4]) #npost
+    }
+    if(pname %in% c("PmigrF_strain","PmigrM_strain","propinitstrain")){
+      ans[[pname]] <- (length(parlist[[pname]])==dms[5]) #nstrain
+    }
+    if(pname %in% c("PmigrF_prot","PmigrM_prot","propinitprot")){
+      ans[[pname]] <- (length(parlist[[pname]])==dms[6]) #nprotn
+    }
+    if(pname %in% c("immigration_female","immigration_male")){
+      ans[[pname]] <- all(dim(parlist[[pname]])==c(dms[1], length(OCA1::agz)))
+    }
+    if(pname=="RiskHazardData"){
+      ans[[pname]] <- all(dim(parlist[[pname]])==c(dms[1], length(OCA1::agz), 2, dms[3]))
+    }
+  } #end loop over list names
+  unlist(ans)
+}
+
+## utility for defaults: [1,0,0,...] or just 1
+hotone <- function(n){
+  ans <- rep(0,n)
+  ans[1] <- 1
+  ans
+}
+
+## a utility to construct default values for unsupplied parameters/data
+default_parameters <- function(parname, dms, verbose=FALSE){
+  if(verbose) message("Using default value for ",parname,"...")
+  ans <- NA
+  if(parname %in% c("migrage")){
+    ans <- rep(0,dms[2]) #nnat
+  }
+  if(parname %in% c("propinitnat")){
+    ans <- hotone(dms[2]) #nnat
+  }
+  if(parname %in% c("PmigrF_risk","PmigrM_risk","propinitrisk","birthrisk")){
+    ans <- hotone(dms[3]) #nrisk
+  }
+  if(parname %in% c("PmigrF_post","PmigrM_post","propinitpost")){
+    ans <- hotone(dms[4]) #npost
+  }
+  if(parname %in% c("PmigrF_strain","PmigrM_strain","propinitstrain")){
+    ans <- hotone(dms[5]) #nstrain
+  }
+  if(parname %in% c("PmigrF_prot","PmigrM_prot","propinitprot")){
+    ans <- hotone(dms[6]) #nprotn
+  }
+  if(parname %in% c("immigration_female","immigration_male")){
+    ans <- matrix(0, nrow = dms[1], ncol = length(OCA1::agz))
+  }
+  if(parname=="RiskHazardData"){
+     ans <- array(0,
+                  dim = c(dms[1], length(OCA1::agz), 2, dms[3]),
+                  dimnames = list(
+                    tindex = 1:dms[1],
+                    acat = OCA1::agz,
+                    sex = c("M", "F"),
+                    risk = 1:dms[3]
+                  )
+                  )
+  }
+  if(is.na(sum(ans))) stop("No default available for ",parname,"!\n") #sum to handle arrays
+  ans
+}
+
+## loops over to add missing parameters as default
+add_defaults_if_missing <- function(L, parnames, dms, verbose){
+  for(pname in parnames){
+    if(!pname %in% names(L)) L[[pname]] <- default_parameters(pname, dms, verbose)
+  }
+  L
+}
 
 ##' .. content for \description{} (no empty lines) ..TODO
 ##'
 ##' .. content for \details{} ..TODO
 ##' @title TODO
 ##' @param tc TODO
-##' @param propinitnat vector of length nnat with initial proportions
-##' @param propinitrisk vector of length nrisk with initial proportions
-##' @param birthrisk where to births go in risk?
-##' @param propinitpost initial post-TB proportions
-##' @param propinitstrain initial TB strain proportions
-##' @param propinitprot initial TB protection proportions
+##' @param nnat TODO
+##' @param nrisk TODO
+##' @param npost TODO
+##' @param nstrain TODO
+##' @param nprot TODO
 ##' @param migrationdata list of migration data see details
 ##' @param riskdata list of risk data see details
+##' @param postdata TODO
+##' @param straindata TODO
+##' @param protdata TODO
 ##' @param verbose give more feedback
 ##' @return list of parameters to run odin model
 ##' @author Pete Dodd
 ##' @import data.table
 ##' @export
 create_demographic_parms <- function(tc = 1970:2020,
-                                     propinitnat = 1,
-                                     propinitrisk = 1,
-                                     birthrisk = 1,
-                                     propinitpost = 1,
-                                     propinitstrain = 1,
-                                     propinitprot = 1,
-                                     migrationdata,
-                                     riskdata,
+                                     nnat=1,nrisk=1,npost=1,nstrain=1,nprot=1,
+                                     migrationdata=list(),
+                                     riskdata=list(),
+                                     postdata=list(),
+                                     straindata=list(),
+                                     protdata=list(),
                                      verbose=FALSE) {
+  ## === initial feedback:
+  if (verbose) message("Using ", nnat, " nativity classes...")
+  if (verbose) message("Using ", nrisk, " risk classes...")
+  if (verbose) message("Using ", npost, " post-TB classes (1=none)...")
+  if (verbose) message("Using ", nstrain, " TB strains...")
+  if (verbose) message("Using ", nprot, " TB protection classes (1=none)...")
+  if (verbose) message("*** NOTE: this will use ", 2*length(OCA1::agz)*nnat*nrisk*npost*nstrain*nprot, " strata! ***")
+  if (verbose) message("The total number of ODEs will be (the number of strata) x (the number of TB states).\n")
+  nt <- length(tc)
+  dms <- c(nt, nnat, nrisk, npost, nstrain, nprot) #dimensions
+
+  ## === complete & load supplied data:
+  ## ---migration data
+  migr_parnames <- c(
+    "propinitnat",
+    "immigration_female",
+    "immigration_male",
+    "migrage",
+    ## migration x other strata:
+    "PmigrF_risk",
+    "PmigrM_risk",
+    "PmigrF_post",
+    "PmigrM_post",
+    "PmigrF_strain",
+    "PmigrM_strain",
+    "PmigrF_prot",
+    "PmigrM_prot"
+  )
+  migrationdata <- add_defaults_if_missing(migrationdata, migr_parnames, dms, verbose)
+  list2env(migrationdata, envir = environment()) #load complete list
+
+  ##   ## correct omegaF and omegaM:
+  ##   ## TODO create IpcM[age] = IM[age] / N[M,age] & for F
+  ##   ## omegaM -> omegaM + IpcM & for F
+
+  ## --- risk data
+  risk_parnames <- c("propinitrisk", "birthrisk", "RiskHazardData")
+  riskdata <- add_defaults_if_missing(riskdata, risk_parnames, dms, verbose)
+  list2env(riskdata, envir = environment()) #load complete list
+
+  ## --- post data
+  post_parnames <- c("propinitpost")
+  postdata <- add_defaults_if_missing(postdata, post_parnames, dms, verbose)
+  list2env(postdata, envir = environment()) #load complete list
+
+  ## --- strain data
+  strain_parnames <- c("propinitstrain")
+  straindata <- add_defaults_if_missing(straindata, strain_parnames, dms, verbose)
+  list2env(straindata, envir = environment()) #load complete list
+
+  ## --- protn data
+  protn_parnames <- c("propinitprot")
+  protdata <- add_defaults_if_missing(protdata, protn_parnames, dms, verbose)
+  list2env(protdata, envir = environment()) #load complete list
+
+
+  ## === CHECK s
+  ## TODO consider whether easier to work with riskdata etc lists above, picking out probs
+  ## check probabilities
+  if(verbose) message("\n")
   param_list <- list("propinitnat"=propinitnat,
-                     "propinitnat"=propinitrisk,
+                     "propinitrisk"=propinitrisk,
                      "birthrisk"=birthrisk,
                      "propinitpost"=propinitpost,
                      "propinitstrain"=propinitstrain,
-                     "propinitprot"=propinitprot)
-    
+                     "propinitprot"=propinitprot,
+                     "PmigrF_risk"=PmigrF_risk,
+                     "PmigrF_risk"=PmigrF_risk,
+                     "PmigrF_post"=PmigrF_post,
+                     "PmigrF_post"=PmigrF_post,
+                     "PmigrF_strain"=PmigrF_strain,
+                     "PmigrF_strain"=PmigrF_strain,
+                     "PmigrF_prot"=PmigrF_prot,
+                     "PmigrF_prot"=PmigrF_prot)
   checks <- sapply(param_list,check_probabilities)
-
   if(all(checks)){
     if(verbose) message("All parameters containing probabilities were correct\n")
   }  else {
     message("Parameters with problems:", paste(names(param_list)[!checks]))
   }
-  
-  if(length(birthrisk)!=length(propinitrisk)){
-    message("Creating a birthrisk with the same length as propinitisk!\n")
-    birthrisk <- rep(0, length(propinitrisk))
-    birthrisk[1] <- 1
+
+  ## check dimension
+  param_list <- c(param_list,
+                  list("immigration_female"=immigration_female,
+                       "immigration_female"=immigration_female,
+                       "RiskHazardData"=RiskHazardData)
+                  )
+  checks <- check_dims(param_list,dms)
+  if(all(checks)){
+    if(verbose) message("All input parameters dimensions were correct\n")
+  }  else {
+    message("Parameters with dimension problems:", paste(names(param_list)[!checks]))
   }
 
-  ## --- create the base parameters:
+  ## === create the base parameters:
   list2env(create_demographic_baseparms(tc), envir = environment())
 
-  ## --- build on base parameters:
-  ## now promote the initial states to arrays:
-  nnat <- length(propinitnat) #number of nativity classes
-  nrisk <- length(propinitrisk) # number of nativity classes
-  if (verbose) message("Using ", nnat, " nativity classes...\n")
-  if (verbose) message("Using ", nrisk, " risk classes...\n")
-
-  ## TB
-  npost <- length(propinitpost) #number of post TB
-  nstrain <- length(propinitstrain) #number of TB strains
-  nprot <- length(propinitprot)     #number of TB protection strata
-  if (verbose) message("Using ", npost, " post-TB classes (1=none)...\n")
-  if (verbose) message("Using ", nstrain, " TB strains...\n")
-  if (verbose) message("Using ", nprot, " TB protection classes (1=none)...\n")
-
+  ## === build on base parameters:
   ## promote to array
   popinitF <- array(popinitF,
                     dim = c(length(OCA1::agz), nnat, nrisk, npost, nstrain, nprot),
@@ -152,9 +295,6 @@ create_demographic_parms <- function(tc = 1970:2020,
                     )
     )
 
-  if (verbose) message("*** NOTE: this will use ", 2*prod(dim(popinitM)), " strata! ***\n")
-  if (verbose) message("The total number of ODEs will be (the number of strata) x (the number of TB states).\n")
-
   ## multiply nativity/risk by proportions (done like this to avoid nested loops)
   for (k in 1:nnat) {
     popinitM[, k, , , , ] <- popinitM[, k, , , , ] * propinitnat[k]
@@ -175,54 +315,6 @@ create_demographic_parms <- function(tc = 1970:2020,
   for (i7 in 1:nprot) {
     popinitM[, , , , , i7] <- popinitM[, , , , , i7] * propinitprot[i7]
     popinitF[, , , , , i7] <- popinitF[, , , , , i7] * propinitprot[i7]
-  }
-
-  ## migration data
-  if(missing(migrationdata)){
-    if (verbose & nnat>1) message("Multiple nativity classes, but no migration dynamics data supplied: using static defaults.\n")
-    migrage <- rep(0,nnat) #rates of moving between categories
-    ## plumbing for where new migrants go in strata:
-    ## M & F
-    PmigrF_risk <- PmigrM_risk <- rep(0, nrisk)
-    PmigrF_post <- PmigrM_post <- rep(0, npost)
-    PmigrF_strain <- PmigrM_strain <- rep(0, nstrain)
-    PmigrF_prot <- PmigrM_prot <- rep(0, nprot)
-    ## default to bottom:
-    PmigrF_risk[1] <- PmigrM_risk[1] <- 1
-    PmigrF_post[1] <- PmigrM_post[1] <- 1
-    PmigrF_strain[1] <- PmigrM_strain[1] <- 1
-    PmigrF_prot[1] <- PmigrM_prot[1] <- 1
-    ## migration flow
-    immigration_female <- immigration_male <- matrix(0, nrow = length(tc), ncol = length(OCA1::agz))
-  } else {
-    ## TODO checks
-    ## relevant data in migrationdata list
-    ## dims all consistent
-    ## probabilities all valid
-    ## migration data >=0
-    list2env(migrationdata, envir = environment())
-
-    ## correct omegaF and omegaM:
-    ## TODO create IpcM[age] = IM[age] / N[M,age] & for F
-    ## omegaM -> omegaM + IpcM & for F
-
-  }
-
-  if (missing(riskdata)) {
-    if (verbose & nrisk > 1) cat("Multiple risk classes, but no dynamics data supplied: using static defaults.\n")
-    ## zeros all the way:
-    RiskHazardData <- array(0,
-      dim = c(length(ttp), length(OCA1::agz), 2, nrisk),
-      dimnames = list(
-        tindex = 1:length(ttp),
-        acat = OCA1::agz,
-        sex = c("M", "F"),
-        risk = 1:nrisk
-      )
-    )
-
-  } else {
-    ## TODO checks
   }
 
   ## make parameter object

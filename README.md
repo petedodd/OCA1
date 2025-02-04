@@ -67,7 +67,7 @@ plt_DemoGrowth(out)               #total population over time
 plt_DemoSnapshots(out)            #snapshots
 
 ## version with 2 static nativity classes
-pms <- create_demographic_parms(propinitnat = c(0.9,0.1))
+pms <- create_demographic_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
 out <- runmodel(pms,raw=FALSE)
 out
 
@@ -75,27 +75,28 @@ plt_DemoGrowth(out)
 plt_DemoSnapshots(out)
 
 ## version with 2 static nativity classes and 2 static risk classes
-pms <- create_demographic_parms(propinitnat = c(0.9,0.1),propinitrisk = c(0.9,0.1))
+pms <- create_demographic_parms(nnat = 2, nrisk = 2,
+                                migrationdata = list(propinitnat = c(0.9,0.1)),
+                                riskdata = list(propinitrisk = c(0.9,0.1)))
 out <- runmodel(pms)
 out
 
 plt_DemoGrowth(out)
 
-
 ## go big version with all strata to some degree:
-pms <- create_demographic_parms(propinitnat = c(0.9,0.1),
-                                propinitrisk = c(0.9,0.1),
-                                propinitpost = c(0.9,0.1),
-                                propinitstrain = c(0.9,0.1),
-                                propinitprot = c(0.9,0.1),
-                                verbose=TRUE)
-                                
+pms <- create_demographic_parms(
+  nnat = 2, nrisk = 2, npost = 2, nstrain = 2, nprot = 2,
+  migrationdata = list(propinitnat = c(0.9,0.1)),
+  riskdata = list(propinitrisk = c(0.9,0.1)),
+  straindata = list(propinitstrain = c(0.9,0.1)),
+  protdata = list(propinitprot = c(0.9,0.1)),
+  verbose=TRUE)
+
 ## NOTE needs to work harder:
 out <- runmodel(pms)
 out
 
 plt_DemoGrowth(out) #still stable
-
 
 ```
 
