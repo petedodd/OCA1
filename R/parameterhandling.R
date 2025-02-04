@@ -267,6 +267,9 @@ create_demographic_parms <- function(tc = 1970:2020,
     message("Parameters with dimension problems:", paste(names(param_list)[!checks]))
   }
 
+  ## check that the last layer of the risk progression hazard is zero
+  if(any(RiskHazardData[,,,nrisk])>0) stop("Non-zero RiskHazardData in the top risk layer will result in a population leak!")
+
   ## === create the base parameters:
   list2env(create_demographic_baseparms(tc), envir = environment())
 
