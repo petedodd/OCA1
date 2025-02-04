@@ -257,7 +257,7 @@ create_demographic_parms <- function(tc = 1970:2020,
   ## check dimension
   param_list <- c(param_list,
                   list("immigration_female"=immigration_female,
-                       "immigration_female"=immigration_female,
+                       "immigration_male"=immigration_male,
                        "RiskHazardData"=RiskHazardData)
                   )
   checks <- check_dims(param_list,dms)
