@@ -6,35 +6,41 @@
 \usage{
 create_demographic_parms(
   tc = 1970:2020,
-  propinitnat = 1,
-  propinitrisk = 1,
-  birthrisk = 1,
-  propinitpost = 1,
-  propinitstrain = 1,
-  propinitprot = 1,
-  migrationdata,
-  riskdata,
+  nnat = 1,
+  nrisk = 1,
+  npost = 1,
+  nstrain = 1,
+  nprot = 1,
+  migrationdata = list(),
+  riskdata = list(),
+  postdata = list(),
+  straindata = list(),
+  protdata = list(),
   verbose = FALSE
 )
 }
 \arguments{
 \item{tc}{TODO}
 
-\item{propinitnat}{vector of length nnat with initial proportions}
+\item{nnat}{TODO}
 
-\item{propinitrisk}{vector of length nrisk with initial proportions}
+\item{nrisk}{TODO}
 
-\item{birthrisk}{where to births go in risk?}
+\item{npost}{TODO}
 
-\item{propinitpost}{initial post-TB proportions}
+\item{nstrain}{TODO}
 
-\item{propinitstrain}{initial TB strain proportions}
-
-\item{propinitprot}{initial TB protection proportions}
+\item{nprot}{TODO}
 
 \item{migrationdata}{list of migration data see details}
 
 \item{riskdata}{list of risk data see details}
+
+\item{postdata}{TODO}
+
+\item{straindata}{TODO}
+
+\item{protdata}{TODO}
 
 \item{verbose}{give more feedback}
 }
