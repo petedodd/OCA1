@@ -18,11 +18,9 @@ ocaode_ <- R6::R6Class(
       rhs_desolve = "ocaode_rhs_desolve",
       initmod_desolve = "ocaode_initmod_desolve"),
     dll = "OCA1",
-    user = c("BF", "birthrisk", "BM", "immigration_female",
-             "immigration_male", "migrage", "nage", "nnat", "npost", "nprot",
-             "nrisk", "nstrain", "PmigrF_post", "PmigrF_prot", "PmigrF_risk",
-             "PmigrF_strain", "PmigrM_post", "PmigrM_prot", "PmigrM_risk",
-             "PmigrM_strain", "popdatF", "popdatM", "popinitF", "popinitM",
+    user = c("BB", "birthrisk", "immigration", "migrage", "nage", "nnat",
+             "npost", "nprot", "nrisk", "nstrain", "Pmigr_post",
+             "Pmigr_prot", "Pmigr_risk", "Pmigr_strain", "popdat", "popinit",
              "r", "RiskHazardData", "ttp"),
 
     ## This is never called, but is used to ensure that R finds our

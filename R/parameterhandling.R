@@ -87,6 +87,8 @@ create_demographic_parms <- function(tc = 1970:2020,
 
   ## --- build on base parameters:
   ## now promote the initial states to arrays:
+  ntimes <- length(ttp)         #number of data time points
+  nage <- length(OCA1::agz)     #number of ages
   nnat <- length(propinitnat) #number of nativity classes
   nrisk <- length(propinitrisk) # number of nativity classes
   if (verbose) cat("Using ", nnat, " nativity classes...\n")
@@ -101,52 +103,54 @@ create_demographic_parms <- function(tc = 1970:2020,
   if (verbose) cat("Using ", nprot, " TB protection classes (1=none)...\n")
 
   ## promote to array
-  popinitF <- array(popinitF,
-                    dim = c(length(OCA1::agz), nnat, nrisk, npost, nstrain, nprot),
-                    dimnames = list(
-                      acat = OCA1::agz,
-                      nativity = 1:nnat,
-                      risk = 1:nrisk,
-                      post = 1:npost,
-                      strain = 1:nstrain,
-                      protn = 1:nprot
-                    )
-                    )
-  popinitM <- array(popinitM,
-                    dim = c(length(OCA1::agz), nnat, nrisk, npost, nstrain, nprot),
-                    dimnames = list(
-                      acat = OCA1::agz,
-                      nativity = 1:nnat,
-                      risk = 1:nrisk,
-                      post = 1:npost,
-                      strain = 1:nstrain,
-                      protn = 1:nprot
-                    )
+  popinit <- array(0,
+    dim = c(nage, 2, nnat, nrisk, npost, nstrain, nprot),
+    dimnames = list(
+      acat = OCA1::agz,
+      sex = c("M", "F"),
+      nativity = 1:nnat,
+      risk = 1:nrisk,
+      post = 1:npost,
+      strain = 1:nstrain,
+      protn = 1:nprot
     )
+  )
+  popinit[, 1, , , , , ] <- popinitM
+  popinit[, 2, , , , , ] <- popinitF
 
-  if (verbose) cat("*** NOTE: this will use ", 2*prod(dim(popinitM)), " strata! ***\n")
+  ## male/female births
+  BB <- cbind(bzm,bzf)
+
+  ## combine ageing data
+  popdat <- array(0,
+    dim = c(ntimes, nage, 2),
+    dimnames = list(
+      tindex = 1:ntimes,
+      acat = OCA1::agz,
+      sex = c("M", "F")
+    )
+  )
+  popdat[, , 1] <- omegaM
+  popdat[, , 2] <- omegaF
+
+  if (verbose) cat("*** NOTE: this will use ", 2*prod(dim(popinit)), " strata! ***\n")
   if (verbose) cat("The total number of ODEs will be (the number of strata) x (the number of TB states).\n")
 
   ## multiply nativity/risk by proportions (done like this to avoid nested loops)
   for (k in 1:nnat) {
-    popinitM[, k, , , , ] <- popinitM[, k, , , , ] * propinitnat[k]
-    popinitF[, k, , , , ] <- popinitF[, k, , , , ] * propinitnat[k]
+    popinit[, , k, , , , ] <- popinit[, , k, , , , ] * propinitnat[k]
   }
   for (l in 1:nrisk) {
-    popinitM[, , l, , , ] <- popinitM[, , l, , , ] * propinitrisk[l]
-    popinitF[, , l, , , ] <- popinitF[, , l, , , ] * propinitrisk[l]
+    popinit[, , , l, , , ] <- popinit[, , , l, , , ] * propinitrisk[l]
   }
   for (i5 in 1:npost) {
-    popinitM[, , , i5, , ] <- popinitM[, , , i5, , ] * propinitpost[i5]
-    popinitF[, , , i5, , ] <- popinitF[, , , i5, , ] * propinitpost[i5]
+    popinit[, , , , i5, , ] <- popinit[, , , , i5, , ] * propinitpost[i5]
   }
   for (i6 in 1:nstrain) {
-    popinitM[, , , , i6, ] <- popinitM[, , , , i6, ] * propinitstrain[i6]
-    popinitF[, , , , i6, ] <- popinitF[, , , , i6, ] * propinitstrain[i6]
+    popinit[, , , , , i6, ] <- popinit[, , , , , i6, ] * propinitstrain[i6]
   }
   for (i7 in 1:nprot) {
-    popinitM[, , , , , i7] <- popinitM[, , , , , i7] * propinitprot[i7]
-    popinitF[, , , , , i7] <- popinitF[, , , , , i7] * propinitprot[i7]
+    popinit[, , , , , , i7] <- popinit[, , , , , , i7] * propinitprot[i7]
   }
 
   ## migration data
@@ -154,18 +158,24 @@ create_demographic_parms <- function(tc = 1970:2020,
     if (verbose & nnat>1) cat("Multiple nativity classes, but no migration dynamics data supplied: using static defaults.\n")
     migrage <- rep(0,nnat) #rates of moving between categories
     ## plumbing for where new migrants go in strata:
-    ## M & F
-    PmigrF_risk <- PmigrM_risk <- rep(0, nrisk)
-    PmigrF_post <- PmigrM_post <- rep(0, npost)
-    PmigrF_strain <- PmigrM_strain <- rep(0, nstrain)
-    PmigrF_prot <- PmigrM_prot <- rep(0, nprot)
+    Pmigr_risk <- matrix(0, nrow = 2, ncol = nrisk)
+    Pmigr_post <- matrix(0, nrow = 2, ncol = npost)
+    Pmigr_strain <- matrix(0, nrow = 2, ncol = nstrain)
+    Pmigr_prot <- matrix(0, nrow = 2, ncol = nprot)
     ## default to bottom:
-    PmigrF_risk[1] <- PmigrM_risk[1] <- 1
-    PmigrF_post[1] <- PmigrM_post[1] <- 1
-    PmigrF_strain[1] <- PmigrM_strain[1] <- 1
-    PmigrF_prot[1] <- PmigrM_prot[1] <- 1
+    Pmigr_risk[, 1] <- 1
+    Pmigr_post[, 1] <- 1
+    Pmigr_strain[, 1] <- 1
+    Pmigr_prot[, 1] <- 1
     ## migration flow
-    immigration_female <- immigration_male <- matrix(0, nrow = length(tc), ncol = length(OCA1::agz))
+    immigration <- array(0,
+      dim = c(ntimes, nage, 2),
+      dimnames = list(
+        tindex = 1:ntimes,
+        acat = OCA1::agz,
+        sex = c("M", "F")
+      )
+    )
   } else {
     ## TODO checks
     ## relevant data in migrationdata list
@@ -184,9 +194,9 @@ create_demographic_parms <- function(tc = 1970:2020,
     if (verbose & nrisk > 1) cat("Multiple risk classes, but no dynamics data supplied: using static defaults.\n")
     ## zeros all the way:
     RiskHazardData <- array(0,
-      dim = c(length(ttp), length(OCA1::agz), 2, nrisk),
+      dim = c(ntimes, nage, 2, nrisk),
       dimnames = list(
-        tindex = 1:length(ttp),
+        tindex = 1:ntimes,
         acat = OCA1::agz,
         sex = c("M", "F"),
         risk = 1:nrisk
@@ -208,23 +218,16 @@ create_demographic_parms <- function(tc = 1970:2020,
     birthrisk = birthrisk,
     r = r,
     ttp = tc,
-    popdatF = omegaF,
-    popdatM = omegaM,
-    BF = bzf, BM = bzm,
-    popinitM = popinitM,
-    popinitF = popinitF,
+    popdat = popdat,
+    BB = BB,
+    popinit = popinit,
     ## migration data:
     migrage = migrage,
-    PmigrF_risk = PmigrF_risk,
-    PmigrM_risk = PmigrM_risk,
-    PmigrF_post = PmigrF_post,
-    PmigrM_post = PmigrM_post,
-    PmigrF_strain = PmigrF_strain,
-    PmigrM_strain = PmigrM_strain,
-    PmigrF_prot = PmigrF_prot,
-    PmigrM_prot = PmigrM_prot,
-    immigration_female = immigration_female,
-    immigration_male = immigration_male,
+    Pmigr_risk = Pmigr_risk,
+    Pmigr_post = Pmigr_post,
+    Pmigr_strain = Pmigr_strain,
+    Pmigr_prot = Pmigr_prot,
+    immigration = immigration,
     ## risk dynamics
     RiskHazardData = RiskHazardData
   )
