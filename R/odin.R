@@ -20,8 +20,12 @@ ocaode_ <- R6::R6Class(
     dll = "OCA1",
     user = c("BB", "birthrisk", "immigration", "migrage", "nage", "nnat",
              "npost", "nprot", "nrisk", "nstrain", "Pmigr_post",
-             "Pmigr_prot", "Pmigr_risk", "Pmigr_strain", "popdat", "popinit",
-             "r", "RiskHazardData", "ttp"),
+             "Pmigr_prot", "Pmigr_risk", "Pmigr_strain", "popdat",
+             "popinitA", "popinitE", "popinitL", "popinitS", "popinitT",
+             "popinitU", "r", "RiskHazardData", "ttp", "detect_asymp",
+             "detect_symp", "foi", "mortality_untreatedTB", "progn_fast",
+             "progn_slow", "progn_symp", "stabilization",
+             "treatment_inversedurn"),
 
     ## This is never called, but is used to ensure that R finds our
     ## symbols that we will use from the package; without this they

@@ -1,25 +1,17 @@
 # OCA1
 UK TB transmission model
 
-This uses `odin` vn 1 as tjos seems to work
+This uses `odin` vn 1 as this seems to work
 
 
 ## Work in progress:
 
-Currently, this is just simulating 17 age cat 2 sex demography for UK
-
-A. Immediate next steps:
-
-1. work on additional indices
-
-B. Medium term next steps:
-1. introduce indices relating to migration and in/out migration
 2. introduce TB-related index layers
 3. decide on and start to implement TB model structure
 
 C. End project steps
 1. more realistic input/output handling
-2. fitting utilities?
+
 
 
 ## Updating
