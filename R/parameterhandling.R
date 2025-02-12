@@ -49,13 +49,26 @@ check_probabilities <- function(params) {
     return(FALSE)
   }
 
-  # 3. Check if the sum is (approximately) equal to 1 (important for discrete distributions):
-  if (abs(sum(params) - 1) > .Machine$double.eps^0.5) { # Using tolerance for floating point comparison
+  if(is.vector(params)){
+  
+  # 3. Check if the sum is (approximately) equal to 1 
+  if (abs(sum(params) - 1) > .Machine$double.eps^0.5) { 
     message("The sum of parameters must be approximately equal to 1.")
     return(FALSE)
   }
 
-  return(TRUE) # Return TRUE if all checks pass (implicitly returns NULL if stop is called)
+    
+  }
+  
+  else if(is.matrix(params)){
+    
+    test <- apply(params, 1, function(x) abs(sum(x) - 1) > .Machine$double.eps^0.5)
+    
+    if(any(test)) return(FALSE)
+    
+  }
+  
+  return(TRUE) # Return TRUE if all checks pass 
 }
 
 ## utility: length if vector, dim[2] if array
@@ -265,7 +278,7 @@ create_demographic_parms <- function(tc = 1970:2020,
   if(all(checks)){
     if(verbose) message("All parameters containing probabilities were correct\n")
   }  else {
-    message("Parameters with problems:", paste(names(param_list)[!checks]))
+    message("Parameters with problems:", paste(names(param_list)[!checks],collapse = ", "))
   }
 
   ## check dimension
