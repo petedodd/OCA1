@@ -15,19 +15,19 @@ test_that("default_parameters works", {
 
 
 
-if(parname %in% c("Pmigr_risk","propinitrisk","birthrisk")){
-  ans <- hotone(dms[3]) #nrisk
-}
-if(parname %in% c("Pmigr_post","propinitpost")){
-  ans <- hotone(dms[4]) #npost
-}
-if(parname %in% c("Pmigr_strain","propinitstrain")){
-  ans <- hotone(dms[5]) #nstrain
-}
-if(parname %in% c("Pmigr_prot","propinitprot")){
-  ans <- hotone(dms[6]) #nprotn
-}
+#if(parname %in% c("Pmigr_risk","propinitrisk","birthrisk")){
+#  ans <- hotone(dms[3]) #nrisk
+#}
+#if(parname %in% c("Pmigr_post","propinitpost")){
+#  ans <- hotone(dms[4]) #npost
+#}
+#if(parname %in% c("Pmigr_strain","propinitstrain")){
+#  ans <- hotone(dms[5]) #nstrain
+#}
+#if(parname %in% c("Pmigr_prot","propinitprot")){
+#  ans <- hotone(dms[6]) #nprotn
+#}
 ## these need bumping up to duplicate by sex
-if(parname %in% c("Pmigr_risk","Pmigr_post","Pmigr_strain","Pmigr_prot")){
-  ans <- rbind(ans,ans) #one for each sex
-}
+#if(parname %in% c("Pmigr_risk","Pmigr_post","Pmigr_strain","Pmigr_prot")){
+#  ans <- rbind(ans,ans) #one for each sex
+#}
