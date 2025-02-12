@@ -33,9 +33,10 @@ runmodel <- function(p, times, raw = FALSE) {
 raw2datatable <- function(ans) {
     ans <- data.table::as.data.table(ans)
     ans <- data.table::melt(ans, id = "t")
-    ans[, variable := gsub("\\[|\\]|N", "", variable)]
+    ans[, state := gsub("\\[|\\]|,|[[:digit:]]+", "", variable)]
+    ans[, vars := gsub("\\[|\\]|[[:alpha:]]+", "", variable)]
     ans[, c("astring", "sexstring", "natstring","rskstring","poststring","strainstring","protstring") :=
-            data.table::tstrsplit(variable, split = ",")]
+            data.table::tstrsplit(vars, split = ",")]
     ans[, c("AgeGrp", "sex", "natcat","risk","post","strain","prot") := .(
             OCA1::agz[as.integer(astring)],
             c("M", "F")[as.integer(sexstring)],
@@ -45,7 +46,7 @@ raw2datatable <- function(ans) {
             as.integer(strainstring),
             as.integer(protstring)
           )]
-    ans[, c("astring", "sexstring", "natstring", "rskstring", "variable",
+    ans[, c("astring", "sexstring", "natstring", "rskstring", "vars", "variable",
             "poststring", "strainstring", "protstring") := NULL]
     ## as before
     ans$sex <- factor(ans$sex,levels=c("M","F"))
