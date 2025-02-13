@@ -6,6 +6,8 @@ output:
   pdf_document:
     toc: true
     number_sections: true
+header-includes:
+  \usepackage{fourier}
 vignette: >
   %\VignetteIndexEntry{OCA-model-specification}
   %\VignetteEngine{knitr::rmarkdown}
