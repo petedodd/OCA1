@@ -59,6 +59,8 @@ plt_DemoGrowth(out)               #total population over time
 plt_DemoSnapshots(out)            #snapshots
 
 plt_TBSnapshots(out)              # TB snaps
+plt_TBrates(out, riskk = 1, postt = 1, strainn = 1, prott = 1)  # incidence and notif rates
+plt_TBrates(out, riskk = 2, postt = 3, strainn = 1, prott = 1)  # shows missing data so use proper level
 
 
 ## version with 2 static nativity classes
