@@ -58,6 +58,9 @@ out                               #inspect
 plt_DemoGrowth(out)               #total population over time
 plt_DemoSnapshots(out)            #snapshots
 
+plt_TBSnapshots(out)              # TB snaps
+
+
 ## version with 2 static nativity classes
 pms <- create_demographic_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
 out <- runmodel(pms,raw=FALSE)
@@ -89,6 +92,9 @@ out <- runmodel(pms)
 out
 
 plt_DemoGrowth(out) #still stable
+
+## Looking at TB snapshots
+
 
 ```
 
