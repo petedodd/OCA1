@@ -1,4 +1,4 @@
-# OCA1
+# OCA1 <img src="man/figures/logo.png" align="right" height="139" alt="" />
 UK TB transmission model
 
 This uses `odin` vn 1 as this seems to work
