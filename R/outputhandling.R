@@ -22,7 +22,7 @@ plt_DemoGrowth <- function(outdat) {
     aes(Year, pop)
   ) +
     ggplot2::geom_point() +
-    ggplot2::geom_line(data = outdat[, .(pop = sum(value)), by = t], aes(t, pop), col = 2) +
+    ggplot2::geom_line(data = outdat[!grepl("rate", state), .(pop = sum(value)), by = t], aes(t, pop), col = 2) +
     ggplot2::ylab("Population (in thousands)") +
     ggplot2::ggtitle(cntry) +
     ggplot2::scale_y_continuous(labels = absspace) +
@@ -45,7 +45,7 @@ plt_DemoSnapshots <- function(outdat) {
   cntry <- "GBR"
   N <- OCA1::UKdemo$N
   tmz <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 5)
-  tmpo <- outdat[, .(value = sum(value)), by = .(t, sex, AgeGrp)]
+  tmpo <- outdat[!grepl("rate", state), .(value = sum(value)), by = .(t, sex, AgeGrp)]
   PL <- list()
   for (i in 1:length(tmz)) {
     YR <- tmz[i]
@@ -85,7 +85,7 @@ plt_TBSnapshots <- function(outdat){
   tmp <- tmp[t > 1970]
   # select every fifth year for population pyramid
   tmp <- tmp[t %% 5 == 0]
-  tmp <- tmp[state != "Uninfected", .(value = sum(value)), by = .(t, AgeGrp, sex, natcat, state)]
+  tmp <- tmp[(state!= "Uninfected" & !grepl("rate", state)), .(value = sum(value)), by = .(t, AgeGrp, sex, natcat, state)]
   tmp[, state := factor(state, levels = c("Learly", "Llate", "Asymp", "Symp", "Treat"))]
   
   pl <- ggplot2::ggplot(tmp, aes(x = AgeGrp, fill = state)) +
