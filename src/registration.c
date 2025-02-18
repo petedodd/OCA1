@@ -9,6 +9,7 @@
 
 /* .C calls */
 extern void ocaode_initmod_desolve(void *);
+extern void ocaode_output_dde(void *);
 extern void ocaode_rhs_dde(void *);
 extern void ocaode_rhs_desolve(void *);
 
@@ -23,6 +24,7 @@ extern SEXP ocaode_set_user(SEXP, SEXP);
 
 static const R_CMethodDef CEntries[] = {
     {"ocaode_initmod_desolve", (DL_FUNC) &ocaode_initmod_desolve, 1},
+    {"ocaode_output_dde",      (DL_FUNC) &ocaode_output_dde,      1},
     {"ocaode_rhs_dde",         (DL_FUNC) &ocaode_rhs_dde,         1},
     {"ocaode_rhs_desolve",     (DL_FUNC) &ocaode_rhs_desolve,     1},
     {NULL, NULL, 0}

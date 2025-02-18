@@ -36,39 +36,28 @@ create_demographic_baseparms <- function(tc = 1970:2020) {
 
 ## a utility to check probabilities are valid
 check_probabilities <- function(params) {
-
   # 1. Check for numeric type:
   if (!all(is.numeric(params))) {
     message("All parameters must be numeric.")
     return(FALSE)
   }
-
   # 2. Check for values between 0 and 1 (inclusive):
   if (!all(params >= 0 & params <= 1)) {
     message("All parameters must be probabilities between 0 and 1.")
     return(FALSE)
   }
-
   if(is.vector(params)){
-  
-  # 3. Check if the sum is (approximately) equal to 1 
-  if (abs(sum(params) - 1) > .Machine$double.eps^0.5) { 
-    message("The sum of parameters must be approximately equal to 1.")
-    return(FALSE)
+  # 3. Check if the sum is (approximately) equal to 1
+    if (abs(sum(params) - 1) > .Machine$double.eps^0.5) {
+      message("The sum of parameters must be approximately equal to 1.")
+      return(FALSE)
+    }
   }
-
-    
-  }
-  
   else if(is.matrix(params)){
-    
     test <- apply(params, 1, function(x) abs(sum(x) - 1) > .Machine$double.eps^0.5)
-    
     if(any(test)) return(FALSE)
-    
   }
-  
-  return(TRUE) # Return TRUE if all checks pass 
+  return(TRUE) # Return TRUE if all checks pass
 }
 
 ## utility: length if vector, dim[2] if array
@@ -87,7 +76,7 @@ check_dims <- function(parlist, dms){
     if(pname %in% c("Pmigr_risk","propinitrisk","birthrisk")){
       ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[3]) #nrisk
     }
-    if(pname %in% c("Pmigr_post","propinitpost")){
+    if(pname %in% c("Pmigr_post","propinitpost","progn_posttb")){
       ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[4]) #npost
     }
     if(pname %in% c("Pmigr_strain","propinitstrain")){
@@ -153,9 +142,9 @@ default_parameters <- function(parname, dms, verbose=FALSE){
         acat = OCA1::agz,
         sex = c("M", "F")
       )
-    )
+      )
   }
-  if(parname=="RiskHazardData"){
+  if(parname == "RiskHazardData"){
     ans <- array(0,
       dim = c(dms[1], length(OCA1::agz), 2, dms[3]),
       dimnames = list(
@@ -165,6 +154,9 @@ default_parameters <- function(parname, dms, verbose=FALSE){
         risk = 1:dms[3]
       )
     )
+  }
+  if (parname == "progn_posttb") {
+    ans <- rep(0,dms[4])
   }
   if(is.na(sum(ans))) stop("No default available for ",parname,"!\n") #sum to handle arrays
   ans
@@ -245,7 +237,7 @@ create_demographic_parms <- function(tc = 1970:2020,
   list2env(riskdata, envir = environment()) #load complete list
 
   ## --- post data
-  post_parnames <- c("propinitpost")
+  post_parnames <- c("propinitpost", "progn_posttb")
   postdata <- add_defaults_if_missing(postdata, post_parnames, dms, verbose)
   list2env(postdata, envir = environment()) #load complete list
 
@@ -295,6 +287,11 @@ create_demographic_parms <- function(tc = 1970:2020,
 
   ## check that the last layer of the risk progression hazard is zero
   if (any(RiskHazardData[, , , nrisk] > 0)) stop("Non-zero RiskHazardData in the top risk layer will result in a population leak!")
+
+  ## check post progression
+  if (any(progn_posttb < 0)) stop("Negative progression for post-TB!\n")
+  if (progn_posttb[1] > .Machine$double.eps^0.5 ) stop("First element positive in progn_posttb will generate unwanted behaviour!\n")
+  if (progn_posttb[npost] > .Machine$double.eps^0.5) stop("Last element positive in progn_posttb will generate unwanted behaviour!\n")
 
   ## === create the base parameters:
   list2env(create_demographic_baseparms(tc), envir = environment())
@@ -386,7 +383,9 @@ create_demographic_parms <- function(tc = 1970:2020,
     Pmigr_prot = Pmigr_prot,
     immigration = immigration,
     ## risk dynamics
-    RiskHazardData = RiskHazardData
+    RiskHazardData = RiskHazardData,
+    ## post-TB progression
+    progn_posttb = progn_posttb
   )
 }
 

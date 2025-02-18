@@ -16,15 +16,17 @@ ocaode_ <- R6::R6Class(
     cfuns = list(
       rhs_dde = "ocaode_rhs_dde",
       rhs_desolve = "ocaode_rhs_desolve",
-      initmod_desolve = "ocaode_initmod_desolve"),
+      initmod_desolve = "ocaode_initmod_desolve",
+      output_dde = "ocaode_output_dde"),
     dll = "OCA1",
     user = c("BB", "birthrisk", "immigration", "migrage", "nage", "nnat",
              "npost", "nprot", "nrisk", "nstrain", "Pmigr_post",
              "Pmigr_prot", "Pmigr_risk", "Pmigr_strain", "popdat",
              "popinitA", "popinitE", "popinitL", "popinitS", "popinitT",
              "popinitU", "r", "RiskHazardData", "ttp", "detect_asymp",
-             "detect_symp", "foi", "mortality_untreatedTB", "progn_fast",
-             "progn_slow", "progn_symp", "stabilization",
+             "detect_symp", "foi", "mortality_treated",
+             "mortality_untreated", "progn_fast", "progn_posttb",
+             "progn_slow", "progn_symp", "relapse", "stabilization",
              "treatment_inversedurn"),
 
     ## This is never called, but is used to ensure that R finds our
@@ -36,6 +38,7 @@ ocaode_ <- R6::R6Class(
         .C("ocaode_rhs_dde", package = "OCA1")
         .C("ocaode_rhs_desolve", package = "OCA1")
         .C("ocaode_initmod_desolve", package = "OCA1")
+        .C("ocaode_output_dde", package = "OCA1")
       }
     },
 

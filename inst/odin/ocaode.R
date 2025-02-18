@@ -28,6 +28,7 @@ ttp[] <- user()           #time points for data
 ## interpolation
 bz[] <- interpolate(ttp,BB,"linear")
 omega[,] <- interpolate(ttp,popdat,"linear")
+tol <- 1e-12 #tolerance safety
 
 ## by TB
 popinitU[,,,,,,] <- user() #initial population
@@ -73,8 +74,11 @@ progn_fast <- user(0.1)    #fast progression rate
 progn_symp <- user(0.5)    #symptom progression rate
 detect_asymp <- user(0.0)  #detection hazard, asymptomatic
 detect_symp <- user(1.0)   #detection hazard, symptomatic NOTE will need to be interpolated
-mortality_untreatedTB <- user(0)   #TODO applies to asymp also? may need to be array
+mortality_treated <- user(0.0)        #CFR treated TB
+mortality_untreated <- user(0)   #TODO applies to asymp also? may need to be array
 treatment_inversedurn <- user(0)      #ATM because o/w leak
+progn_posttb[] <- user(0)               #progression thru layers of posttb
+relapse <- user(1e-2)                 #relapse rate
 
 ## TODO which need to be arrays?
 
@@ -97,28 +101,61 @@ deriv(Uninfected[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogU
 deriv(Learly[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogE[i,j,k,l,i5,i6,i7] + foi * Uninfected[i,j,k,l,i5,i6,i7] - stabilization * Learly[i,j,k,l,i5,i6,i7] - progn_fast * Learly[i,j,k,l,i5,i6,i7]
 
 ## Late TBI
-deriv(Llate[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogL[i,j,k,l,i5,i6,i7] + stabilization * Learly[i,j,k,l,i5,i6,i7] - progn_slow * Llate[i,j,k,l,i5,i6,i7]
+deriv(Llate[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogL[i,j,k,l,i5,i6,i7] + stabilization * Learly[i,j,k,l,i5,i6,i7] - progn_slow * Llate[i,j,k,l,i5,i6,i7] + fromtreatmentL[i,j,k,l,i5,i6,i7] - relapsefrompost[i,j,k,l,i5,i6,i7]
 
 ## Asymptomatic TB disease
-deriv(Asymp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogA[i,j,k,l,i5,i6,i7] + progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7] - progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_asymp * Asymp[i,j,k,l,i5,i6,i7]
+deriv(Asymp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogA[i,j,k,l,i5,i6,i7] + progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7] - progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_asymp * Asymp[i,j,k,l,i5,i6,i7] + fromtreatmentA[i,j,k,l,i5,i6,i7] + relapsefrompost[i,j,k,l,i5,i6,i7]
 
 ## Symptomatic TB disease
-deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k,l,i5,i6,i7] + progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_symp * Symp[i,j,k,l,i5,i6,i7] - mortality_untreatedTB * Symp[i,j,k,l,i5,i6,i7]
+deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k,l,i5,i6,i7] + progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_symp * Symp[i,j,k,l,i5,i6,i7] - mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
 
 ## currently on ATT
-deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,k,l,i5,i6,i7] +  detect_asymp * Asymp[i,j,k,l,i5,i6,i7] +  detect_symp * Symp[i,j,k,l,i5,i6,i7] - treatment_inversedurn * Treat[i,j,k,l,i5,i6,i7]
+deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,k,l,i5,i6,i7] + treatmentstarts[i,j,k,l,i5,i6,i7] - treatmentends[i,j,k,l,i5,i6,i7] #TODO
 
 
-## TODO capture notifications
+## --- monitored rates
+## capture notifications
+rate_notificationrate <- 1e5 * sum(treatmentstarts) / (sum(totalpops) + tol)
+output(rate_notificationrate) <- TRUE
+## TODO check how it plays with current processing
 
+rate_tbmortality[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- mortality_treated * treatmentends[i,j,k,l,i5,i6,i7] + mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
+dim(rate_tbmortality) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+## --- interim quantities
+treatmentstarts[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- detect_asymp * Asymp[i,j,k,l,i5,i6,i7] +  detect_symp * Symp[i,j,k,l,i5,i6,i7]
+totalpops[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- Uninfected[i,j,k,l,i5,i6,i7] + Learly[i,j,k,l,i5,i6,i7] + Llate[i,j,k,l,i5,i6,i7] + Asymp[i,j,k,l,i5,i6,i7] + Symp[i,j,k,l,i5,i6,i7] + Treat[i,j,k,l,i5,i6,i7]
+
+## treatent ends & destinations
+treatmentends[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- treatment_inversedurn * Treat[i,j,k,l,i5,i6,i7]
+fromtreatmentL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nprot,1:nprot] <- if(i5==2) sum(treatmentends[i,j,k,l,1:npost,i6,i7]) else if(npost==1) (1-relapse) * treatmentends[i,j,k,l,i5,i6,i7] / (1-mortality_treated) else 0 #if post-TB layers, put in
+fromtreatmentA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(npost==1) relapse * treatmentends[i,j,k,l,i5,i6,i7] / (1-mortality_treated) else 0 #if no post-TB layers, put here
+relapsefrompost[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5==2) relapse * Llate[i,j,k,l,i5,i6,i7] else 0
+
+## NOTE on relapse (see above):
+## if npost = 1, relapse will go from T -> A
+## if npost > 1, relapse will go from L x (post == 1)
+## note that relapse is treated as probability for npost==1 and as rate for npost>1
+
+## TODO post-TB progression and relapse from post-TB
+## TODO convertions CFRs and mortality hazards
+## TODO tot up TB mortality and also introduce a correction to overall mortality
+
+
+## dims
+dim(treatmentstarts) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(totalpops) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(treatmentends) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(fromtreatmentL) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(fromtreatmentA) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(relapsefrompost) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 
 ## --- demographic dynamics summarizers
-demogU[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinU[i,j,k,l,i5,i6,i7] - omega[i,j] * Uninfected[i,j,k,l,i5,i6,i7] + migrU[i,j,k,l,i5,i6,i7] + migrageinU[i,j,k,l,i5,i6,i7] - migrageoutU[i,j,k,l,i5,i6,i7] + RiskChangeU[i,j,k,l,i5,i6,i7]
-demogE[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinE[i,j,k,l,i5,i6,i7] - omega[i,j] * Learly[i,j,k,l,i5,i6,i7] + migrE[i,j,k,l,i5,i6,i7] + migrageinE[i,j,k,l,i5,i6,i7] - migrageoutE[i,j,k,l,i5,i6,i7] + RiskChangeE[i,j,k,l,i5,i6,i7]
-demogL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinL[i,j,k,l,i5,i6,i7] - omega[i,j] * Llate[i,j,k,l,i5,i6,i7] + migrL[i,j,k,l,i5,i6,i7] + migrageinL[i,j,k,l,i5,i6,i7] - migrageoutL[i,j,k,l,i5,i6,i7] + RiskChangeL[i,j,k,l,i5,i6,i7]
-demogA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinA[i,j,k,l,i5,i6,i7] - omega[i,j] * Asymp[i,j,k,l,i5,i6,i7] + migrA[i,j,k,l,i5,i6,i7] + migrageinA[i,j,k,l,i5,i6,i7] - migrageoutA[i,j,k,l,i5,i6,i7] + RiskChangeA[i,j,k,l,i5,i6,i7]
-demogS[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinS[i,j,k,l,i5,i6,i7] - omega[i,j] * Symp[i,j,k,l,i5,i6,i7] + migrS[i,j,k,l,i5,i6,i7] + migrageinS[i,j,k,l,i5,i6,i7] - migrageoutS[i,j,k,l,i5,i6,i7] + RiskChangeS[i,j,k,l,i5,i6,i7]
-demogT[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinT[i,j,k,l,i5,i6,i7] - omega[i,j] * Treat[i,j,k,l,i5,i6,i7] + migrT[i,j,k,l,i5,i6,i7] + migrageinT[i,j,k,l,i5,i6,i7] - migrageoutT[i,j,k,l,i5,i6,i7] + RiskChangeT[i,j,k,l,i5,i6,i7]
+demogU[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinU[i,j,k,l,i5,i6,i7] - omega[i,j] * Uninfected[i,j,k,l,i5,i6,i7] + migrU[i,j,k,l,i5,i6,i7] + migrageinU[i,j,k,l,i5,i6,i7] - migrageoutU[i,j,k,l,i5,i6,i7] + RiskChangeU[i,j,k,l,i5,i6,i7] + PostTBprognU[i,j,k,l,i5,i6,i7]
+demogE[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinE[i,j,k,l,i5,i6,i7] - omega[i,j] * Learly[i,j,k,l,i5,i6,i7] + migrE[i,j,k,l,i5,i6,i7] + migrageinE[i,j,k,l,i5,i6,i7] - migrageoutE[i,j,k,l,i5,i6,i7] + RiskChangeE[i,j,k,l,i5,i6,i7] + PostTBprognE[i,j,k,l,i5,i6,i7]
+demogL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinL[i,j,k,l,i5,i6,i7] - omega[i,j] * Llate[i,j,k,l,i5,i6,i7] + migrL[i,j,k,l,i5,i6,i7] + migrageinL[i,j,k,l,i5,i6,i7] - migrageoutL[i,j,k,l,i5,i6,i7] + RiskChangeL[i,j,k,l,i5,i6,i7] + PostTBprognL[i,j,k,l,i5,i6,i7]
+demogA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinA[i,j,k,l,i5,i6,i7] - omega[i,j] * Asymp[i,j,k,l,i5,i6,i7] + migrA[i,j,k,l,i5,i6,i7] + migrageinA[i,j,k,l,i5,i6,i7] - migrageoutA[i,j,k,l,i5,i6,i7] + RiskChangeA[i,j,k,l,i5,i6,i7] + PostTBprognA[i,j,k,l,i5,i6,i7]
+demogS[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinS[i,j,k,l,i5,i6,i7] - omega[i,j] * Symp[i,j,k,l,i5,i6,i7] + migrS[i,j,k,l,i5,i6,i7] + migrageinS[i,j,k,l,i5,i6,i7] - migrageoutS[i,j,k,l,i5,i6,i7] + RiskChangeS[i,j,k,l,i5,i6,i7] + PostTBprognS[i,j,k,l,i5,i6,i7]
+demogT[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinT[i,j,k,l,i5,i6,i7] - omega[i,j] * Treat[i,j,k,l,i5,i6,i7] + migrT[i,j,k,l,i5,i6,i7] + migrageinT[i,j,k,l,i5,i6,i7] - migrageoutT[i,j,k,l,i5,i6,i7] + RiskChangeT[i,j,k,l,i5,i6,i7] + PostTBprognT[i,j,k,l,i5,i6,i7]
 
 dim(demogU) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(demogE) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
@@ -148,6 +185,7 @@ dim(native) <- nnat
 dim(birthrisk) <- nrisk
 dim(r) <- nage
 dim(tbbottom) <- c(npost,nstrain,nprot)
+dim(progn_posttb) <- npost
 
 dim(ageinU) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(ageinE) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
@@ -255,5 +293,19 @@ dim(RiskChangeA) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(RiskChangeS) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(RiskChangeT) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 
-## TODO
-## foi
+## -- posttb layer progression
+## NOTE ensure that progn_posttb[npost] == 0 and progn_posttb[1]==0
+PostTBprognU[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5>1) progn_posttb[i5-1] * Uninfected[i,j,k,l,i5-1,i6,i7]-progn_posttb[i5] * Uninfected[i,j,k,l,i5,i6,i7] else 0
+PostTBprognE[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5>1) progn_posttb[i5-1] * Learly[i,j,k,l,i5-1,i6,i7]-progn_posttb[i5] * Learly[i,j,k,l,i5,i6,i7] else 0
+PostTBprognL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5>1) progn_posttb[i5-1] * Llate[i,j,k,l,i5-1,i6,i7]-progn_posttb[i5] * Llate[i,j,k,l,i5,i6,i7] else 0
+PostTBprognA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5>1) progn_posttb[i5-1] * Asymp[i,j,k,l,i5-1,i6,i7]-progn_posttb[i5] * Asymp[i,j,k,l,i5,i6,i7] else 0
+PostTBprognS[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5>1) progn_posttb[i5-1] * Symp[i,j,k,l,i5-1,i6,i7]-progn_posttb[i5] * Symp[i,j,k,l,i5,i6,i7] else 0
+PostTBprognT[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5>1) progn_posttb[i5-1] * Treat[i,j,k,l,i5-1,i6,i7]-progn_posttb[i5] * Treat[i,j,k,l,i5,i6,i7] else 0
+
+dim(PostTBprognU) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(PostTBprognE) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(PostTBprognL) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(PostTBprognA) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(PostTBprognS) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(PostTBprognT) <-  c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+
