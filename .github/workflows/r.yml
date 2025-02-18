@@ -37,7 +37,7 @@ jobs:
         shell: Rscript {0}
       - name: Run tests
         run: |
-          Rscript -e 'testthat::check_local(".")'
+          Rscript -e 'testthat::test_local(".")'
       - name: Check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
