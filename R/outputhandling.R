@@ -7,7 +7,7 @@ absspace <- function(x, ...) {
 ##'
 ##' .. content for \details{} ..TODO
 ##' @title TODO
-##' @param outdat 
+##' @param outdat
 ##' @return  a ggplot2 plot object
 ##' @author Pete Dodd
 ##' @import ggplot2
@@ -72,13 +72,16 @@ plt_DemoSnapshots <- function(outdat) {
   ggpubr::ggarrange(plotlist = PL, ncol = 4, nrow = nr)
 }
 
+
+
+## TODO needs better factor names
+
 #' Title
 #'
 #' @param outdat data table output from by OCA1 model
 #'
 #' @returns ggplot2 plot
 #' @export
-
 plt_TBSnapshots <- function(outdat){
   mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
   tmp <- outdat
@@ -87,7 +90,7 @@ plt_TBSnapshots <- function(outdat){
   tmp <- tmp[t %% 5 == 0]
   tmp <- tmp[(state!= "Uninfected" & !grepl("rate", state)), .(value = sum(value)), by = .(t, AgeGrp, sex, natcat, state)]
   tmp[, state := factor(state, levels = c("Learly", "Llate", "Asymp", "Symp", "Treat"))]
-  
+
   pl <- ggplot2::ggplot(tmp, aes(x = AgeGrp, fill = state)) +
     ggplot2::coord_flip() +
     ggplot2::geom_bar(data = tmp[sex == 'M'], stat = 'identity', aes(y = value)) +  # Males (positive values)
@@ -100,9 +103,9 @@ plt_TBSnapshots <- function(outdat){
     ggplot2::geom_hline(yintercept = 0, col = 'grey') +
     ggplot2::theme_bw() +
     ggplot2::ggtitle("Population distribution by age, sex, nativity and TB status") +
-    ggplot2::ylab("Population") + 
+    ggplot2::ylab("Population") +
     ggplot2::xlab("")
-  
+
   pl
 }
 
