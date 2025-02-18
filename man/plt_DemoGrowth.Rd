@@ -7,7 +7,7 @@
 plt_DemoGrowth(outdat)
 }
 \arguments{
-\item{outdat}{}
+\item{outdat}{a data.table eg returned by runmodel with raw=FALSE}
 }
 \value{
 a ggplot2 plot object

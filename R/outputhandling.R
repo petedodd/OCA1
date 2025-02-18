@@ -7,7 +7,7 @@ absspace <- function(x, ...) {
 ##'
 ##' .. content for \details{} ..TODO
 ##' @title TODO
-##' @param outdat
+##' @param outdat  a data.table eg returned by runmodel with raw=FALSE
 ##' @return  a ggplot2 plot object
 ##' @author Pete Dodd
 ##' @import ggplot2
@@ -76,12 +76,13 @@ plt_DemoSnapshots <- function(outdat) {
 
 ## TODO needs better factor names
 
-#' Title
-#'
-#' @param outdat data table output from by OCA1 model
-#'
-#' @returns ggplot2 plot
-#' @export
+##' .. content for \description{} (no empty lines) ..TODO
+##'
+##' .. content for \details{} ..TODO
+##' @title TODO
+##' @param outdat a data.table eg returned by runmodel with raw=FALSE
+##' @returns ggplot2 plot
+##' @export
 plt_TBSnapshots <- function(outdat){
   mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
   tmp <- outdat
