@@ -32,12 +32,12 @@ jobs:
           r-version: ${{ matrix.r-version }}
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "rcmdcheck", "devtools"))
+          install.packages(c("remotes", "rcmdcheck", "testthat"))
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       - name: Run tests
         run: |
-          Rscript -e 'devtools::test(" ")'
+          Rscript -e 'testthat::check_local(".")'
       - name: Check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
