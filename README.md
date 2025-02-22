@@ -1,3 +1,5 @@
+[![R Package Tests](https://github.com/petedodd/OCA1/actions/workflows/r.yml/badge.svg)](https://github.com/petedodd/OCA1/actions/workflows/r.yml)
+
 # OCA1 <img src="man/figures/logo.png" align="right" height="139" alt="" />
 UK TB transmission model
 
