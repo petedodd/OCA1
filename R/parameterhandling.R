@@ -1,6 +1,8 @@
 ## internal package function aimed at simplifying additional layers of parameter customization
 create_demographic_baseparms <- function(tc = 1970:2020) {
   r <- OCA1::UKdemo$r
+  if(any(is.null(tc) | is.na(tc))) stop("tc argument must not contain any NA values")
+  if(!(all(is.numeric(tc)))) stop("tc argument must only contain numeric values")
   if(min(tc) < min(OCA1::UKdemo$omega$Year) | max(tc) > max(OCA1::UKdemo$omega$Year)) stop("Range of tc must between 1950 and 2100")
   ## men
   omegaL <- OCA1::UKdemo$omega[Year %in% tc, .(Year, AgeGrp, omegaM)]
