@@ -21,6 +21,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Create R cache directory
+        run: mkdir -p ~/.cache/R  # Create the directory
 
       - uses: actions/cache@v4
         with:
