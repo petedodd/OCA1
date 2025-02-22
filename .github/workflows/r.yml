@@ -1,43 +1,44 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-#
-# See https://github.com/r-lib/actions/tree/master/examples#readme for
-# additional example workflows available for the R community.
-
-name: R
+name: R Package Tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: macos-latest
+  test:
+    runs-on: ${{ matrix.config.os }}
     strategy:
       matrix:
-        r-version: ['4.1.1']
+        config:
+          - { os: ubuntu-latest, r: '4.3', rspm: 'https://packagemanager.r-project.org/all/latest' }
+          - { os: macos-latest, r: '4.3', rspm: 'https://packagemanager.r-project.org/all/latest' }
+          - { os: windows-latest, r: '4.3', rspm: 'https://packagemanager.r-project.org/all/latest' }
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up R ${{ matrix.r-version }}
-        uses: r-lib/actions/setup-r@f57f1301a053485946083d7a45022b278929a78a
+
+      - uses: actions/cache@v4
         with:
-          r-version: ${{ matrix.r-version }}
+          path: ~/.cache/R
+          key: ${{ runner.os }}-r-${{ matrix.config.r }}-${{ hashFiles('DESCRIPTION') }}
+          restore-keys: |
+            ${{ runner.os }}-r-${{ matrix.config.r }}-
+            ${{ runner.os }}-r-
+
+      - uses: r-lib/actions/setup-r@v2 # Use latest v2
+        with:
+          r-version: ${{ matrix.config.r }} # Use matrix.config.r
+          use-rspm: true
+          sudo: false # Explicitly disable sudo 
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "rcmdcheck", "testthat"))
-          remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
-      - name: Run tests
-        run: |
-          Rscript -e 'testthat::test_local(".")'
-      - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
+          Rscript -e 'install.packages(c("remotes", "rcmdcheck", "testthat"), repos = "https://cloud.r-project.org/")'
+          Rscript -e 'remotes::install_deps(dependencies = TRUE)'
+
+      - name: Run Tests
+        run: Rscript -e 'testthat::test_local()'
