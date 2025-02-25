@@ -26,6 +26,8 @@ knitr::opts_chunk$set(
 
 TODO 
 
+![Model diagram.](model.png)
+
 # demography
 
 $$
