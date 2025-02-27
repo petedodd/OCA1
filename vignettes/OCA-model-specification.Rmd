@@ -31,8 +31,28 @@ TODO
 # demography
 
 $$
+\frac{\mathrm{d}}{\mathrm{d}t}N_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)
+$$
+
+where $a$ is age, $s$ is sez, $n$ is natal class, $r$ is risk group, $p$ is protection, and $q$ is strain.
+
+$$
 \begin{aligned}
-    & \frac{\mathrm{d}}{\mathrm{d}t}N_{a,s,n,r,p,v}(t) = {b}_{a,s,n,r,p,v}(t) - \bar{\mu}N_{}(t)\\
+& \frac{\mathrm{d}}{\mathrm{d}t}U_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
+& \frac{\mathrm{d}}{\mathrm{d}t}E_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
+& \frac{\mathrm{d}}{\mathrm{d}t}L_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
+& \frac{\mathrm{d}}{\mathrm{d}t}A_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
+& \frac{\mathrm{d}}{\mathrm{d}t}D_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
+& \frac{\mathrm{d}}{\mathrm{d}t}T_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)
+\end{aligned}
+$$
+
+TODO other stuff
+
+
+$$
+\begin{aligned}
+    & \frac{\mathrm{d}}{\mathrm{d}t}N_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
     & N_t(s,a,h,r) = \overbrace{b_t(s)\delta(a)}^{\mathrm{births}} -\overbrace{ \mu^0_t(s,a)N_t(s,a,h,r)}^{\mathrm{background~deaths}} + \overbrace{m_t(s,a)}^{\mathrm{net~migration}}\\
     & -\chi_{h>0}\chi_{r=0}\times\mu^H(s,a,h)N_t(s,a,h,r)\\
     &-\chi_{h>0}\chi_{r>0}\times\mu^A(s,a,h,r)N_t(s,a,h,r)  \\
