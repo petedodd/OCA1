@@ -272,7 +272,7 @@ create_demographic_parms <- function(tc = 1970:2020,
   if(all(checks)){
     if(verbose) message("All parameters containing probabilities were correct\n")
   }  else {
-    message("Parameters with problems:", paste(names(param_list)[!checks],collapse = ", "))
+    stop("Parameters with problems:", paste(names(param_list)[!checks],collapse = ", "))
   }
 
   ## check dimension

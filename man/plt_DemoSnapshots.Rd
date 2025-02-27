@@ -2,21 +2,31 @@
 % Please edit documentation in R/outputhandling.R
 \name{plt_DemoSnapshots}
 \alias{plt_DemoSnapshots}
-\title{TODO}
+\title{Visualising Demographic snapshots}
 \usage{
 plt_DemoSnapshots(outdat)
 }
 \arguments{
-\item{outdat}{a data.table eg returned by runmodel with raw=FALSE}
+\item{outdat}{a data.table returned by \code{runmodel} with \code{raw=FALSE}}
 }
 \value{
-a ggplot2 plot object
+a \code{ggplot2} plot object
 }
 \description{
-.. content for \description{} (no empty lines) ..TODO
+A short description...
 }
 \details{
-.. content for \details{} ..TODO
+Additional details...
+}
+\examples{
+pms <- create_demographic_parms() #create UK parameters
+out <- runmodel(pms)              #run model with these
+out                               #inspect
+## visualize
+plt_DemoSnapshots(out)  
+}
+\seealso{
+\code{\link[=plt_DemoGrowth]{plt_DemoGrowth()}}
 }
 \author{
 Pete Dodd

@@ -3,13 +3,22 @@ absspace <- function(x, ...) {
   format(abs(x), ..., big.mark = " ", scientific = FALSE, trim = TRUE)
 }
 
-##' .. content for \description{} (no empty lines) ..TODO
-##'
-##' .. content for \details{} ..TODO
-##' @title TODO
-##' @param outdat  a data.table eg returned by runmodel with raw=FALSE
-##' @return  a ggplot2 plot object
+
+##' @title Visualising demographic growth over time
+##' @description
+##' `plt_DemoGrowth` takes an model output object and provides a visualisation to show how the population sizes change over time
+##' @param outdat  a data.table returned by `runmodel` with `raw=FALSE`
+##' @details
+##' The `ggplot2` package is used to construct a line and scatter plot for the population sizes for the time period used to run the model
+##' @return  a `ggplot2` plot object
+##' @seealso [plt_DemoSnapshots()]
 ##' @author Pete Dodd
+##' @examples
+##' pms <- create_demographic_parms() #create UK parameters
+##' out <- runmodel(pms)              #run model with these
+##' out                               #inspect
+##' ## visualize
+##' plt_DemoGrowth(out)  
 ##' @import ggplot2
 ##' @import data.table
 ##' @export
@@ -30,13 +39,22 @@ plt_DemoGrowth <- function(outdat) {
     ggplot2::expand_limits(y=c(0,NA))
 }
 
-##' .. content for \description{} (no empty lines) ..TODO
-##'
-##' .. content for \details{} ..TODO
-##' @title TODO
-##' @param outdat a data.table eg returned by runmodel with raw=FALSE
-##' @return a ggplot2 plot object
+
+##' @title Visualising Demographic snapshots
+##' @description
+##' A short description...
+##' @details
+##' Additional details...
+##' @seealso [plt_DemoGrowth()]
+##' @param outdat a data.table returned by `runmodel` with `raw=FALSE`
+##' @return a `ggplot2` plot object
 ##' @author Pete Dodd
+##' @examples
+##' pms <- create_demographic_parms() #create UK parameters
+##' out <- runmodel(pms)              #run model with these
+##' out                               #inspect
+##' ## visualize
+##' plt_DemoSnapshots(out)  
 ##' @import ggplot2
 ##' @import ggpubr
 ##' @import data.table

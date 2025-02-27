@@ -2,21 +2,31 @@
 % Please edit documentation in R/outputhandling.R
 \name{plt_DemoGrowth}
 \alias{plt_DemoGrowth}
-\title{TODO}
+\title{Visualising demographic growth over time}
 \usage{
 plt_DemoGrowth(outdat)
 }
 \arguments{
-\item{outdat}{a data.table eg returned by runmodel with raw=FALSE}
+\item{outdat}{a data.table returned by \code{runmodel} with \code{raw=FALSE}}
 }
 \value{
-a ggplot2 plot object
+a \code{ggplot2} plot object
 }
 \description{
-.. content for \description{} (no empty lines) ..TODO
+\code{plt_DemoGrowth} takes an model output object and provides a visualisation to show how the population sizes change over time
 }
 \details{
-.. content for \details{} ..TODO
+The \code{ggplot2} package is used to construct a line and scatter plot for the population sizes for the time period used to run the model
+}
+\examples{
+pms <- create_demographic_parms() #create UK parameters
+out <- runmodel(pms)              #run model with these
+out                               #inspect
+## visualize
+plt_DemoGrowth(out)  
+}
+\seealso{
+\code{\link[=plt_DemoSnapshots]{plt_DemoSnapshots()}}
 }
 \author{
 Pete Dodd
