@@ -48,10 +48,20 @@ create_demographic_parms(
 list of parameters to run odin model
 }
 \description{
-.. content for \description{} (no empty lines) ..TODO
+A short description...
 }
 \details{
-.. content for \details{} ..TODO
+Additional details...
+}
+\examples{
+## example without nativity class used
+pms <- create_demographic_parms() #create UK parameters
+## version with 2 static nativity classes
+pms <- create_demographic_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
+## version with 2 static nativity classes and 2 static risk classes
+pms <- create_demographic_parms(nnat = 2, nrisk = 2,
+                                migrationdata = list(propinitnat = c(0.9,0.1)),
+                                riskdata = list(propinitrisk = c(0.9,0.1)))
 }
 \author{
 Pete Dodd
