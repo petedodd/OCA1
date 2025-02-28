@@ -12,6 +12,7 @@ absspace <- function(x, ...) {
 ##' The `ggplot2` package is used to construct a line and scatter plot for the population sizes for the time period used to run the model
 ##' @return  a `ggplot2` plot object
 ##' @seealso [plt_DemoSnapshots()]
+##' @seealso [plt_TBSnapshots()]
 ##' @author Pete Dodd
 ##' @examples
 ##' pms <- create_demographic_parms() #create UK parameters
@@ -46,6 +47,7 @@ plt_DemoGrowth <- function(outdat) {
 ##' @details
 ##' Additional details...
 ##' @seealso [plt_DemoGrowth()]
+##' @seealso [plt_TBSnapshots()]
 ##' @param outdat a data.table returned by `runmodel` with `raw=FALSE`
 ##' @return a `ggplot2` plot object
 ##' @author Pete Dodd
@@ -92,14 +94,23 @@ plt_DemoSnapshots <- function(outdat) {
 
 
 
-## TODO needs better factor names
 
-##' .. content for \description{} (no empty lines) ..TODO
-##'
-##' .. content for \details{} ..TODO
-##' @title TODO
-##' @param outdat a data.table eg returned by runmodel with raw=FALSE
-##' @returns ggplot2 plot
+##' @title Visualising TB Snapshots
+##' @description
+##' A short description...
+##' @details
+##' Additional details...
+##' 
+##' @param outdat a data.table eg returned by `runmodel` with `raw=FALSE`
+##' @examples
+##' ##' pms <- create_demographic_parms() #create UK parameters
+##' out <- runmodel(pms)              #run model with these
+##' out                               #inspect
+##' ## visualize
+##' plt_TBSnapshots(out)  
+##' @returns `ggplot2` plot
+##' @seealso [plt_DemoSnapshots()]
+##' @seealso [plt_DemoGrowth()]
 ##' @export
 plt_TBSnapshots <- function(outdat){
   mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")

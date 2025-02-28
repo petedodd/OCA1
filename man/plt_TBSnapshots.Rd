@@ -2,19 +2,31 @@
 % Please edit documentation in R/outputhandling.R
 \name{plt_TBSnapshots}
 \alias{plt_TBSnapshots}
-\title{TODO}
+\title{Visualising TB Snapshots}
 \usage{
 plt_TBSnapshots(outdat)
 }
 \arguments{
-\item{outdat}{a data.table eg returned by runmodel with raw=FALSE}
+\item{outdat}{a data.table eg returned by \code{runmodel} with \code{raw=FALSE}}
 }
 \value{
-ggplot2 plot
+\code{ggplot2} plot
 }
 \description{
-.. content for \description{} (no empty lines) ..TODO
+A short description...
 }
 \details{
-.. content for \details{} ..TODO
+Additional details...
+}
+\examples{
+##' pms <- create_demographic_parms() #create UK parameters
+out <- runmodel(pms)              #run model with these
+out                               #inspect
+## visualize
+plt_TBSnapshots(out)  
+}
+\seealso{
+\code{\link[=plt_DemoSnapshots]{plt_DemoSnapshots()}}
+
+\code{\link[=plt_DemoGrowth]{plt_DemoGrowth()}}
 }

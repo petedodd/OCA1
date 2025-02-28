@@ -27,6 +27,8 @@ plt_DemoSnapshots(out)
 }
 \seealso{
 \code{\link[=plt_DemoGrowth]{plt_DemoGrowth()}}
+
+\code{\link[=plt_TBSnapshots]{plt_TBSnapshots()}}
 }
 \author{
 Pete Dodd
