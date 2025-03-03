@@ -64,9 +64,7 @@ out <- runmodel(pms)                    #rerun with above params
 plt_DemoGrowth(out)               #total population over time
 plt_DemoSnapshots(out)            #snapshots
 
-plt_TBSnapshots(out)              # TB snaps
 plt_TBSnapshots(out, by_layer = "natcat")
-
 plt_TBSnapshots(out, by_layer = "risk") # pyramid
 plt_TBSnapshots(out, by_layer = "post") # pyramid
 
