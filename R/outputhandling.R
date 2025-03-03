@@ -94,53 +94,71 @@ plt_DemoSnapshots <- function(outdat) {
 
 
 
+#' Title
+#'
+#' @param outdat modelled output 
+#' @param by_layer one of natcat, risk, post, strain, prot
+#' @returns Population pyramid
+#' @export
+#'
 
-##' @title Visualising TB Snapshots
-##' @description
-##' A short description...
-##' @details
-##' Additional details...
-##' 
-##' @param outdat a data.table eg returned by `runmodel` with `raw=FALSE`
-##' @examples
-##' ##' pms <- create_demographic_parms() #create UK parameters
-##' out <- runmodel(pms)              #run model with these
-##' out                               #inspect
-##' ## visualize
-##' plt_TBSnapshots(out)  
-##' @returns `ggplot2` plot
-##' @seealso [plt_DemoSnapshots()]
-##' @seealso [plt_DemoGrowth()]
-##' @export
-plt_TBSnapshots <- function(outdat){
-  mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
-  tmp <- outdat
-  tmp <- tmp[t > 1970]
-  # select every fifth year for population pyramid
+plt_TBSnapshots <- function(outdat, by_layer) {
+
+  mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", 
+              "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
+  
+
+  layer_names <- c(
+    "natcat" = "Nativity",
+    "risk" = "TB risk",
+    "post" = "Post TB",
+    "strain" = "TB strain",
+    "prot" = "Protection"
+  )
+  
+  # Ensure the provided `by_layer` is valid
+  stopifnot(by_layer %in% names(layer_names))
+  
+  # Get the descriptive name for the selected layer
+  new_layer_name <- layer_names[[by_layer]]
+  
+  # Define dyn_name specific to the selected layer
+  #dyn_name <- paste(new_layer_name, "layer")
+  dyn_name <- new_layer_name
+  tmp <- outdat[t > 1970]
+  
   tmp <- tmp[t %% 5 == 0]
-  tmp <- tmp[(state!= "Uninfected" & !grepl("rate", state)), .(value = sum(value)), by = .(t, AgeGrp, sex, natcat, state)]
+  
+  # Aggregate population values by year, age group, sex, TB state, and the selected layer
+  tmp <- tmp[(state != "Uninfected" & !grepl("rate", state)), 
+             .(value = sum(value)), by = c("t", "AgeGrp", "sex", "state", by_layer)]
+  
+  tmp[, (by_layer) := paste0(new_layer_name, get(by_layer))]
+  setnames(tmp, by_layer, new_layer_name)
+  
   tmp[, state := factor(state, levels = c("Learly", "Llate", "Asymp", "Symp", "Treat"))]
-
+  
+  # Generate the population pyramid plot
   pl <- ggplot2::ggplot(tmp, aes(x = AgeGrp, fill = state)) +
     ggplot2::coord_flip() +
-    ggplot2::geom_bar(data = tmp[sex == 'M'], stat = 'identity', aes(y = value)) +  # Males (positive values)
-    ggplot2::geom_bar(data = tmp[sex == 'F'], stat = 'identity', aes(y = -value)) +  # Females (negative values on left)
-    ggplot2::scale_y_continuous(labels = function(x) format(abs(x), big.mark = ",", scientific = FALSE, trim = TRUE)) +  # Format y-axis labels as absolute values
+    ggplot2::geom_bar(data = tmp[sex == 'M'], stat = 'identity', aes(y = value)) +
+    ggplot2::geom_bar(data = tmp[sex == 'F'], stat = 'identity', aes(y = -value)) +
+    ggplot2::scale_y_continuous(labels = function(x) format(abs(x), big.mark = ",", scientific = FALSE, trim = TRUE)) +
     ggplot2::scale_fill_manual(values = mycols) +
-    ggplot2::facet_wrap(natcat ~ t, scales = 'free', nrow = 2) +
-    ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1),
-                   legend.position = "bottom") +
-    ggplot2::geom_hline(yintercept = 0, col = 'grey') +
+    ggplot2::facet_wrap(as.formula(paste0("`", new_layer_name, "` ~ t")), scales = 'free', nrow = 2) +
     ggplot2::theme_bw() +
-    ggplot2::ggtitle("Population distribution by age, sex, nativity and TB status") +
+    ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1),
+                   legend.position = "bottom", legend.title = element_blank()) +
+    ggplot2::geom_hline(yintercept = 0, col = 'grey') +
+        ggplot2::ggtitle(paste("Population distribution by Age, Sex,", dyn_name, "and TB status")) +
     ggplot2::ylab("Population") +
     ggplot2::xlab("")
-
+  
   pl
 }
 
-
-
+# plt_TBSnapshots(out, "natcat")
+# plt_TBSnapshots(out, "risk")
 
 
 #' Title
