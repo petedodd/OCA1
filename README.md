@@ -52,9 +52,13 @@ NOTE need to redo with explicit migration at some point in any case
 library(OCA1)
 
 ## example without nativity class used
-pms <- create_demographic_parms() #create UK parameters
-out <- runmodel(pms)              #run model with these
-out                               #inspect
+pms <- create_demographic_parms()       #create UK parameters
+out <- runmodel(pms,singleout = FALSE)  #run model with these, keep variable types separate
+out$state                               #inspect
+out$rate
+
+## run with all outputs together
+out <- runmodel(pms)                    #rerun with above params
 
 ## visualize
 plt_DemoGrowth(out)               #total population over time
