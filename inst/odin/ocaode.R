@@ -113,14 +113,28 @@ deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k
 deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,k,l,i5,i6,i7] + treatmentstarts[i,j,k,l,i5,i6,i7] - treatmentends[i,j,k,l,i5,i6,i7] #TODO
 
 
+##  l = risk group (optional)
+## TB:
+##  i5 = post-TB   (compulsory)
+##  i6 = strain    (optional)
+##  i7 = protection from TPT + vaccination (optional)
+
+
+
 ## --- monitored rates
 ## capture notifications
-rate_notificationrate <- 1e5 * sum(treatmentstarts) / (sum(totalpops) + tol)
-output(rate_notificationrate) <- TRUE
+output(rateNotification[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- 1e5 * treatmentstarts[i,j,k,l,i5,i6,i7] / (totalpops[i,j,k,l,i5,i6,i7] + tol)
+
 ## TODO check how it plays with current processing
 
-rate_tbmortality[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- mortality_treated * treatmentends[i,j,k,l,i5,i6,i7] + mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
-dim(rate_tbmortality) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+output(rateTBmortality[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- mortality_treated * treatmentends[i,j,k,l,i5,i6,i7] + mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
+output(rateIncidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7])/totalpops[i,j,k,l,i5,i6,i7]
+
+dim(rateIncidence) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(rateNotification) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(rateTBmortality) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+
+
 ## --- interim quantities
 treatmentstarts[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- detect_asymp * Asymp[i,j,k,l,i5,i6,i7] +  detect_symp * Symp[i,j,k,l,i5,i6,i7]
 totalpops[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- Uninfected[i,j,k,l,i5,i6,i7] + Learly[i,j,k,l,i5,i6,i7] + Llate[i,j,k,l,i5,i6,i7] + Asymp[i,j,k,l,i5,i6,i7] + Symp[i,j,k,l,i5,i6,i7] + Treat[i,j,k,l,i5,i6,i7]
