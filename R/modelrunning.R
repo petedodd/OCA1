@@ -9,13 +9,13 @@
 ##' @param p parameter list
 ##' @param times vector of times to run the model over - if not given, will construct from p
 ##' @param raw return the raw matrix ODE output or a data.table? (default FALSE)
-##' @param singleout (default TRUE) return a single output, or a list of data.tables split by variable type (only if raw=FALSE)
+##' @param singleout (default FALSE) return a single output, or a list of data.tables split by variable type (only if raw=FALSE)
 ##' @return a matrix of timeseries
 ##' @author Pete Dodd
 ##' @useDynLib OCA1, .registration = TRUE
 ##' @import data.table
 ##' @export
-runmodel <- function(p, times, raw = FALSE, singleout = TRUE) {
+runmodel <- function(p, times, raw = FALSE, singleout = FALSE) {
   if (missing(times)) {
     times <- seq(from = min(p$ttp), to = max(p$ttp), by = 0.1) # default times if not given
   }
@@ -39,7 +39,7 @@ raw2datatable <- function(ans) {
     ans <- data.table::as.data.table(ans)
     ans <- data.table::melt(ans, id = "t")
     ans[, state := gsub("\\[|\\]|,|[[:digit:]]+", "", variable)]
-    ans[, vars := gsub("\\[|\\]|[[:alpha:]]+", "", variable)]
+    ans[, vars := gsub("_|\\[|\\]|[[:alpha:]]+", "", variable)]
     ans[, c("astring", "sexstring", "natstring","rskstring","poststring","strainstring","protstring") :=
             data.table::tstrsplit(vars, split = ",")]
     ## suppressing warnings to allow graceful conversion to NA where missing
@@ -63,7 +63,7 @@ raw2datatable <- function(ans) {
 ## for outputting a list of data.tables by output type (var): determined by colnames of type var_nm
 typesplit_raw2datatable <- function(ans) {
   ## find prefixes
-  colnmz <- colnames(out)
+  colnmz <- colnames(ans)
   colnmz <- gsub("\\[|\\]|,|[[:digit:]]+", "", colnmz)
   colnmz <- unique(colnmz)
   PF <- strsplit(colnmz, split = "_")

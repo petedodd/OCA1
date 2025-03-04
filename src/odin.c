@@ -739,45 +739,45 @@ typedef struct ocaode_internal {
   int dim_PostTBprognU_7;
   int dim_progn_posttb;
   int dim_r;
-  int dim_rateIncidence;
-  int dim_rateIncidence_1;
-  int dim_rateIncidence_12;
-  int dim_rateIncidence_123;
-  int dim_rateIncidence_1234;
-  int dim_rateIncidence_12345;
-  int dim_rateIncidence_123456;
-  int dim_rateIncidence_2;
-  int dim_rateIncidence_3;
-  int dim_rateIncidence_4;
-  int dim_rateIncidence_5;
-  int dim_rateIncidence_6;
-  int dim_rateIncidence_7;
-  int dim_rateNotification;
-  int dim_rateNotification_1;
-  int dim_rateNotification_12;
-  int dim_rateNotification_123;
-  int dim_rateNotification_1234;
-  int dim_rateNotification_12345;
-  int dim_rateNotification_123456;
-  int dim_rateNotification_2;
-  int dim_rateNotification_3;
-  int dim_rateNotification_4;
-  int dim_rateNotification_5;
-  int dim_rateNotification_6;
-  int dim_rateNotification_7;
-  int dim_rateTBmortality;
-  int dim_rateTBmortality_1;
-  int dim_rateTBmortality_12;
-  int dim_rateTBmortality_123;
-  int dim_rateTBmortality_1234;
-  int dim_rateTBmortality_12345;
-  int dim_rateTBmortality_123456;
-  int dim_rateTBmortality_2;
-  int dim_rateTBmortality_3;
-  int dim_rateTBmortality_4;
-  int dim_rateTBmortality_5;
-  int dim_rateTBmortality_6;
-  int dim_rateTBmortality_7;
+  int dim_rate_Incidence;
+  int dim_rate_Incidence_1;
+  int dim_rate_Incidence_12;
+  int dim_rate_Incidence_123;
+  int dim_rate_Incidence_1234;
+  int dim_rate_Incidence_12345;
+  int dim_rate_Incidence_123456;
+  int dim_rate_Incidence_2;
+  int dim_rate_Incidence_3;
+  int dim_rate_Incidence_4;
+  int dim_rate_Incidence_5;
+  int dim_rate_Incidence_6;
+  int dim_rate_Incidence_7;
+  int dim_rate_Notification;
+  int dim_rate_Notification_1;
+  int dim_rate_Notification_12;
+  int dim_rate_Notification_123;
+  int dim_rate_Notification_1234;
+  int dim_rate_Notification_12345;
+  int dim_rate_Notification_123456;
+  int dim_rate_Notification_2;
+  int dim_rate_Notification_3;
+  int dim_rate_Notification_4;
+  int dim_rate_Notification_5;
+  int dim_rate_Notification_6;
+  int dim_rate_Notification_7;
+  int dim_rate_TBmortality;
+  int dim_rate_TBmortality_1;
+  int dim_rate_TBmortality_12;
+  int dim_rate_TBmortality_123;
+  int dim_rate_TBmortality_1234;
+  int dim_rate_TBmortality_12345;
+  int dim_rate_TBmortality_123456;
+  int dim_rate_TBmortality_2;
+  int dim_rate_TBmortality_3;
+  int dim_rate_TBmortality_4;
+  int dim_rate_TBmortality_5;
+  int dim_rate_TBmortality_6;
+  int dim_rate_TBmortality_7;
   int dim_relapsefrompost;
   int dim_relapsefrompost_1;
   int dim_relapsefrompost_12;
@@ -1009,7 +1009,7 @@ typedef struct ocaode_internal {
   int nprot;
   int nrisk;
   int nstrain;
-  int offset_output_rateIncidence;
+  int offset_output_rate_Incidence;
   int offset_variable_Asymp;
   int offset_variable_Llate;
   int offset_variable_Symp;
@@ -2058,45 +2058,45 @@ SEXP ocaode_contents(SEXP internal_p) {
   SET_VECTOR_ELT(contents, 663, ScalarInteger(internal->dim_PostTBprognU_7));
   SET_VECTOR_ELT(contents, 664, ScalarInteger(internal->dim_progn_posttb));
   SET_VECTOR_ELT(contents, 665, ScalarInteger(internal->dim_r));
-  SET_VECTOR_ELT(contents, 666, ScalarInteger(internal->dim_rateIncidence));
-  SET_VECTOR_ELT(contents, 667, ScalarInteger(internal->dim_rateIncidence_1));
-  SET_VECTOR_ELT(contents, 668, ScalarInteger(internal->dim_rateIncidence_12));
-  SET_VECTOR_ELT(contents, 669, ScalarInteger(internal->dim_rateIncidence_123));
-  SET_VECTOR_ELT(contents, 670, ScalarInteger(internal->dim_rateIncidence_1234));
-  SET_VECTOR_ELT(contents, 671, ScalarInteger(internal->dim_rateIncidence_12345));
-  SET_VECTOR_ELT(contents, 672, ScalarInteger(internal->dim_rateIncidence_123456));
-  SET_VECTOR_ELT(contents, 673, ScalarInteger(internal->dim_rateIncidence_2));
-  SET_VECTOR_ELT(contents, 674, ScalarInteger(internal->dim_rateIncidence_3));
-  SET_VECTOR_ELT(contents, 675, ScalarInteger(internal->dim_rateIncidence_4));
-  SET_VECTOR_ELT(contents, 676, ScalarInteger(internal->dim_rateIncidence_5));
-  SET_VECTOR_ELT(contents, 677, ScalarInteger(internal->dim_rateIncidence_6));
-  SET_VECTOR_ELT(contents, 678, ScalarInteger(internal->dim_rateIncidence_7));
-  SET_VECTOR_ELT(contents, 679, ScalarInteger(internal->dim_rateNotification));
-  SET_VECTOR_ELT(contents, 680, ScalarInteger(internal->dim_rateNotification_1));
-  SET_VECTOR_ELT(contents, 681, ScalarInteger(internal->dim_rateNotification_12));
-  SET_VECTOR_ELT(contents, 682, ScalarInteger(internal->dim_rateNotification_123));
-  SET_VECTOR_ELT(contents, 683, ScalarInteger(internal->dim_rateNotification_1234));
-  SET_VECTOR_ELT(contents, 684, ScalarInteger(internal->dim_rateNotification_12345));
-  SET_VECTOR_ELT(contents, 685, ScalarInteger(internal->dim_rateNotification_123456));
-  SET_VECTOR_ELT(contents, 686, ScalarInteger(internal->dim_rateNotification_2));
-  SET_VECTOR_ELT(contents, 687, ScalarInteger(internal->dim_rateNotification_3));
-  SET_VECTOR_ELT(contents, 688, ScalarInteger(internal->dim_rateNotification_4));
-  SET_VECTOR_ELT(contents, 689, ScalarInteger(internal->dim_rateNotification_5));
-  SET_VECTOR_ELT(contents, 690, ScalarInteger(internal->dim_rateNotification_6));
-  SET_VECTOR_ELT(contents, 691, ScalarInteger(internal->dim_rateNotification_7));
-  SET_VECTOR_ELT(contents, 692, ScalarInteger(internal->dim_rateTBmortality));
-  SET_VECTOR_ELT(contents, 693, ScalarInteger(internal->dim_rateTBmortality_1));
-  SET_VECTOR_ELT(contents, 694, ScalarInteger(internal->dim_rateTBmortality_12));
-  SET_VECTOR_ELT(contents, 695, ScalarInteger(internal->dim_rateTBmortality_123));
-  SET_VECTOR_ELT(contents, 696, ScalarInteger(internal->dim_rateTBmortality_1234));
-  SET_VECTOR_ELT(contents, 697, ScalarInteger(internal->dim_rateTBmortality_12345));
-  SET_VECTOR_ELT(contents, 698, ScalarInteger(internal->dim_rateTBmortality_123456));
-  SET_VECTOR_ELT(contents, 699, ScalarInteger(internal->dim_rateTBmortality_2));
-  SET_VECTOR_ELT(contents, 700, ScalarInteger(internal->dim_rateTBmortality_3));
-  SET_VECTOR_ELT(contents, 701, ScalarInteger(internal->dim_rateTBmortality_4));
-  SET_VECTOR_ELT(contents, 702, ScalarInteger(internal->dim_rateTBmortality_5));
-  SET_VECTOR_ELT(contents, 703, ScalarInteger(internal->dim_rateTBmortality_6));
-  SET_VECTOR_ELT(contents, 704, ScalarInteger(internal->dim_rateTBmortality_7));
+  SET_VECTOR_ELT(contents, 666, ScalarInteger(internal->dim_rate_Incidence));
+  SET_VECTOR_ELT(contents, 667, ScalarInteger(internal->dim_rate_Incidence_1));
+  SET_VECTOR_ELT(contents, 668, ScalarInteger(internal->dim_rate_Incidence_12));
+  SET_VECTOR_ELT(contents, 669, ScalarInteger(internal->dim_rate_Incidence_123));
+  SET_VECTOR_ELT(contents, 670, ScalarInteger(internal->dim_rate_Incidence_1234));
+  SET_VECTOR_ELT(contents, 671, ScalarInteger(internal->dim_rate_Incidence_12345));
+  SET_VECTOR_ELT(contents, 672, ScalarInteger(internal->dim_rate_Incidence_123456));
+  SET_VECTOR_ELT(contents, 673, ScalarInteger(internal->dim_rate_Incidence_2));
+  SET_VECTOR_ELT(contents, 674, ScalarInteger(internal->dim_rate_Incidence_3));
+  SET_VECTOR_ELT(contents, 675, ScalarInteger(internal->dim_rate_Incidence_4));
+  SET_VECTOR_ELT(contents, 676, ScalarInteger(internal->dim_rate_Incidence_5));
+  SET_VECTOR_ELT(contents, 677, ScalarInteger(internal->dim_rate_Incidence_6));
+  SET_VECTOR_ELT(contents, 678, ScalarInteger(internal->dim_rate_Incidence_7));
+  SET_VECTOR_ELT(contents, 679, ScalarInteger(internal->dim_rate_Notification));
+  SET_VECTOR_ELT(contents, 680, ScalarInteger(internal->dim_rate_Notification_1));
+  SET_VECTOR_ELT(contents, 681, ScalarInteger(internal->dim_rate_Notification_12));
+  SET_VECTOR_ELT(contents, 682, ScalarInteger(internal->dim_rate_Notification_123));
+  SET_VECTOR_ELT(contents, 683, ScalarInteger(internal->dim_rate_Notification_1234));
+  SET_VECTOR_ELT(contents, 684, ScalarInteger(internal->dim_rate_Notification_12345));
+  SET_VECTOR_ELT(contents, 685, ScalarInteger(internal->dim_rate_Notification_123456));
+  SET_VECTOR_ELT(contents, 686, ScalarInteger(internal->dim_rate_Notification_2));
+  SET_VECTOR_ELT(contents, 687, ScalarInteger(internal->dim_rate_Notification_3));
+  SET_VECTOR_ELT(contents, 688, ScalarInteger(internal->dim_rate_Notification_4));
+  SET_VECTOR_ELT(contents, 689, ScalarInteger(internal->dim_rate_Notification_5));
+  SET_VECTOR_ELT(contents, 690, ScalarInteger(internal->dim_rate_Notification_6));
+  SET_VECTOR_ELT(contents, 691, ScalarInteger(internal->dim_rate_Notification_7));
+  SET_VECTOR_ELT(contents, 692, ScalarInteger(internal->dim_rate_TBmortality));
+  SET_VECTOR_ELT(contents, 693, ScalarInteger(internal->dim_rate_TBmortality_1));
+  SET_VECTOR_ELT(contents, 694, ScalarInteger(internal->dim_rate_TBmortality_12));
+  SET_VECTOR_ELT(contents, 695, ScalarInteger(internal->dim_rate_TBmortality_123));
+  SET_VECTOR_ELT(contents, 696, ScalarInteger(internal->dim_rate_TBmortality_1234));
+  SET_VECTOR_ELT(contents, 697, ScalarInteger(internal->dim_rate_TBmortality_12345));
+  SET_VECTOR_ELT(contents, 698, ScalarInteger(internal->dim_rate_TBmortality_123456));
+  SET_VECTOR_ELT(contents, 699, ScalarInteger(internal->dim_rate_TBmortality_2));
+  SET_VECTOR_ELT(contents, 700, ScalarInteger(internal->dim_rate_TBmortality_3));
+  SET_VECTOR_ELT(contents, 701, ScalarInteger(internal->dim_rate_TBmortality_4));
+  SET_VECTOR_ELT(contents, 702, ScalarInteger(internal->dim_rate_TBmortality_5));
+  SET_VECTOR_ELT(contents, 703, ScalarInteger(internal->dim_rate_TBmortality_6));
+  SET_VECTOR_ELT(contents, 704, ScalarInteger(internal->dim_rate_TBmortality_7));
   SET_VECTOR_ELT(contents, 705, ScalarInteger(internal->dim_relapsefrompost));
   SET_VECTOR_ELT(contents, 706, ScalarInteger(internal->dim_relapsefrompost_1));
   SET_VECTOR_ELT(contents, 707, ScalarInteger(internal->dim_relapsefrompost_12));
@@ -2412,7 +2412,7 @@ SEXP ocaode_contents(SEXP internal_p) {
   SET_VECTOR_ELT(contents, 933, ScalarInteger(internal->nprot));
   SET_VECTOR_ELT(contents, 934, ScalarInteger(internal->nrisk));
   SET_VECTOR_ELT(contents, 935, ScalarInteger(internal->nstrain));
-  SET_VECTOR_ELT(contents, 936, ScalarInteger(internal->offset_output_rateIncidence));
+  SET_VECTOR_ELT(contents, 936, ScalarInteger(internal->offset_output_rate_Incidence));
   SET_VECTOR_ELT(contents, 937, ScalarInteger(internal->offset_variable_Asymp));
   SET_VECTOR_ELT(contents, 938, ScalarInteger(internal->offset_variable_Llate));
   SET_VECTOR_ELT(contents, 939, ScalarInteger(internal->offset_variable_Symp));
@@ -3227,45 +3227,45 @@ SEXP ocaode_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 663, mkChar("dim_PostTBprognU_7"));
   SET_STRING_ELT(nms, 664, mkChar("dim_progn_posttb"));
   SET_STRING_ELT(nms, 665, mkChar("dim_r"));
-  SET_STRING_ELT(nms, 666, mkChar("dim_rateIncidence"));
-  SET_STRING_ELT(nms, 667, mkChar("dim_rateIncidence_1"));
-  SET_STRING_ELT(nms, 668, mkChar("dim_rateIncidence_12"));
-  SET_STRING_ELT(nms, 669, mkChar("dim_rateIncidence_123"));
-  SET_STRING_ELT(nms, 670, mkChar("dim_rateIncidence_1234"));
-  SET_STRING_ELT(nms, 671, mkChar("dim_rateIncidence_12345"));
-  SET_STRING_ELT(nms, 672, mkChar("dim_rateIncidence_123456"));
-  SET_STRING_ELT(nms, 673, mkChar("dim_rateIncidence_2"));
-  SET_STRING_ELT(nms, 674, mkChar("dim_rateIncidence_3"));
-  SET_STRING_ELT(nms, 675, mkChar("dim_rateIncidence_4"));
-  SET_STRING_ELT(nms, 676, mkChar("dim_rateIncidence_5"));
-  SET_STRING_ELT(nms, 677, mkChar("dim_rateIncidence_6"));
-  SET_STRING_ELT(nms, 678, mkChar("dim_rateIncidence_7"));
-  SET_STRING_ELT(nms, 679, mkChar("dim_rateNotification"));
-  SET_STRING_ELT(nms, 680, mkChar("dim_rateNotification_1"));
-  SET_STRING_ELT(nms, 681, mkChar("dim_rateNotification_12"));
-  SET_STRING_ELT(nms, 682, mkChar("dim_rateNotification_123"));
-  SET_STRING_ELT(nms, 683, mkChar("dim_rateNotification_1234"));
-  SET_STRING_ELT(nms, 684, mkChar("dim_rateNotification_12345"));
-  SET_STRING_ELT(nms, 685, mkChar("dim_rateNotification_123456"));
-  SET_STRING_ELT(nms, 686, mkChar("dim_rateNotification_2"));
-  SET_STRING_ELT(nms, 687, mkChar("dim_rateNotification_3"));
-  SET_STRING_ELT(nms, 688, mkChar("dim_rateNotification_4"));
-  SET_STRING_ELT(nms, 689, mkChar("dim_rateNotification_5"));
-  SET_STRING_ELT(nms, 690, mkChar("dim_rateNotification_6"));
-  SET_STRING_ELT(nms, 691, mkChar("dim_rateNotification_7"));
-  SET_STRING_ELT(nms, 692, mkChar("dim_rateTBmortality"));
-  SET_STRING_ELT(nms, 693, mkChar("dim_rateTBmortality_1"));
-  SET_STRING_ELT(nms, 694, mkChar("dim_rateTBmortality_12"));
-  SET_STRING_ELT(nms, 695, mkChar("dim_rateTBmortality_123"));
-  SET_STRING_ELT(nms, 696, mkChar("dim_rateTBmortality_1234"));
-  SET_STRING_ELT(nms, 697, mkChar("dim_rateTBmortality_12345"));
-  SET_STRING_ELT(nms, 698, mkChar("dim_rateTBmortality_123456"));
-  SET_STRING_ELT(nms, 699, mkChar("dim_rateTBmortality_2"));
-  SET_STRING_ELT(nms, 700, mkChar("dim_rateTBmortality_3"));
-  SET_STRING_ELT(nms, 701, mkChar("dim_rateTBmortality_4"));
-  SET_STRING_ELT(nms, 702, mkChar("dim_rateTBmortality_5"));
-  SET_STRING_ELT(nms, 703, mkChar("dim_rateTBmortality_6"));
-  SET_STRING_ELT(nms, 704, mkChar("dim_rateTBmortality_7"));
+  SET_STRING_ELT(nms, 666, mkChar("dim_rate_Incidence"));
+  SET_STRING_ELT(nms, 667, mkChar("dim_rate_Incidence_1"));
+  SET_STRING_ELT(nms, 668, mkChar("dim_rate_Incidence_12"));
+  SET_STRING_ELT(nms, 669, mkChar("dim_rate_Incidence_123"));
+  SET_STRING_ELT(nms, 670, mkChar("dim_rate_Incidence_1234"));
+  SET_STRING_ELT(nms, 671, mkChar("dim_rate_Incidence_12345"));
+  SET_STRING_ELT(nms, 672, mkChar("dim_rate_Incidence_123456"));
+  SET_STRING_ELT(nms, 673, mkChar("dim_rate_Incidence_2"));
+  SET_STRING_ELT(nms, 674, mkChar("dim_rate_Incidence_3"));
+  SET_STRING_ELT(nms, 675, mkChar("dim_rate_Incidence_4"));
+  SET_STRING_ELT(nms, 676, mkChar("dim_rate_Incidence_5"));
+  SET_STRING_ELT(nms, 677, mkChar("dim_rate_Incidence_6"));
+  SET_STRING_ELT(nms, 678, mkChar("dim_rate_Incidence_7"));
+  SET_STRING_ELT(nms, 679, mkChar("dim_rate_Notification"));
+  SET_STRING_ELT(nms, 680, mkChar("dim_rate_Notification_1"));
+  SET_STRING_ELT(nms, 681, mkChar("dim_rate_Notification_12"));
+  SET_STRING_ELT(nms, 682, mkChar("dim_rate_Notification_123"));
+  SET_STRING_ELT(nms, 683, mkChar("dim_rate_Notification_1234"));
+  SET_STRING_ELT(nms, 684, mkChar("dim_rate_Notification_12345"));
+  SET_STRING_ELT(nms, 685, mkChar("dim_rate_Notification_123456"));
+  SET_STRING_ELT(nms, 686, mkChar("dim_rate_Notification_2"));
+  SET_STRING_ELT(nms, 687, mkChar("dim_rate_Notification_3"));
+  SET_STRING_ELT(nms, 688, mkChar("dim_rate_Notification_4"));
+  SET_STRING_ELT(nms, 689, mkChar("dim_rate_Notification_5"));
+  SET_STRING_ELT(nms, 690, mkChar("dim_rate_Notification_6"));
+  SET_STRING_ELT(nms, 691, mkChar("dim_rate_Notification_7"));
+  SET_STRING_ELT(nms, 692, mkChar("dim_rate_TBmortality"));
+  SET_STRING_ELT(nms, 693, mkChar("dim_rate_TBmortality_1"));
+  SET_STRING_ELT(nms, 694, mkChar("dim_rate_TBmortality_12"));
+  SET_STRING_ELT(nms, 695, mkChar("dim_rate_TBmortality_123"));
+  SET_STRING_ELT(nms, 696, mkChar("dim_rate_TBmortality_1234"));
+  SET_STRING_ELT(nms, 697, mkChar("dim_rate_TBmortality_12345"));
+  SET_STRING_ELT(nms, 698, mkChar("dim_rate_TBmortality_123456"));
+  SET_STRING_ELT(nms, 699, mkChar("dim_rate_TBmortality_2"));
+  SET_STRING_ELT(nms, 700, mkChar("dim_rate_TBmortality_3"));
+  SET_STRING_ELT(nms, 701, mkChar("dim_rate_TBmortality_4"));
+  SET_STRING_ELT(nms, 702, mkChar("dim_rate_TBmortality_5"));
+  SET_STRING_ELT(nms, 703, mkChar("dim_rate_TBmortality_6"));
+  SET_STRING_ELT(nms, 704, mkChar("dim_rate_TBmortality_7"));
   SET_STRING_ELT(nms, 705, mkChar("dim_relapsefrompost"));
   SET_STRING_ELT(nms, 706, mkChar("dim_relapsefrompost_1"));
   SET_STRING_ELT(nms, 707, mkChar("dim_relapsefrompost_12"));
@@ -3497,7 +3497,7 @@ SEXP ocaode_contents(SEXP internal_p) {
   SET_STRING_ELT(nms, 933, mkChar("nprot"));
   SET_STRING_ELT(nms, 934, mkChar("nrisk"));
   SET_STRING_ELT(nms, 935, mkChar("nstrain"));
-  SET_STRING_ELT(nms, 936, mkChar("offset_output_rateIncidence"));
+  SET_STRING_ELT(nms, 936, mkChar("offset_output_rate_Incidence"));
   SET_STRING_ELT(nms, 937, mkChar("offset_variable_Asymp"));
   SET_STRING_ELT(nms, 938, mkChar("offset_variable_Llate"));
   SET_STRING_ELT(nms, 939, mkChar("offset_variable_Symp"));
@@ -3915,27 +3915,27 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   internal->dim_PostTBprognU_7 = internal->nprot;
   internal->dim_progn_posttb = internal->npost;
   internal->dim_r = internal->nage;
-  internal->dim_rateIncidence_1 = internal->nage;
-  internal->dim_rateIncidence_2 = 2;
-  internal->dim_rateIncidence_3 = internal->nnat;
-  internal->dim_rateIncidence_4 = internal->nrisk;
-  internal->dim_rateIncidence_5 = internal->npost;
-  internal->dim_rateIncidence_6 = internal->nstrain;
-  internal->dim_rateIncidence_7 = internal->nprot;
-  internal->dim_rateNotification_1 = internal->nage;
-  internal->dim_rateNotification_2 = 2;
-  internal->dim_rateNotification_3 = internal->nnat;
-  internal->dim_rateNotification_4 = internal->nrisk;
-  internal->dim_rateNotification_5 = internal->npost;
-  internal->dim_rateNotification_6 = internal->nstrain;
-  internal->dim_rateNotification_7 = internal->nprot;
-  internal->dim_rateTBmortality_1 = internal->nage;
-  internal->dim_rateTBmortality_2 = 2;
-  internal->dim_rateTBmortality_3 = internal->nnat;
-  internal->dim_rateTBmortality_4 = internal->nrisk;
-  internal->dim_rateTBmortality_5 = internal->npost;
-  internal->dim_rateTBmortality_6 = internal->nstrain;
-  internal->dim_rateTBmortality_7 = internal->nprot;
+  internal->dim_rate_Incidence_1 = internal->nage;
+  internal->dim_rate_Incidence_2 = 2;
+  internal->dim_rate_Incidence_3 = internal->nnat;
+  internal->dim_rate_Incidence_4 = internal->nrisk;
+  internal->dim_rate_Incidence_5 = internal->npost;
+  internal->dim_rate_Incidence_6 = internal->nstrain;
+  internal->dim_rate_Incidence_7 = internal->nprot;
+  internal->dim_rate_Notification_1 = internal->nage;
+  internal->dim_rate_Notification_2 = 2;
+  internal->dim_rate_Notification_3 = internal->nnat;
+  internal->dim_rate_Notification_4 = internal->nrisk;
+  internal->dim_rate_Notification_5 = internal->npost;
+  internal->dim_rate_Notification_6 = internal->nstrain;
+  internal->dim_rate_Notification_7 = internal->nprot;
+  internal->dim_rate_TBmortality_1 = internal->nage;
+  internal->dim_rate_TBmortality_2 = 2;
+  internal->dim_rate_TBmortality_3 = internal->nnat;
+  internal->dim_rate_TBmortality_4 = internal->nrisk;
+  internal->dim_rate_TBmortality_5 = internal->npost;
+  internal->dim_rate_TBmortality_6 = internal->nstrain;
+  internal->dim_rate_TBmortality_7 = internal->nprot;
   internal->dim_relapsefrompost_1 = internal->nage;
   internal->dim_relapsefrompost_2 = 2;
   internal->dim_relapsefrompost_3 = internal->nnat;
@@ -4326,24 +4326,24 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   internal->dim_PostTBprognU_1234 = internal->dim_PostTBprognU_1 * internal->dim_PostTBprognU_2 * internal->dim_PostTBprognU_3 * internal->dim_PostTBprognU_4;
   internal->dim_PostTBprognU_12345 = internal->dim_PostTBprognU_1 * internal->dim_PostTBprognU_2 * internal->dim_PostTBprognU_3 * internal->dim_PostTBprognU_4 * internal->dim_PostTBprognU_5;
   internal->dim_PostTBprognU_123456 = internal->dim_PostTBprognU_1 * internal->dim_PostTBprognU_2 * internal->dim_PostTBprognU_3 * internal->dim_PostTBprognU_4 * internal->dim_PostTBprognU_5 * internal->dim_PostTBprognU_6;
-  internal->dim_rateIncidence = internal->dim_rateIncidence_1 * internal->dim_rateIncidence_2 * internal->dim_rateIncidence_3 * internal->dim_rateIncidence_4 * internal->dim_rateIncidence_5 * internal->dim_rateIncidence_6 * internal->dim_rateIncidence_7;
-  internal->dim_rateIncidence_12 = internal->dim_rateIncidence_1 * internal->dim_rateIncidence_2;
-  internal->dim_rateIncidence_123 = internal->dim_rateIncidence_1 * internal->dim_rateIncidence_2 * internal->dim_rateIncidence_3;
-  internal->dim_rateIncidence_1234 = internal->dim_rateIncidence_1 * internal->dim_rateIncidence_2 * internal->dim_rateIncidence_3 * internal->dim_rateIncidence_4;
-  internal->dim_rateIncidence_12345 = internal->dim_rateIncidence_1 * internal->dim_rateIncidence_2 * internal->dim_rateIncidence_3 * internal->dim_rateIncidence_4 * internal->dim_rateIncidence_5;
-  internal->dim_rateIncidence_123456 = internal->dim_rateIncidence_1 * internal->dim_rateIncidence_2 * internal->dim_rateIncidence_3 * internal->dim_rateIncidence_4 * internal->dim_rateIncidence_5 * internal->dim_rateIncidence_6;
-  internal->dim_rateNotification = internal->dim_rateNotification_1 * internal->dim_rateNotification_2 * internal->dim_rateNotification_3 * internal->dim_rateNotification_4 * internal->dim_rateNotification_5 * internal->dim_rateNotification_6 * internal->dim_rateNotification_7;
-  internal->dim_rateNotification_12 = internal->dim_rateNotification_1 * internal->dim_rateNotification_2;
-  internal->dim_rateNotification_123 = internal->dim_rateNotification_1 * internal->dim_rateNotification_2 * internal->dim_rateNotification_3;
-  internal->dim_rateNotification_1234 = internal->dim_rateNotification_1 * internal->dim_rateNotification_2 * internal->dim_rateNotification_3 * internal->dim_rateNotification_4;
-  internal->dim_rateNotification_12345 = internal->dim_rateNotification_1 * internal->dim_rateNotification_2 * internal->dim_rateNotification_3 * internal->dim_rateNotification_4 * internal->dim_rateNotification_5;
-  internal->dim_rateNotification_123456 = internal->dim_rateNotification_1 * internal->dim_rateNotification_2 * internal->dim_rateNotification_3 * internal->dim_rateNotification_4 * internal->dim_rateNotification_5 * internal->dim_rateNotification_6;
-  internal->dim_rateTBmortality = internal->dim_rateTBmortality_1 * internal->dim_rateTBmortality_2 * internal->dim_rateTBmortality_3 * internal->dim_rateTBmortality_4 * internal->dim_rateTBmortality_5 * internal->dim_rateTBmortality_6 * internal->dim_rateTBmortality_7;
-  internal->dim_rateTBmortality_12 = internal->dim_rateTBmortality_1 * internal->dim_rateTBmortality_2;
-  internal->dim_rateTBmortality_123 = internal->dim_rateTBmortality_1 * internal->dim_rateTBmortality_2 * internal->dim_rateTBmortality_3;
-  internal->dim_rateTBmortality_1234 = internal->dim_rateTBmortality_1 * internal->dim_rateTBmortality_2 * internal->dim_rateTBmortality_3 * internal->dim_rateTBmortality_4;
-  internal->dim_rateTBmortality_12345 = internal->dim_rateTBmortality_1 * internal->dim_rateTBmortality_2 * internal->dim_rateTBmortality_3 * internal->dim_rateTBmortality_4 * internal->dim_rateTBmortality_5;
-  internal->dim_rateTBmortality_123456 = internal->dim_rateTBmortality_1 * internal->dim_rateTBmortality_2 * internal->dim_rateTBmortality_3 * internal->dim_rateTBmortality_4 * internal->dim_rateTBmortality_5 * internal->dim_rateTBmortality_6;
+  internal->dim_rate_Incidence = internal->dim_rate_Incidence_1 * internal->dim_rate_Incidence_2 * internal->dim_rate_Incidence_3 * internal->dim_rate_Incidence_4 * internal->dim_rate_Incidence_5 * internal->dim_rate_Incidence_6 * internal->dim_rate_Incidence_7;
+  internal->dim_rate_Incidence_12 = internal->dim_rate_Incidence_1 * internal->dim_rate_Incidence_2;
+  internal->dim_rate_Incidence_123 = internal->dim_rate_Incidence_1 * internal->dim_rate_Incidence_2 * internal->dim_rate_Incidence_3;
+  internal->dim_rate_Incidence_1234 = internal->dim_rate_Incidence_1 * internal->dim_rate_Incidence_2 * internal->dim_rate_Incidence_3 * internal->dim_rate_Incidence_4;
+  internal->dim_rate_Incidence_12345 = internal->dim_rate_Incidence_1 * internal->dim_rate_Incidence_2 * internal->dim_rate_Incidence_3 * internal->dim_rate_Incidence_4 * internal->dim_rate_Incidence_5;
+  internal->dim_rate_Incidence_123456 = internal->dim_rate_Incidence_1 * internal->dim_rate_Incidence_2 * internal->dim_rate_Incidence_3 * internal->dim_rate_Incidence_4 * internal->dim_rate_Incidence_5 * internal->dim_rate_Incidence_6;
+  internal->dim_rate_Notification = internal->dim_rate_Notification_1 * internal->dim_rate_Notification_2 * internal->dim_rate_Notification_3 * internal->dim_rate_Notification_4 * internal->dim_rate_Notification_5 * internal->dim_rate_Notification_6 * internal->dim_rate_Notification_7;
+  internal->dim_rate_Notification_12 = internal->dim_rate_Notification_1 * internal->dim_rate_Notification_2;
+  internal->dim_rate_Notification_123 = internal->dim_rate_Notification_1 * internal->dim_rate_Notification_2 * internal->dim_rate_Notification_3;
+  internal->dim_rate_Notification_1234 = internal->dim_rate_Notification_1 * internal->dim_rate_Notification_2 * internal->dim_rate_Notification_3 * internal->dim_rate_Notification_4;
+  internal->dim_rate_Notification_12345 = internal->dim_rate_Notification_1 * internal->dim_rate_Notification_2 * internal->dim_rate_Notification_3 * internal->dim_rate_Notification_4 * internal->dim_rate_Notification_5;
+  internal->dim_rate_Notification_123456 = internal->dim_rate_Notification_1 * internal->dim_rate_Notification_2 * internal->dim_rate_Notification_3 * internal->dim_rate_Notification_4 * internal->dim_rate_Notification_5 * internal->dim_rate_Notification_6;
+  internal->dim_rate_TBmortality = internal->dim_rate_TBmortality_1 * internal->dim_rate_TBmortality_2 * internal->dim_rate_TBmortality_3 * internal->dim_rate_TBmortality_4 * internal->dim_rate_TBmortality_5 * internal->dim_rate_TBmortality_6 * internal->dim_rate_TBmortality_7;
+  internal->dim_rate_TBmortality_12 = internal->dim_rate_TBmortality_1 * internal->dim_rate_TBmortality_2;
+  internal->dim_rate_TBmortality_123 = internal->dim_rate_TBmortality_1 * internal->dim_rate_TBmortality_2 * internal->dim_rate_TBmortality_3;
+  internal->dim_rate_TBmortality_1234 = internal->dim_rate_TBmortality_1 * internal->dim_rate_TBmortality_2 * internal->dim_rate_TBmortality_3 * internal->dim_rate_TBmortality_4;
+  internal->dim_rate_TBmortality_12345 = internal->dim_rate_TBmortality_1 * internal->dim_rate_TBmortality_2 * internal->dim_rate_TBmortality_3 * internal->dim_rate_TBmortality_4 * internal->dim_rate_TBmortality_5;
+  internal->dim_rate_TBmortality_123456 = internal->dim_rate_TBmortality_1 * internal->dim_rate_TBmortality_2 * internal->dim_rate_TBmortality_3 * internal->dim_rate_TBmortality_4 * internal->dim_rate_TBmortality_5 * internal->dim_rate_TBmortality_6;
   internal->dim_relapsefrompost = internal->dim_relapsefrompost_1 * internal->dim_relapsefrompost_2 * internal->dim_relapsefrompost_3 * internal->dim_relapsefrompost_4 * internal->dim_relapsefrompost_5 * internal->dim_relapsefrompost_6 * internal->dim_relapsefrompost_7;
   internal->dim_relapsefrompost_12 = internal->dim_relapsefrompost_1 * internal->dim_relapsefrompost_2;
   internal->dim_relapsefrompost_123 = internal->dim_relapsefrompost_1 * internal->dim_relapsefrompost_2 * internal->dim_relapsefrompost_3;
@@ -4565,7 +4565,7 @@ SEXP ocaode_set_user(SEXP internal_p, SEXP user) {
   for (int i = 2; i <= internal->nnat; ++i) {
     internal->native[i - 1] = 0;
   }
-  internal->offset_output_rateIncidence = internal->dim_rateNotification + internal->dim_rateTBmortality;
+  internal->offset_output_rate_Incidence = internal->dim_rate_Notification + internal->dim_rate_TBmortality;
   internal->offset_variable_Asymp = internal->dim_Learly + internal->dim_Llate + internal->dim_Uninfected;
   internal->offset_variable_Llate = internal->dim_Learly + internal->dim_Uninfected;
   internal->offset_variable_Symp = internal->dim_Asymp + internal->dim_Learly + internal->dim_Llate + internal->dim_Uninfected;
@@ -4876,38 +4876,38 @@ SEXP ocaode_metadata(SEXP internal_p) {
   SEXP output_names = PROTECT(allocVector(STRSXP, 3));
   setAttrib(output_length, R_NamesSymbol, output_names);
   SET_VECTOR_ELT(output_length, 0, allocVector(INTSXP, 7));
-  int * dim_rateNotification = INTEGER(VECTOR_ELT(output_length, 0));
-  dim_rateNotification[0] = internal->dim_rateNotification_1;
-  dim_rateNotification[1] = internal->dim_rateNotification_2;
-  dim_rateNotification[2] = internal->dim_rateNotification_3;
-  dim_rateNotification[3] = internal->dim_rateNotification_4;
-  dim_rateNotification[4] = internal->dim_rateNotification_5;
-  dim_rateNotification[5] = internal->dim_rateNotification_6;
-  dim_rateNotification[6] = internal->dim_rateNotification_7;
+  int * dim_rate_Notification = INTEGER(VECTOR_ELT(output_length, 0));
+  dim_rate_Notification[0] = internal->dim_rate_Notification_1;
+  dim_rate_Notification[1] = internal->dim_rate_Notification_2;
+  dim_rate_Notification[2] = internal->dim_rate_Notification_3;
+  dim_rate_Notification[3] = internal->dim_rate_Notification_4;
+  dim_rate_Notification[4] = internal->dim_rate_Notification_5;
+  dim_rate_Notification[5] = internal->dim_rate_Notification_6;
+  dim_rate_Notification[6] = internal->dim_rate_Notification_7;
   SET_VECTOR_ELT(output_length, 1, allocVector(INTSXP, 7));
-  int * dim_rateTBmortality = INTEGER(VECTOR_ELT(output_length, 1));
-  dim_rateTBmortality[0] = internal->dim_rateTBmortality_1;
-  dim_rateTBmortality[1] = internal->dim_rateTBmortality_2;
-  dim_rateTBmortality[2] = internal->dim_rateTBmortality_3;
-  dim_rateTBmortality[3] = internal->dim_rateTBmortality_4;
-  dim_rateTBmortality[4] = internal->dim_rateTBmortality_5;
-  dim_rateTBmortality[5] = internal->dim_rateTBmortality_6;
-  dim_rateTBmortality[6] = internal->dim_rateTBmortality_7;
+  int * dim_rate_TBmortality = INTEGER(VECTOR_ELT(output_length, 1));
+  dim_rate_TBmortality[0] = internal->dim_rate_TBmortality_1;
+  dim_rate_TBmortality[1] = internal->dim_rate_TBmortality_2;
+  dim_rate_TBmortality[2] = internal->dim_rate_TBmortality_3;
+  dim_rate_TBmortality[3] = internal->dim_rate_TBmortality_4;
+  dim_rate_TBmortality[4] = internal->dim_rate_TBmortality_5;
+  dim_rate_TBmortality[5] = internal->dim_rate_TBmortality_6;
+  dim_rate_TBmortality[6] = internal->dim_rate_TBmortality_7;
   SET_VECTOR_ELT(output_length, 2, allocVector(INTSXP, 7));
-  int * dim_rateIncidence = INTEGER(VECTOR_ELT(output_length, 2));
-  dim_rateIncidence[0] = internal->dim_rateIncidence_1;
-  dim_rateIncidence[1] = internal->dim_rateIncidence_2;
-  dim_rateIncidence[2] = internal->dim_rateIncidence_3;
-  dim_rateIncidence[3] = internal->dim_rateIncidence_4;
-  dim_rateIncidence[4] = internal->dim_rateIncidence_5;
-  dim_rateIncidence[5] = internal->dim_rateIncidence_6;
-  dim_rateIncidence[6] = internal->dim_rateIncidence_7;
-  SET_STRING_ELT(output_names, 0, mkChar("rateNotification"));
-  SET_STRING_ELT(output_names, 1, mkChar("rateTBmortality"));
-  SET_STRING_ELT(output_names, 2, mkChar("rateIncidence"));
+  int * dim_rate_Incidence = INTEGER(VECTOR_ELT(output_length, 2));
+  dim_rate_Incidence[0] = internal->dim_rate_Incidence_1;
+  dim_rate_Incidence[1] = internal->dim_rate_Incidence_2;
+  dim_rate_Incidence[2] = internal->dim_rate_Incidence_3;
+  dim_rate_Incidence[3] = internal->dim_rate_Incidence_4;
+  dim_rate_Incidence[4] = internal->dim_rate_Incidence_5;
+  dim_rate_Incidence[5] = internal->dim_rate_Incidence_6;
+  dim_rate_Incidence[6] = internal->dim_rate_Incidence_7;
+  SET_STRING_ELT(output_names, 0, mkChar("rate_Notification"));
+  SET_STRING_ELT(output_names, 1, mkChar("rate_TBmortality"));
+  SET_STRING_ELT(output_names, 2, mkChar("rate_Incidence"));
   SET_VECTOR_ELT(ret, 1, output_length);
   UNPROTECT(2);
-  SET_VECTOR_ELT(ret, 2, ScalarInteger(internal->dim_rateIncidence + internal->dim_rateNotification + internal->dim_rateTBmortality));
+  SET_VECTOR_ELT(ret, 2, ScalarInteger(internal->dim_rate_Incidence + internal->dim_rate_Notification + internal->dim_rate_TBmortality));
   SEXP interpolate_t = PROTECT(allocVector(VECSXP, 3));
   SEXP interpolate_t_nms = PROTECT(allocVector(STRSXP, 3));
   setAttrib(interpolate_t, R_NamesSymbol, interpolate_t_nms);
@@ -5687,7 +5687,7 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
             for (int i5 = 1; i5 <= internal->npost; ++i5) {
               for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
                 for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-                  output[internal->offset_output_rateIncidence + i - 1 + internal->dim_rateIncidence_1 * (j - 1) + internal->dim_rateIncidence_12 * (k - 1) + internal->dim_rateIncidence_123 * (l - 1) + internal->dim_rateIncidence_1234 * (i5 - 1) + internal->dim_rateIncidence_12345 * (i6 - 1) + internal->dim_rateIncidence_123456 * (i7 - 1)] = 100000 * (internal->progn_fast * Learly[internal->dim_Learly_123456 * (i7 - 1) + internal->dim_Learly_12345 * (i6 - 1) + internal->dim_Learly_1234 * (i5 - 1) + internal->dim_Learly_123 * (l - 1) + internal->dim_Learly_12 * (k - 1) + internal->dim_Learly_1 * (j - 1) + i - 1] + internal->progn_slow * Llate[internal->dim_Llate_123456 * (i7 - 1) + internal->dim_Llate_12345 * (i6 - 1) + internal->dim_Llate_1234 * (i5 - 1) + internal->dim_Llate_123 * (l - 1) + internal->dim_Llate_12 * (k - 1) + internal->dim_Llate_1 * (j - 1) + i - 1]) / (double) internal->totalpops[internal->dim_totalpops_123456 * (i7 - 1) + internal->dim_totalpops_12345 * (i6 - 1) + internal->dim_totalpops_1234 * (i5 - 1) + internal->dim_totalpops_123 * (l - 1) + internal->dim_totalpops_12 * (k - 1) + internal->dim_totalpops_1 * (j - 1) + i - 1];
+                  output[internal->offset_output_rate_Incidence + i - 1 + internal->dim_rate_Incidence_1 * (j - 1) + internal->dim_rate_Incidence_12 * (k - 1) + internal->dim_rate_Incidence_123 * (l - 1) + internal->dim_rate_Incidence_1234 * (i5 - 1) + internal->dim_rate_Incidence_12345 * (i6 - 1) + internal->dim_rate_Incidence_123456 * (i7 - 1)] = 100000 * (internal->progn_fast * Learly[internal->dim_Learly_123456 * (i7 - 1) + internal->dim_Learly_12345 * (i6 - 1) + internal->dim_Learly_1234 * (i5 - 1) + internal->dim_Learly_123 * (l - 1) + internal->dim_Learly_12 * (k - 1) + internal->dim_Learly_1 * (j - 1) + i - 1] + internal->progn_slow * Llate[internal->dim_Llate_123456 * (i7 - 1) + internal->dim_Llate_12345 * (i6 - 1) + internal->dim_Llate_1234 * (i5 - 1) + internal->dim_Llate_123 * (l - 1) + internal->dim_Llate_12 * (k - 1) + internal->dim_Llate_1 * (j - 1) + i - 1]) / (double) internal->totalpops[internal->dim_totalpops_123456 * (i7 - 1) + internal->dim_totalpops_12345 * (i6 - 1) + internal->dim_totalpops_1234 * (i5 - 1) + internal->dim_totalpops_123 * (l - 1) + internal->dim_totalpops_12 * (k - 1) + internal->dim_totalpops_1 * (j - 1) + i - 1];
                 }
               }
             }
@@ -5702,7 +5702,7 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
             for (int i5 = 1; i5 <= internal->npost; ++i5) {
               for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
                 for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-                  output[0 + i - 1 + internal->dim_rateNotification_1 * (j - 1) + internal->dim_rateNotification_12 * (k - 1) + internal->dim_rateNotification_123 * (l - 1) + internal->dim_rateNotification_1234 * (i5 - 1) + internal->dim_rateNotification_12345 * (i6 - 1) + internal->dim_rateNotification_123456 * (i7 - 1)] = 100000 * internal->treatmentstarts[internal->dim_treatmentstarts_123456 * (i7 - 1) + internal->dim_treatmentstarts_12345 * (i6 - 1) + internal->dim_treatmentstarts_1234 * (i5 - 1) + internal->dim_treatmentstarts_123 * (l - 1) + internal->dim_treatmentstarts_12 * (k - 1) + internal->dim_treatmentstarts_1 * (j - 1) + i - 1] / (double) (internal->totalpops[internal->dim_totalpops_123456 * (i7 - 1) + internal->dim_totalpops_12345 * (i6 - 1) + internal->dim_totalpops_1234 * (i5 - 1) + internal->dim_totalpops_123 * (l - 1) + internal->dim_totalpops_12 * (k - 1) + internal->dim_totalpops_1 * (j - 1) + i - 1] + internal->tol);
+                  output[0 + i - 1 + internal->dim_rate_Notification_1 * (j - 1) + internal->dim_rate_Notification_12 * (k - 1) + internal->dim_rate_Notification_123 * (l - 1) + internal->dim_rate_Notification_1234 * (i5 - 1) + internal->dim_rate_Notification_12345 * (i6 - 1) + internal->dim_rate_Notification_123456 * (i7 - 1)] = 100000 * internal->treatmentstarts[internal->dim_treatmentstarts_123456 * (i7 - 1) + internal->dim_treatmentstarts_12345 * (i6 - 1) + internal->dim_treatmentstarts_1234 * (i5 - 1) + internal->dim_treatmentstarts_123 * (l - 1) + internal->dim_treatmentstarts_12 * (k - 1) + internal->dim_treatmentstarts_1 * (j - 1) + i - 1] / (double) (internal->totalpops[internal->dim_totalpops_123456 * (i7 - 1) + internal->dim_totalpops_12345 * (i6 - 1) + internal->dim_totalpops_1234 * (i5 - 1) + internal->dim_totalpops_123 * (l - 1) + internal->dim_totalpops_12 * (k - 1) + internal->dim_totalpops_1 * (j - 1) + i - 1] + internal->tol);
                 }
               }
             }
@@ -5717,7 +5717,7 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
             for (int i5 = 1; i5 <= internal->npost; ++i5) {
               for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
                 for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-                  output[internal->dim_rateNotification + i - 1 + internal->dim_rateTBmortality_1 * (j - 1) + internal->dim_rateTBmortality_12 * (k - 1) + internal->dim_rateTBmortality_123 * (l - 1) + internal->dim_rateTBmortality_1234 * (i5 - 1) + internal->dim_rateTBmortality_12345 * (i6 - 1) + internal->dim_rateTBmortality_123456 * (i7 - 1)] = internal->mortality_treated * internal->treatmentends[internal->dim_treatmentends_123456 * (i7 - 1) + internal->dim_treatmentends_12345 * (i6 - 1) + internal->dim_treatmentends_1234 * (i5 - 1) + internal->dim_treatmentends_123 * (l - 1) + internal->dim_treatmentends_12 * (k - 1) + internal->dim_treatmentends_1 * (j - 1) + i - 1] + internal->mortality_untreated * Symp[internal->dim_Symp_123456 * (i7 - 1) + internal->dim_Symp_12345 * (i6 - 1) + internal->dim_Symp_1234 * (i5 - 1) + internal->dim_Symp_123 * (l - 1) + internal->dim_Symp_12 * (k - 1) + internal->dim_Symp_1 * (j - 1) + i - 1];
+                  output[internal->dim_rate_Notification + i - 1 + internal->dim_rate_TBmortality_1 * (j - 1) + internal->dim_rate_TBmortality_12 * (k - 1) + internal->dim_rate_TBmortality_123 * (l - 1) + internal->dim_rate_TBmortality_1234 * (i5 - 1) + internal->dim_rate_TBmortality_12345 * (i6 - 1) + internal->dim_rate_TBmortality_123456 * (i7 - 1)] = internal->mortality_treated * internal->treatmentends[internal->dim_treatmentends_123456 * (i7 - 1) + internal->dim_treatmentends_12345 * (i6 - 1) + internal->dim_treatmentends_1234 * (i5 - 1) + internal->dim_treatmentends_123 * (l - 1) + internal->dim_treatmentends_12 * (k - 1) + internal->dim_treatmentends_1 * (j - 1) + i - 1] + internal->mortality_untreated * Symp[internal->dim_Symp_123456 * (i7 - 1) + internal->dim_Symp_12345 * (i6 - 1) + internal->dim_Symp_1234 * (i5 - 1) + internal->dim_Symp_123 * (l - 1) + internal->dim_Symp_12 * (k - 1) + internal->dim_Symp_1 * (j - 1) + i - 1];
                 }
               }
             }
@@ -5793,7 +5793,7 @@ void ocaode_output_dde(size_t n_eq, double t, double * state, size_t n_output, d
           for (int i5 = 1; i5 <= internal->npost; ++i5) {
             for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
               for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-                output[internal->offset_output_rateIncidence + i - 1 + internal->dim_rateIncidence_1 * (j - 1) + internal->dim_rateIncidence_12 * (k - 1) + internal->dim_rateIncidence_123 * (l - 1) + internal->dim_rateIncidence_1234 * (i5 - 1) + internal->dim_rateIncidence_12345 * (i6 - 1) + internal->dim_rateIncidence_123456 * (i7 - 1)] = 100000 * (internal->progn_fast * Learly[internal->dim_Learly_123456 * (i7 - 1) + internal->dim_Learly_12345 * (i6 - 1) + internal->dim_Learly_1234 * (i5 - 1) + internal->dim_Learly_123 * (l - 1) + internal->dim_Learly_12 * (k - 1) + internal->dim_Learly_1 * (j - 1) + i - 1] + internal->progn_slow * Llate[internal->dim_Llate_123456 * (i7 - 1) + internal->dim_Llate_12345 * (i6 - 1) + internal->dim_Llate_1234 * (i5 - 1) + internal->dim_Llate_123 * (l - 1) + internal->dim_Llate_12 * (k - 1) + internal->dim_Llate_1 * (j - 1) + i - 1]) / (double) internal->totalpops[internal->dim_totalpops_123456 * (i7 - 1) + internal->dim_totalpops_12345 * (i6 - 1) + internal->dim_totalpops_1234 * (i5 - 1) + internal->dim_totalpops_123 * (l - 1) + internal->dim_totalpops_12 * (k - 1) + internal->dim_totalpops_1 * (j - 1) + i - 1];
+                output[internal->offset_output_rate_Incidence + i - 1 + internal->dim_rate_Incidence_1 * (j - 1) + internal->dim_rate_Incidence_12 * (k - 1) + internal->dim_rate_Incidence_123 * (l - 1) + internal->dim_rate_Incidence_1234 * (i5 - 1) + internal->dim_rate_Incidence_12345 * (i6 - 1) + internal->dim_rate_Incidence_123456 * (i7 - 1)] = 100000 * (internal->progn_fast * Learly[internal->dim_Learly_123456 * (i7 - 1) + internal->dim_Learly_12345 * (i6 - 1) + internal->dim_Learly_1234 * (i5 - 1) + internal->dim_Learly_123 * (l - 1) + internal->dim_Learly_12 * (k - 1) + internal->dim_Learly_1 * (j - 1) + i - 1] + internal->progn_slow * Llate[internal->dim_Llate_123456 * (i7 - 1) + internal->dim_Llate_12345 * (i6 - 1) + internal->dim_Llate_1234 * (i5 - 1) + internal->dim_Llate_123 * (l - 1) + internal->dim_Llate_12 * (k - 1) + internal->dim_Llate_1 * (j - 1) + i - 1]) / (double) internal->totalpops[internal->dim_totalpops_123456 * (i7 - 1) + internal->dim_totalpops_12345 * (i6 - 1) + internal->dim_totalpops_1234 * (i5 - 1) + internal->dim_totalpops_123 * (l - 1) + internal->dim_totalpops_12 * (k - 1) + internal->dim_totalpops_1 * (j - 1) + i - 1];
               }
             }
           }
@@ -5808,7 +5808,7 @@ void ocaode_output_dde(size_t n_eq, double t, double * state, size_t n_output, d
           for (int i5 = 1; i5 <= internal->npost; ++i5) {
             for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
               for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-                output[0 + i - 1 + internal->dim_rateNotification_1 * (j - 1) + internal->dim_rateNotification_12 * (k - 1) + internal->dim_rateNotification_123 * (l - 1) + internal->dim_rateNotification_1234 * (i5 - 1) + internal->dim_rateNotification_12345 * (i6 - 1) + internal->dim_rateNotification_123456 * (i7 - 1)] = 100000 * internal->treatmentstarts[internal->dim_treatmentstarts_123456 * (i7 - 1) + internal->dim_treatmentstarts_12345 * (i6 - 1) + internal->dim_treatmentstarts_1234 * (i5 - 1) + internal->dim_treatmentstarts_123 * (l - 1) + internal->dim_treatmentstarts_12 * (k - 1) + internal->dim_treatmentstarts_1 * (j - 1) + i - 1] / (double) (internal->totalpops[internal->dim_totalpops_123456 * (i7 - 1) + internal->dim_totalpops_12345 * (i6 - 1) + internal->dim_totalpops_1234 * (i5 - 1) + internal->dim_totalpops_123 * (l - 1) + internal->dim_totalpops_12 * (k - 1) + internal->dim_totalpops_1 * (j - 1) + i - 1] + internal->tol);
+                output[0 + i - 1 + internal->dim_rate_Notification_1 * (j - 1) + internal->dim_rate_Notification_12 * (k - 1) + internal->dim_rate_Notification_123 * (l - 1) + internal->dim_rate_Notification_1234 * (i5 - 1) + internal->dim_rate_Notification_12345 * (i6 - 1) + internal->dim_rate_Notification_123456 * (i7 - 1)] = 100000 * internal->treatmentstarts[internal->dim_treatmentstarts_123456 * (i7 - 1) + internal->dim_treatmentstarts_12345 * (i6 - 1) + internal->dim_treatmentstarts_1234 * (i5 - 1) + internal->dim_treatmentstarts_123 * (l - 1) + internal->dim_treatmentstarts_12 * (k - 1) + internal->dim_treatmentstarts_1 * (j - 1) + i - 1] / (double) (internal->totalpops[internal->dim_totalpops_123456 * (i7 - 1) + internal->dim_totalpops_12345 * (i6 - 1) + internal->dim_totalpops_1234 * (i5 - 1) + internal->dim_totalpops_123 * (l - 1) + internal->dim_totalpops_12 * (k - 1) + internal->dim_totalpops_1 * (j - 1) + i - 1] + internal->tol);
               }
             }
           }
@@ -5823,7 +5823,7 @@ void ocaode_output_dde(size_t n_eq, double t, double * state, size_t n_output, d
           for (int i5 = 1; i5 <= internal->npost; ++i5) {
             for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
               for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-                output[internal->dim_rateNotification + i - 1 + internal->dim_rateTBmortality_1 * (j - 1) + internal->dim_rateTBmortality_12 * (k - 1) + internal->dim_rateTBmortality_123 * (l - 1) + internal->dim_rateTBmortality_1234 * (i5 - 1) + internal->dim_rateTBmortality_12345 * (i6 - 1) + internal->dim_rateTBmortality_123456 * (i7 - 1)] = internal->mortality_treated * internal->treatmentends[internal->dim_treatmentends_123456 * (i7 - 1) + internal->dim_treatmentends_12345 * (i6 - 1) + internal->dim_treatmentends_1234 * (i5 - 1) + internal->dim_treatmentends_123 * (l - 1) + internal->dim_treatmentends_12 * (k - 1) + internal->dim_treatmentends_1 * (j - 1) + i - 1] + internal->mortality_untreated * Symp[internal->dim_Symp_123456 * (i7 - 1) + internal->dim_Symp_12345 * (i6 - 1) + internal->dim_Symp_1234 * (i5 - 1) + internal->dim_Symp_123 * (l - 1) + internal->dim_Symp_12 * (k - 1) + internal->dim_Symp_1 * (j - 1) + i - 1];
+                output[internal->dim_rate_Notification + i - 1 + internal->dim_rate_TBmortality_1 * (j - 1) + internal->dim_rate_TBmortality_12 * (k - 1) + internal->dim_rate_TBmortality_123 * (l - 1) + internal->dim_rate_TBmortality_1234 * (i5 - 1) + internal->dim_rate_TBmortality_12345 * (i6 - 1) + internal->dim_rate_TBmortality_123456 * (i7 - 1)] = internal->mortality_treated * internal->treatmentends[internal->dim_treatmentends_123456 * (i7 - 1) + internal->dim_treatmentends_12345 * (i6 - 1) + internal->dim_treatmentends_1234 * (i5 - 1) + internal->dim_treatmentends_123 * (l - 1) + internal->dim_treatmentends_12 * (k - 1) + internal->dim_treatmentends_1 * (j - 1) + i - 1] + internal->mortality_untreated * Symp[internal->dim_Symp_123456 * (i7 - 1) + internal->dim_Symp_12345 * (i6 - 1) + internal->dim_Symp_1234 * (i5 - 1) + internal->dim_Symp_123 * (l - 1) + internal->dim_Symp_12 * (k - 1) + internal->dim_Symp_1 * (j - 1) + i - 1];
               }
             }
           }
@@ -5835,7 +5835,7 @@ void ocaode_output_dde(size_t n_eq, double t, double * state, size_t n_output, d
 SEXP ocaode_rhs_r(SEXP internal_p, SEXP t, SEXP state) {
   SEXP dstatedt = PROTECT(allocVector(REALSXP, LENGTH(state)));
   ocaode_internal *internal = ocaode_get_internal(internal_p, 1);
-  SEXP output_ptr = PROTECT(allocVector(REALSXP, internal->dim_rateIncidence + internal->dim_rateNotification + internal->dim_rateTBmortality));
+  SEXP output_ptr = PROTECT(allocVector(REALSXP, internal->dim_rate_Incidence + internal->dim_rate_Notification + internal->dim_rate_TBmortality));
   setAttrib(dstatedt, install("output"), output_ptr);
   UNPROTECT(1);
   double *output = REAL(output_ptr);

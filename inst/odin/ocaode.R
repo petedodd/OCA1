@@ -123,16 +123,16 @@ deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,
 
 ## --- monitored rates
 ## capture notifications
-output(rateNotification[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- 1e5 * treatmentstarts[i,j,k,l,i5,i6,i7] / (totalpops[i,j,k,l,i5,i6,i7] + tol)
+output(rate_Notification[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- 1e5 * treatmentstarts[i,j,k,l,i5,i6,i7] / (totalpops[i,j,k,l,i5,i6,i7] + tol)
 
 ## TODO check how it plays with current processing
 
-output(rateTBmortality[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- mortality_treated * treatmentends[i,j,k,l,i5,i6,i7] + mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
-output(rateIncidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7])/totalpops[i,j,k,l,i5,i6,i7]
+output(rate_TBmortality[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- mortality_treated * treatmentends[i,j,k,l,i5,i6,i7] + mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
+output(rate_Incidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7])/totalpops[i,j,k,l,i5,i6,i7]
 
-dim(rateIncidence) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
-dim(rateNotification) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
-dim(rateTBmortality) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(rate_Incidence) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(rate_Notification) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(rate_TBmortality) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 
 
 ## --- interim quantities
