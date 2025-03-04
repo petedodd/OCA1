@@ -94,48 +94,146 @@ plt_DemoSnapshots <- function(outdat) {
 
 
 
+#' Title
+#'
+#' @param outdat modelled output 
+#' @param by_layer one of natcat, risk, post, strain, prot
+#' @returns Population pyramid
+#' @export
+#'
 
-##' @title Visualising TB Snapshots
-##' @description
-##' A short description...
-##' @details
-##' Additional details...
-##' 
-##' @param outdat a data.table eg returned by `runmodel` with `raw=FALSE`
-##' @examples
-##' ##' pms <- create_demographic_parms() #create UK parameters
-##' out <- runmodel(pms)              #run model with these
-##' out                               #inspect
-##' ## visualize
-##' plt_TBSnapshots(out)  
-##' @returns `ggplot2` plot
-##' @seealso [plt_DemoSnapshots()]
-##' @seealso [plt_DemoGrowth()]
-##' @export
-plt_TBSnapshots <- function(outdat){
-  mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
-  tmp <- outdat
-  tmp <- tmp[t > 1970]
-  # select every fifth year for population pyramid
+plt_TBSnapshots <- function(outdat, by_layer) {
+
+  mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", 
+              "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
+  
+
+  layer_names <- c(
+    "natcat" = "Nativity",
+    "risk" = "TB risk",
+    "post" = "Post TB",
+    "strain" = "TB strain",
+    "prot" = "Protection"
+  )
+  
+  # Ensure the provided `by_layer` is valid
+  stopifnot(by_layer %in% names(layer_names))
+  
+  # Get the descriptive name for the selected layer
+  new_layer_name <- layer_names[[by_layer]]
+  
+  # Define dyn_name specific to the selected layer
+  #dyn_name <- paste(new_layer_name, "layer")
+  dyn_name <- new_layer_name
+  tmp <- outdat[t > 1970]
+  
   tmp <- tmp[t %% 5 == 0]
-  tmp <- tmp[(state!= "Uninfected" & !grepl("rate", state)), .(value = sum(value)), by = .(t, AgeGrp, sex, natcat, state)]
+  
+  # Aggregate population values by year, age group, sex, TB state, and the selected layer
+  tmp <- tmp[(state != "Uninfected" & !grepl("rate", state)), 
+             .(value = sum(value)), by = c("t", "AgeGrp", "sex", "state", by_layer)]
+  
+  tmp[, (by_layer) := paste0(new_layer_name, get(by_layer))]
+  setnames(tmp, by_layer, new_layer_name)
+  
   tmp[, state := factor(state, levels = c("Learly", "Llate", "Asymp", "Symp", "Treat"))]
-
+  
+  # Generate the population pyramid plot
   pl <- ggplot2::ggplot(tmp, aes(x = AgeGrp, fill = state)) +
     ggplot2::coord_flip() +
-    ggplot2::geom_bar(data = tmp[sex == 'M'], stat = 'identity', aes(y = value)) +  # Males (positive values)
-    ggplot2::geom_bar(data = tmp[sex == 'F'], stat = 'identity', aes(y = -value)) +  # Females (negative values on left)
-    ggplot2::scale_y_continuous(labels = function(x) format(abs(x), big.mark = ",", scientific = FALSE, trim = TRUE)) +  # Format y-axis labels as absolute values
+    ggplot2::geom_bar(data = tmp[sex == 'M'], stat = 'identity', aes(y = value)) +
+    ggplot2::geom_bar(data = tmp[sex == 'F'], stat = 'identity', aes(y = -value)) +
+    ggplot2::scale_y_continuous(labels = function(x) format(abs(x), big.mark = ",", scientific = FALSE, trim = TRUE)) +
     ggplot2::scale_fill_manual(values = mycols) +
-    ggplot2::facet_wrap(natcat ~ t, scales = 'free', nrow = 2) +
-    ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1),
-                   legend.position = "bottom") +
-    ggplot2::geom_hline(yintercept = 0, col = 'grey') +
+    ggplot2::facet_wrap(as.formula(paste0("`", new_layer_name, "` ~ t")), scales = 'free', nrow = 2) +
     ggplot2::theme_bw() +
-    ggplot2::ggtitle("Population distribution by age, sex, nativity and TB status") +
+    ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1),
+                   legend.position = "bottom", legend.title = element_blank()) +
+    ggplot2::geom_hline(yintercept = 0, col = 'grey') +
+        ggplot2::ggtitle(paste("Population distribution by Age, Sex,", dyn_name, "and TB status")) +
     ggplot2::ylab("Population") +
     ggplot2::xlab("")
-
+  
   pl
 }
 
+# plt_TBSnapshots(out, "natcat")
+# plt_TBSnapshots(out, "risk")
+
+
+#' Title
+#'
+#' @param outdat model output 
+#' @param rate_type One of incidence, notification or mortality
+#' @param by_layer one of natcat, risk, post, strain, prot
+#'
+#' @returns ggplot of rates by age and sex stratified by target layer
+#' @export
+
+plt_TB_rates <- function(outdat, rate_type, by_layer) {
+  
+  # Converuser-friendly rate types to colnames in the dataset
+  state_map <- c(
+    "incidence" = "rateIncidence",
+    "notification" = "rateNotification",
+    "mortality" = "rateTBmortality"
+  )
+  
+  # Mapping modeled layer names to their descriptive labels
+  layer_names <- c(
+    "natcat" = "Nativity layer",
+    "risk" = "TB progression risk layer",
+    "post" = "Post TB layer",
+    "strain" = "TB strain layer",
+    "prot" = "Protection layer"
+  )
+  
+  # make sure rate_type and by_layer are valid input values
+  stopifnot(rate_type %in% names(state_map), by_layer %in% names(layer_names))
+  
+  # select the target rate
+  tmp <- outdat[state == state_map[[rate_type]]] %>%
+        dplyr::mutate(state = dplyr::recode(state, 
+                                        rateIncidence = "Incidence rate",
+                                        rateNotification = "Notification rate",
+                                        rateTBmortality = "TB mortality rate")) %>%
+    
+    dplyr::group_by(t, state, AgeGrp, sex, .data[[by_layer]]) %>%
+    
+    # Compute the mean value for each group, ignoring NA values
+    dplyr::summarise(value = mean(value, na.rm = TRUE), .groups = "drop") %>%
+    as.data.table()
+  
+  # Retrieve the maped layer namer for the selected layer
+  new_layer_name <- layer_names[[by_layer]]
+  
+  # modify the the target layer to clear layer name
+  tmp[, (by_layer) := paste(new_layer_name, get(by_layer))]
+  
+  # Rename the column to use the clear layer name
+  setnames(tmp, by_layer, new_layer_name)
+  
+  # plot title based on the first available state name;
+  plot_title <- if (nrow(tmp) > 0) tmp$state[1] else "No Data"
+  
+  ggplot2::ggplot(tmp, ggplot2::aes(t, value, col = AgeGrp)) +
+    # Create facet grid for stratification layer and sex (columns)
+    ggplot2::facet_grid(as.formula(paste0("`", new_layer_name, "` ~ sex"))) + 
+    ggplot2::geom_line() + 
+    ggplot2::ylab("Rate per 100,000 population") +
+    ggplot2::ggtitle(plot_title) +
+    ggplot2::theme_light() + 
+    ggplot2::xlab("") +
+    
+    # Adjust legend position and remove title
+    ggplot2::theme(legend.position = "bottom", legend.title = element_blank()) +
+    
+    # Adjust legend to have 7 columns for better readability
+    ggplot2::guides(col = guide_legend(ncol = 7))
+}
+
+# plt_TB_rates(out, rate_type = "incidence", by_layer = "natcat")
+# plt_TB_rates(out,rate_type = "notification", by_layer = "risk")
+# plt_TB_rates(out,rate_type = "mortality", by_layer = "post")
+#   
+  
