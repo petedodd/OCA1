@@ -241,10 +241,6 @@ create_demographic_parms <- function(tc = 1970:2020,
   migrationdata <- add_defaults_if_missing(migrationdata, migr_parnames, dms, verbose)
   list2env(migrationdata, envir = environment()) #load complete list
 
-  ##   ## correct omegaF and omegaM:
-  ##   ## TODO create IpcM[age] = IM[age] / N[M,age] & for F
-  ##   ## omegaM -> omegaM + IpcM & for F
-
   ## --- risk data
   risk_parnames <- c("propinitrisk", "birthrisk", "RiskHazardData")
   riskdata <- add_defaults_if_missing(riskdata, risk_parnames, dms, verbose)
@@ -309,6 +305,21 @@ create_demographic_parms <- function(tc = 1970:2020,
 
   ## === create the base parameters:
   list2env(create_demographic_baseparms(tc), envir = environment())
+
+  ## corrections to omega in light of migration
+  ## NOTE immigration is ntimes x nage x 2
+  ## create Narray as pop in this format:
+  Narray <- array(1e-6,
+                  dim=c(ntimes,length(OCA1::agz), 2),
+                  dimnames = list(tindex = 1:dms[1],
+                                  acat = OCA1::agz,
+                                  sex = c("M", "F")))
+  Narray[,,1] <- OCA1::UKdemo$N[Year %in% tc, PopFemale]
+  Narray[,,2] <- OCA1::UKdemo$N[Year %in% tc, PopFemale]
+  ## correct omegaF and omegaM:
+  ## omegaM -> omegaM + IpcM & for F, where IpcM[age] = IM[age] / N[M,age]
+  omegaM <- omegaM + immigration[,,1] / Narray[,,1]
+  omegaF <- omegaF + immigration[,,2] / Narray[,,2]
 
   ## promote to array
   popinit <- array(0,
