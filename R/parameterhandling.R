@@ -333,10 +333,6 @@ create_demographic_parms <- function(tc = 1970:2020,
                                   sex = c("M", "F")))
   Narray[,,1] <- OCA1::UKdemo$N[Year %in% tc, PopFemale]
   Narray[,,2] <- OCA1::UKdemo$N[Year %in% tc, PopFemale]
-  ## correct omegaF and omegaM:
-  ## omegaM -> omegaM + IpcM & for F, where IpcM[age] = IM[age] / N[M,age]
-  omegaM <- omegaM + immigration[,,1] / Narray[,,1]
-  omegaF <- omegaF + immigration[,,2] / Narray[,,2]
 
   ## promote to array
   popinit <- array(0,
