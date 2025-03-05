@@ -164,12 +164,12 @@ dim(fromtreatmentA) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(relapsefrompost) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 
 ## --- demographic dynamics summarizers
-demogU[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinU[i,j,k,l,i5,i6,i7] - omega[i,j] * Uninfected[i,j,k,l,i5,i6,i7] + migrU[i,j,k,l,i5,i6,i7] + migrageinU[i,j,k,l,i5,i6,i7] - migrageoutU[i,j,k,l,i5,i6,i7] + RiskChangeU[i,j,k,l,i5,i6,i7] + PostTBprognU[i,j,k,l,i5,i6,i7]
-demogE[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinE[i,j,k,l,i5,i6,i7] - omega[i,j] * Learly[i,j,k,l,i5,i6,i7] + migrE[i,j,k,l,i5,i6,i7] + migrageinE[i,j,k,l,i5,i6,i7] - migrageoutE[i,j,k,l,i5,i6,i7] + RiskChangeE[i,j,k,l,i5,i6,i7] + PostTBprognE[i,j,k,l,i5,i6,i7]
-demogL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinL[i,j,k,l,i5,i6,i7] - omega[i,j] * Llate[i,j,k,l,i5,i6,i7] + migrL[i,j,k,l,i5,i6,i7] + migrageinL[i,j,k,l,i5,i6,i7] - migrageoutL[i,j,k,l,i5,i6,i7] + RiskChangeL[i,j,k,l,i5,i6,i7] + PostTBprognL[i,j,k,l,i5,i6,i7]
-demogA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinA[i,j,k,l,i5,i6,i7] - omega[i,j] * Asymp[i,j,k,l,i5,i6,i7] + migrA[i,j,k,l,i5,i6,i7] + migrageinA[i,j,k,l,i5,i6,i7] - migrageoutA[i,j,k,l,i5,i6,i7] + RiskChangeA[i,j,k,l,i5,i6,i7] + PostTBprognA[i,j,k,l,i5,i6,i7]
-demogS[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinS[i,j,k,l,i5,i6,i7] - omega[i,j] * Symp[i,j,k,l,i5,i6,i7] + migrS[i,j,k,l,i5,i6,i7] + migrageinS[i,j,k,l,i5,i6,i7] - migrageoutS[i,j,k,l,i5,i6,i7] + RiskChangeS[i,j,k,l,i5,i6,i7] + PostTBprognS[i,j,k,l,i5,i6,i7]
-demogT[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- ageinT[i,j,k,l,i5,i6,i7] - omega[i,j] * Treat[i,j,k,l,i5,i6,i7] + migrT[i,j,k,l,i5,i6,i7] + migrageinT[i,j,k,l,i5,i6,i7] - migrageoutT[i,j,k,l,i5,i6,i7] + RiskChangeT[i,j,k,l,i5,i6,i7] + PostTBprognT[i,j,k,l,i5,i6,i7]
+demogU[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- ageinU[i, j, k, l, i5, i6, i7] - omega[i, j] * Uninfected[i, j, k, l, i5, i6, i7] + migrU[i, j, k, l, i5, i6, i7] - OutR[i, j, k] * Uninfected[i, j, k, l, i5, i6, i7] + migrageinU[i, j, k, l, i5, i6, i7] - migrageoutU[i, j, k, l, i5, i6, i7] + RiskChangeU[i, j, k, l, i5, i6, i7] + PostTBprognU[i, j, k, l, i5, i6, i7]
+demogE[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- ageinE[i, j, k, l, i5, i6, i7] - omega[i, j] * Learly[i, j, k, l, i5, i6, i7] + migrE[i, j, k, l, i5, i6, i7] - OutR[i, j, k] * Learly[i, j, k, l, i5, i6, i7] + migrageinE[i, j, k, l, i5, i6, i7] - migrageoutE[i, j, k, l, i5, i6, i7] + RiskChangeE[i, j, k, l, i5, i6, i7] + PostTBprognE[i, j, k, l, i5, i6, i7]
+demogL[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- ageinL[i, j, k, l, i5, i6, i7] - omega[i, j] * Llate[i, j, k, l, i5, i6, i7] + migrL[i, j, k, l, i5, i6, i7] - OutR[i, j, k] * Llate[i, j, k, l, i5, i6, i7] + migrageinL[i, j, k, l, i5, i6, i7] - migrageoutL[i, j, k, l, i5, i6, i7] + RiskChangeL[i, j, k, l, i5, i6, i7] + PostTBprognL[i, j, k, l, i5, i6, i7]
+demogA[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- ageinA[i, j, k, l, i5, i6, i7] - omega[i, j] * Asymp[i, j, k, l, i5, i6, i7] + migrA[i, j, k, l, i5, i6, i7] - OutR[i, j, k] * Asymp[i, j, k, l, i5, i6, i7] + migrageinA[i, j, k, l, i5, i6, i7] - migrageoutA[i, j, k, l, i5, i6, i7] + RiskChangeA[i, j, k, l, i5, i6, i7] + PostTBprognA[i, j, k, l, i5, i6, i7]
+demogS[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- ageinS[i, j, k, l, i5, i6, i7] - omega[i, j] * Symp[i, j, k, l, i5, i6, i7] + migrS[i, j, k, l, i5, i6, i7] - OutR[i, j, k] * Symp[i, j, k, l, i5, i6, i7] + migrageinS[i, j, k, l, i5, i6, i7] - migrageoutS[i, j, k, l, i5, i6, i7] + RiskChangeS[i, j, k, l, i5, i6, i7] + PostTBprognS[i, j, k, l, i5, i6, i7]
+demogT[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- ageinT[i, j, k, l, i5, i6, i7] - omega[i, j] * Treat[i, j, k, l, i5, i6, i7] + migrT[i, j, k, l, i5, i6, i7] - OutR[i, j, k] * Treat[i, j, k, l, i5, i6, i7] + migrageinT[i, j, k, l, i5, i6, i7] - migrageoutT[i, j, k, l, i5, i6, i7] + RiskChangeT[i, j, k, l, i5, i6, i7] + PostTBprognT[i, j, k, l, i5, i6, i7]
 
 dim(demogU) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(demogE) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
@@ -221,6 +221,7 @@ dim(popinitT) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 ## outside of model need to correct omega -> omega + Ipc where Ipc is In migration per capita
 migrage[] <- user() #migration ageing rate
 In[,] <- interpolate(ttp,immigration,"linear")
+OutR[, , ] <- interpolate(ttp, exmigrate, "linear")
 
 ## where to migrants flow into
 Pmigr_risk[,] <- user()
@@ -228,6 +229,7 @@ Pmigr_post[,] <- user()
 Pmigr_strain[,] <- user()
 Pmigr_prot[,] <- user()
 immigration[,,] <- user()
+exmigrate[,,,] <- user()
 
 ## where to migrants flow into
 Pmigr_nat[1:nnat] <- if(i==2) 1 else 0
@@ -262,8 +264,10 @@ dim(Pmigr_risk) <- c(2,nrisk)
 dim(Pmigr_post) <- c(2,npost)
 dim(Pmigr_strain) <- c(2,nstrain)
 dim(Pmigr_prot) <- c(2,nprot)
-dim(immigration) <- c(lttp,nage,2)
+dim(immigration) <- c(lttp, nage, 2)
+dim(exmigrate) <- c(lttp, nage, 2, nnat)
 dim(In) <- c(nage,2)
+dim(OutR) <- c(nage, 2, nnat)
 
 dim(migrU) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(migrE) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)

@@ -68,6 +68,7 @@ lenordim2 <- function(X) ifelse(is.null(dim(X)), length(X), dim(X)[2])
 
 ## utility to check lengths
 check_dims <- function(parlist, dms){
+  ## dms = c(ntimes, nnat, nrisk, npost, nstrain, nprot)
   parnames <- names(parlist)
   ans <- list()
   for(pname in parnames){
@@ -96,6 +97,9 @@ check_dims <- function(parlist, dms){
     if(pname %in% c("immigration")){
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2))
     }
+    if (pname %in% c("exmigrate")) {
+      ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2, dms[2]))
+    }
     if(pname=="RiskHazardData"){
       ans[[pname]] <- all(dim(parlist[[pname]])==c(dms[1], length(OCA1::agz), 2, dms[3]))
     }
@@ -112,6 +116,7 @@ hotone <- function(n){
 
 ## a utility to construct default values for unsupplied parameters/data
 default_parameters <- function(parname, dms, verbose=FALSE){
+  ## dms = c(ntimes, nnat, nrisk, npost, nstrain, nprot)
   if(verbose) message("Using default value for ",parname,"...")
   ans <- NA
   if(parname %in% c("migrage")){
@@ -145,6 +150,17 @@ default_parameters <- function(parname, dms, verbose=FALSE){
         sex = c("M", "F")
       )
       )
+  }
+  if (parname %in% c("exmigrate")) {
+    ans <- array(0,
+      dim = c(dms[1], length(OCA1::agz), 2, dms[2]),
+      dimnames = list(
+        tindex = 1:dms[1],
+        acat = OCA1::agz,
+        sex = c("M", "F"),
+        nativity = 1:dms[2]
+      )
+    )
   }
   if(parname == "RiskHazardData"){
     ans <- array(0,
@@ -231,6 +247,7 @@ create_demographic_parms <- function(tc = 1970:2020,
   migr_parnames <- c(
     "propinitnat",
     "immigration",
+    "exmigrate",
     "migrage",
     ## migration x other strata:
     "Pmigr_risk",
@@ -407,6 +424,7 @@ create_demographic_parms <- function(tc = 1970:2020,
     Pmigr_strain = Pmigr_strain,
     Pmigr_prot = Pmigr_prot,
     immigration = immigration,
+    exmigrate = exmigrate,
     ## risk dynamics
     RiskHazardData = RiskHazardData,
     ## post-TB progression

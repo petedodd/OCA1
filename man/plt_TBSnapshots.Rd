@@ -4,10 +4,10 @@
 \alias{plt_TBSnapshots}
 \title{Title}
 \usage{
-plt_TBSnapshots(outdat, by_layer)
+plt_TBSnapshots(outdata, by_layer)
 }
 \arguments{
-\item{outdat}{modelled output}
+\item{outdata}{modelled output}
 
 \item{by_layer}{one of natcat, risk, post, strain, prot}
 }

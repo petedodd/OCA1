@@ -4,7 +4,7 @@
 \alias{runmodel}
 \title{runmodel}
 \usage{
-runmodel(p, times, raw = FALSE, singleout = TRUE)
+runmodel(p, times, raw = FALSE, singleout = FALSE)
 }
 \arguments{
 \item{p}{parameter list}
@@ -13,7 +13,7 @@ runmodel(p, times, raw = FALSE, singleout = TRUE)
 
 \item{raw}{return the raw matrix ODE output or a data.table? (default FALSE)}
 
-\item{singleout}{(default TRUE) return a single output, or a list of data.tables split by variable type (only if raw=FALSE)}
+\item{singleout}{(default FALSE) return a single output, or a list of data.tables split by variable type (only if raw=FALSE)}
 }
 \value{
 a matrix of timeseries

@@ -4,10 +4,10 @@
 \alias{plt_DemoGrowth}
 \title{Visualising demographic growth over time}
 \usage{
-plt_DemoGrowth(outdat)
+plt_DemoGrowth(outdata)
 }
 \arguments{
-\item{outdat}{a data.table returned by \code{runmodel} with \code{raw=FALSE}}
+\item{outdata}{a data.table returned by \code{runmodel} with \code{raw=FALSE}}
 }
 \value{
 a \code{ggplot2} plot object

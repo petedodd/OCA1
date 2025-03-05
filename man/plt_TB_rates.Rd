@@ -4,10 +4,10 @@
 \alias{plt_TB_rates}
 \title{Title}
 \usage{
-plt_TB_rates(outdat, rate_type, by_layer)
+plt_TB_rates(outdata, rate_type, by_layer)
 }
 \arguments{
-\item{outdat}{model output}
+\item{outdata}{model output}
 
 \item{rate_type}{One of incidence, notification or mortality}
 
