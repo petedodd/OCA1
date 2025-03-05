@@ -102,13 +102,13 @@ out                               #inspect
 explanation
 ```{r}
 ## visualize
-plt_DemoGrowth(out$state)               #total population over time
+plt_DemoGrowth(out)               #total population over time
 ```
 
 explanation
 
 ```{r,fig.dim = c(8, 6)}
-plt_DemoSnapshots(out$state)            #snapshots
+plt_DemoSnapshots(out)            #snapshots
 ```
 
 TODO

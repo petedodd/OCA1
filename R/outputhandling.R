@@ -7,7 +7,7 @@ absspace <- function(x, ...) {
 ##' @title Visualising demographic growth over time
 ##' @description
 ##' `plt_DemoGrowth` takes an model output object and provides a visualisation to show how the population sizes change over time
-##' @param outdat  a data.table returned by `runmodel` with `raw=FALSE`
+##' @param outdata  a data.table returned by `runmodel` with `raw=FALSE`
 ##' @details
 ##' The `ggplot2` package is used to construct a line and scatter plot for the population sizes for the time period used to run the model
 ##' @return  a `ggplot2` plot object
@@ -23,7 +23,8 @@ absspace <- function(x, ...) {
 ##' @import ggplot2
 ##' @import data.table
 ##' @export
-plt_DemoGrowth <- function(outdat) {
+plt_DemoGrowth <- function(outdata) {
+  outdat <- outdata$state
   cntry <- "GBR"
   N <- OCA1::UKdemo$N
   tc <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 1)
@@ -48,7 +49,7 @@ plt_DemoGrowth <- function(outdat) {
 ##' Additional details...
 ##' @seealso [plt_DemoGrowth()]
 ##' @seealso [plt_TBSnapshots()]
-##' @param outdat a data.table returned by `runmodel` with `raw=FALSE`
+##' @param outdata a data.table returned by `runmodel` with `raw=FALSE`
 ##' @return a `ggplot2` plot object
 ##' @author Pete Dodd
 ##' @examples
@@ -61,7 +62,8 @@ plt_DemoGrowth <- function(outdat) {
 ##' @import ggpubr
 ##' @import data.table
 ##' @export
-plt_DemoSnapshots <- function(outdat) {
+plt_DemoSnapshots <- function(outdata) {
+  outdat <- outdata$state
   cntry <- "GBR"
   N <- OCA1::UKdemo$N
   tmz <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 5)
@@ -96,14 +98,14 @@ plt_DemoSnapshots <- function(outdat) {
 
 #' Title
 #'
-#' @param outdat modelled output 
+#' @param outdata modelled output 
 #' @param by_layer one of natcat, risk, post, strain, prot
 #' @returns Population pyramid
 #' @export
 #'
 
-plt_TBSnapshots <- function(outdat, by_layer) {
-
+plt_TBSnapshots <- function(outdata, by_layer) {
+  outdat <- outdata$state
   mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", 
               "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
 
@@ -163,15 +165,15 @@ plt_TBSnapshots <- function(outdat, by_layer) {
 
 #' Title
 #'
-#' @param outdat model output 
+#' @param outdata model output 
 #' @param rate_type One of incidence, notification or mortality
 #' @param by_layer one of natcat, risk, post, strain, prot
 #'
 #' @returns ggplot of rates by age and sex stratified by target layer
 #' @export
 
-plt_TB_rates <- function(outdat, rate_type, by_layer) {
-
+plt_TB_rates <- function(outdata, rate_type, by_layer) {
+  outdat <- outdata$rate
   # Converuser-friendly rate types to colnames in the dataset
   state_map <- c(
     "incidence" = "rate_Incidence",

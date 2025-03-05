@@ -58,16 +58,16 @@ out$state                               #inspect
 out$rate
 
 ## visualize
-plt_DemoGrowth(out$state)               #total population over time
-plt_DemoSnapshots(out$state)            #snapshots
+plt_DemoGrowth(out)               #total population over time
+plt_DemoSnapshots(out)            #snapshots
 
-plt_TBSnapshots(out$state, by_layer = "natcat")
-plt_TBSnapshots(out$state, by_layer = "risk") # pyramid
-plt_TBSnapshots(out$state, by_layer = "post") # pyramid
+plt_TBSnapshots(out, by_layer = "natcat")
+plt_TBSnapshots(out, by_layer = "risk") # pyramid
+plt_TBSnapshots(out, by_layer = "post") # pyramid
 
-plt_TB_rates(out$rate,rate_type = "incidence",by_layer = "natcat")
-plt_TB_rates(out$rate,rate_type = "notification",by_layer = "risk")
-plt_TB_rates(out$rate,rate_type = "mortality",by_layer = "post")
+plt_TB_rates(out,rate_type = "incidence",by_layer = "natcat")
+plt_TB_rates(out,rate_type = "notification",by_layer = "risk")
+plt_TB_rates(out,rate_type = "mortality",by_layer = "post")
 
 
 
@@ -76,8 +76,8 @@ pms <- create_demographic_parms(nnat = 2, migrationdata = list(propinitnat = c(0
 out <- runmodel(pms,raw=FALSE)
 out
 
-plt_DemoGrowth(out$state)
-plt_DemoSnapshots(out$state)
+plt_DemoGrowth(out)
+plt_DemoSnapshots(out)
 
 ## version with 2 static nativity classes and 2 static risk classes
 pms <- create_demographic_parms(nnat = 2, nrisk = 2,
@@ -86,7 +86,7 @@ pms <- create_demographic_parms(nnat = 2, nrisk = 2,
 out <- runmodel(pms)
 out
 
-plt_DemoGrowth(out$state)
+plt_DemoGrowth(out)
 
 ## go big version with all strata to some degree:
 pms <- create_demographic_parms(
@@ -101,7 +101,7 @@ pms <- create_demographic_parms(
 out <- runmodel(pms)
 out
 
-plt_DemoGrowth(out$state) #still stable
+plt_DemoGrowth(out) #still stable
 
 ## Looking at TB snapshots
 
