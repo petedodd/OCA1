@@ -72,7 +72,7 @@ plt_TB_rates(out,rate_type = "mortality",by_layer = "post")
 
 
 ## version with 2 static nativity classes
-pms <- create_demographic_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
+pms <- create_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
 out <- runmodel(pms,raw=FALSE)
 out
 
@@ -80,16 +80,16 @@ plt_DemoGrowth(out)
 plt_DemoSnapshots(out)
 
 ## version with 2 static nativity classes and 2 static risk classes
-pms <- create_demographic_parms(nnat = 2, nrisk = 2,
-                                migrationdata = list(propinitnat = c(0.9,0.1)),
-                                riskdata = list(propinitrisk = c(0.9,0.1)))
+pms <- create_parms(nnat = 2, nrisk = 2,
+                    migrationdata = list(propinitnat = c(0.9,0.1)),
+                    riskdata = list(propinitrisk = c(0.9,0.1)))
 out <- runmodel(pms)
 out
 
 plt_DemoGrowth(out)
 
 ## go big version with all strata to some degree:
-pms <- create_demographic_parms(
+pms <- create_parms(
   nnat = 2, nrisk = 2, npost = 2, nstrain = 2, nprot = 2,
   migrationdata = list(propinitnat = c(0.9,0.1)),
   riskdata = list(propinitrisk = c(0.9,0.1)),

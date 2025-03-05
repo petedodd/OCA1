@@ -89,7 +89,7 @@ $$
 library(OCA1)
 
 ## example without nativity class used
-pms <- create_demographic_parms(verbose=TRUE) #create UK parameters
+pms <- create_parms(verbose=TRUE) #create UK parameters
 ```
 
 
