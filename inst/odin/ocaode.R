@@ -126,8 +126,8 @@ deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,
 output(rate_Notification[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- 1e5 * treatmentstarts[i,j,k,l,i5,i6,i7] / (totalpops[i,j,k,l,i5,i6,i7] + tol)
 
 ## TODO check how it plays with current processing
-
-output(rate_TBmortality[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- mortality_treated * treatmentends[i,j,k,l,i5,i6,i7] + mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
+rate_TBmortality[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- mortality_treated * treatmentends[i, j, k, l, i5, i6, i7] + mortality_untreated * Symp[i, j, k, l, i5, i6, i7]
+output(rate_TBmortality) <- TRUE
 output(rate_Incidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7])/totalpops[i,j,k,l,i5,i6,i7]
 
 dim(rate_Incidence) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
@@ -173,10 +173,12 @@ totalexits[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- OutR[i,
 ## total/average by age/sex
 dim(NAS) <- c(nage, 2)
 NAS[1:nage, 1:2] <- sum(totalpop[i, j, , , , , ]) #total pop by age/sex
-dim(Exit) <- c(nage, 2)
-Exit[1:nage, 1:2] <- sum(totalexits[i, j, , , , , ]) # total emigration rate by age/sex
+dim(ExitAS) <- c(nage, 2)
+ExitAS[1:nage, 1:2] <- sum(totalexits[i, j, , , , , ]) # total emigration rate by age/sex
+dim(TBdeathsAS) <- c(nage, 2)
+TBdeathsAS[1:nage, 1:2] <- sum(rate_TBmortality[i, j, , , , , ])
 ## corrected omega
-omegac[1:nage, 1:2] <- omega[i,j] + In[i,j] / NAS[i,j] - Exit[i,j]/ NAS[i,j]
+omegac[1:nage, 1:2] <- omega[i,j] + In[i,j] / NAS[i,j] - ExitAS[i,j] / NAS[i,j] - TBdeathsAS[i,j] / NAS[i,j]
 
 
 
