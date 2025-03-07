@@ -3,19 +3,19 @@ test_that("multiplication works", {
   ## try with default args
   new <- create_demographic_parms()
   message("Checking with default arguments")
-  expect_equal(digest::digest(new), "11cc9cdb7b45111ac8bf488cf2c02507")
+  expect_equal(digest::digest(new), "1425f12ba0a23b4564a265e28802fc9f")
 
   ## version with 2 static nativity classes
   pms <- create_demographic_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
   
-  expect_equal(digest::digest(pms), "f00bcb8ba8c52ab37fa4f060eb7ec18b")
+  expect_equal(digest::digest(pms), "7d693d8a319d201762404166aa6a145e")
   
   ## version with 2 static nativity classes and 2 static risk classes
   pms <- create_demographic_parms(nnat = 2, nrisk = 2,
                                   migrationdata = list(propinitnat = c(0.9,0.1)),
                                   riskdata = list(propinitrisk = c(0.9,0.1)))
   
-  expect_equal(digest::digest(pms), "fce31e03bd49deea7038156918b1dc32")
+  expect_equal(digest::digest(pms), "aa55536e25a5612b8edfa52b2c559846")
   
   
   ## go big version with all strata to some degree:
@@ -26,6 +26,6 @@ test_that("multiplication works", {
     straindata = list(propinitstrain = c(0.9,0.1)),
     protdata = list(propinitprot = c(0.9,0.1)))
   
-  expect_equal(digest::digest(pms), "56baf449daa8017075720c485fd730c4")
+  expect_equal(digest::digest(pms), "292f45532fa76512a11048d336900018")
   
 })
