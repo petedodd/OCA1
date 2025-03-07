@@ -9,39 +9,42 @@ test_that("running the basic model works", {
   expect_false(is.null(out))
 
   ## is the result a data frame?
-  expect_true(is.data.frame(out))
+  expect_true(all(unlist(lapply(out, is.data.frame))))
 
-  expect_true(is.numeric(out$value))
+  expect_true(all(unlist(lapply(out, function(x) is.numeric(x$value)))))
+
+  expect_false(all(unlist(lapply(out, function(x) is.na(x$value)))))
+
+  expect_true(all(unlist(lapply(out, function(x) x$value>=0))))
   
-  expect_false(any(is.na(out$value)))  
-  expect_true(all(out$value >= 0 ))
+  
   
   ## Should have 10 columns
-  expect_equal(ncol(out), 10)
-  
-  ## Check column names
-  expect_true(all(colnames(out) == c("t","value","state","AgeGrp",
-                                     "sex","natcat","risk","post","strain","prot")))
 
-  ## check sex levels
-  expect_true(all(levels(out$sex) == c("M","F")))
+    expect_true(all(unlist(lapply(out, function(x) ncol(x == 10)))))
+  ## Check column names
+  expect_true(all(unlist(lapply(out, function(x) colnames(x) ==
+                                  c("t","value","state","AgeGrp",
+                                    "sex","natcat","risk","post","strain","prot")))))
+
   
+  ## check sex levels
+  expect_true(all(unlist(lapply(out, function(x) levels(x$sex) == c("M","F")))))
+
+
   ## check states
   
-  states <- out[!grepl("rate_",out$state)]
-  
-  expect_true(all(states$natcat==1))
-  expect_true(all(states$risk==1))
-  expect_true(all(states$post==1))
-  expect_true(all(states$strain==1))
-  expect_true(all(states$prot==1))
-  
-  times <- as.numeric(substr(out$t, 1,4))
+  expect_true(all(unlist(lapply(out, function(x) x$natcat==1))))
+  expect_true(all(unlist(lapply(out, function(x) x$risk==1))))
+  expect_true(all(unlist(lapply(out, function(x) x$post==1))))
+  expect_true(all(unlist(lapply(out, function(x) x$strain==1))))
+  expect_true(all(unlist(lapply(out, function(x) x$prot==1))))
   
   ## check model was run over expected time series
-  expect_lt(max(times),2021)
-  expect_gt(min(times), 1949)
-  expect_true(all(1970:2020 %in% times))
+  
+  expect_true(all(unlist(lapply(out, function(x) as.numeric(substr(x$t, 1,4)) < 2021))))
+  expect_true(all(unlist(lapply(out, function(x) as.numeric(substr(x$t, 1,4)) > 1949))))
+  expect_true(all(unlist(lapply(out, function(x) 1970:2020 %in% as.numeric(substr(x$t, 1,4))))))
   
 })
 
@@ -78,8 +81,7 @@ test_that("running the model with 2 nativity classes", {
   
   ## check states
   
-  states <- out[!grepl("rate_",out$state)]
-  
+
   expect_true(all(states$natcat %in% c(1,2)))
   expect_true(all(states$risk==1))
   expect_true(all(states$post==1))
