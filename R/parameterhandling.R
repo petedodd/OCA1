@@ -331,7 +331,7 @@ create_demographic_parms <- function(tc = 1970:2020,
                   dimnames = list(tindex = 1:dms[1],
                                   acat = OCA1::agz,
                                   sex = c("M", "F")))
-  Narray[,,1] <- OCA1::UKdemo$N[Year %in% tc, PopFemale]
+  Narray[,,1] <- OCA1::UKdemo$N[Year %in% tc, PopMale]
   Narray[,,2] <- OCA1::UKdemo$N[Year %in% tc, PopFemale]
 
   ## promote to array
