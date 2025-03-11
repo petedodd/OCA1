@@ -73,6 +73,8 @@ plt_TB_rates(out,rate_type = "mortality",by_layer = "post")
 
 ## version with 2 static nativity classes
 pms <- create_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
+pms$cdr_hz_nat    <- c(1, 1.05) # two cdr hz required here as we have two nativity classes
+
 out <- runmodel(pms,raw=FALSE)
 out
 
@@ -83,6 +85,12 @@ plt_DemoSnapshots(out)
 pms <- create_parms(nnat = 2, nrisk = 2,
                     migrationdata = list(propinitnat = c(0.9,0.1)),
                     riskdata = list(propinitrisk = c(0.9,0.1)))
+                    
+## here we have to specify  two cdr hzr for both nat and risk groups. 
+## Other  hz ratio params are at their default values of 1                  
+pms$cdr_hz_nat    <- c(1, 1.05)    
+pms$cdr_hz_risk    <- c(1, 1.05) 
+
 out <- runmodel(pms)
 out
 
@@ -108,8 +116,9 @@ plt_DemoGrowth(out) #still stable
 
 ```
 
-
-
+## TODO
+- How to incorporate this info- the most common countries of birth for those born outside of the UK were India, Pakistan, Romania, Bangladesh and Eritrea
+- Next version should be about using flexible approach to put truncation on haz ratio not to exceed 1 for CDR
 
 ## License
 

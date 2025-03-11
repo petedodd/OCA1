@@ -73,14 +73,46 @@ progn_slow <- user(0.003)    #slow progression rate
 progn_fast <- user(0.1)    #fast progression rate
 progn_symp <- user(0.5)    #symptom progression rate
 detect_asymp <- user(0.0)  #detection hazard, asymptomatic
-detect_symp <- user(1.0)   #detection hazard, symptomatic NOTE will need to be interpolated
+#detect_symp <- user(1.0)   #detection hazard, symptomatic NOTE will need to be interpolated
 mortality_treated <- user(0.0)        #CFR treated TB
-mortality_untreated <- user(0)   #TODO applies to asymp also? may need to be array
+mortality_untreated <- user(0.02)   #TODO applies to asymp also? may need to be array
 treatment_inversedurn <- user(0)      #ATM because o/w leak
 progn_posttb[] <- user(0)               #progression thru layers of posttb
 relapse <- user(1e-2)                 #relapse rate
 
 ## TODO which need to be arrays?
+
+CDR_raw[,,] <- user() #. time, age, sex
+CDR_intrp[,] <- interpolate(ttp, CDR_raw, "linear")
+
+dim(CDR_raw) <- c(lttp,nage,2)
+dim(CDR_intrp) <-  c(nage,2)
+
+cdr_hz_nat[]    <- user()
+cdr_hz_risk[]   <- user()
+cdr_hz_post[]   <- user()
+cdr_hz_strain[] <- user()
+cdr_hz_prot[]   <- user()
+
+dim(cdr_hz_nat)    <- nnat
+dim(cdr_hz_risk)   <- nrisk
+dim(cdr_hz_post)   <- npost
+dim(cdr_hz_strain) <- nstrain
+dim(cdr_hz_prot)   <- nprot
+
+CDR_array[,,,,,,]          <- CDR_intrp[i, j]
+CDR_array[,,1:nnat,,,,]    <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_nat[k]
+CDR_array[,,,1:nrisk,,,]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_risk[l]
+CDR_array[,,,,1:npost,,]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_post[i5]
+CDR_array[,,,,,1:nstrain,] <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_strain[i6]
+CDR_array[,,,,,,1:nprot]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_prot[i7]
+
+
+detect_symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- CDR_array[i,j,k,l,i5,i6,i7]*(mortality_untreated)/(1-CDR_array[i,j,k,l,i5,i6,i7])
+
+dim(CDR_array) <-c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(detect_symp) <-c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+
 
 ## intervention interpolations:
 ## TODO detection (think costs over time?)
@@ -107,7 +139,7 @@ deriv(Llate[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogL[i,j,
 deriv(Asymp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogA[i,j,k,l,i5,i6,i7] + progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7] - progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_asymp * Asymp[i,j,k,l,i5,i6,i7] + fromtreatmentA[i,j,k,l,i5,i6,i7] + relapsefrompost[i,j,k,l,i5,i6,i7]
 
 ## Symptomatic TB disease
-deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k,l,i5,i6,i7] + progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_symp * Symp[i,j,k,l,i5,i6,i7] - mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
+deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k,l,i5,i6,i7] + progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_symp[i,j,k,l,i5,i6,i7] * Symp[i,j,k,l,i5,i6,i7] - mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
 
 ## currently on ATT
 deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,k,l,i5,i6,i7] + treatmentstarts[i,j,k,l,i5,i6,i7] - treatmentends[i,j,k,l,i5,i6,i7] #TODO
@@ -136,7 +168,7 @@ dim(rate_TBmortality) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 
 
 ## --- interim quantities
-treatmentstarts[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- detect_asymp * Asymp[i,j,k,l,i5,i6,i7] +  detect_symp * Symp[i,j,k,l,i5,i6,i7]
+treatmentstarts[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- detect_asymp * Asymp[i,j,k,l,i5,i6,i7] +  detect_symp[i,j,k,l,i5,i6,i7] * Symp[i,j,k,l,i5,i6,i7]
 totalpops[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- Uninfected[i,j,k,l,i5,i6,i7] + Learly[i,j,k,l,i5,i6,i7] + Llate[i,j,k,l,i5,i6,i7] + Asymp[i,j,k,l,i5,i6,i7] + Symp[i,j,k,l,i5,i6,i7] + Treat[i,j,k,l,i5,i6,i7]
 
 ## treatent ends & destinations

@@ -10,12 +10,12 @@ hyperparms <- list(
   ## previous version:  foi=list(meanlog=log(1e-2),sdlog=0.5)
   foi=list(meanlog=-4.495672,sdlog=0.2717918),    #ari0: to give 20% (10% to 30%) LTBI over 20 years
   ## --------------------------------------------------- progression
-  stb=list(meanlog=0.62, sdlog=0.068),       #kappa:arig Ragonnet
-  prg=list(meanlog=-2.837,sdlog=0.32),         #eps: pp Ragonnet
-  eps=list(meanlog=-6.89,sdlog=0.58),         #nu: Ragonnet
+  stabilization=list(meanlog=0.62, sdlog=0.068),       #kappa:arig Ragonnet
+  progn_fast=list(meanlog=-2.837,sdlog=0.32),         #eps: pp Ragonnet
+  progn_slow=list(meanlog=-6.89,sdlog=0.58),         #nu: Ragonnet
   rel=list(meanlog=-3.95,sdlog=0.27),         #omega: relapse Crampin NOTE x-ref
   ## --------------------------------------------------- detection
-  CDR=list(shape1=41.80,shape2=5.22),        #UK: CDR based on WHO data & Laura Anderson data
+  CDRa=list(shape1=41.80,shape2=5.22),        #UK: CDR based on WHO data & Laura Anderson data
   ## --------------------------------------------------- timescales
   drn=list(meanlog=1.1,sdlog=0.2),               #durnX log(3)
   ## --------------------------------------------------- CFRs
@@ -62,4 +62,26 @@ uv2ps <- function(u,HP,returnlist=TRUE){
 }
 
 ## === tb parms
-parms <- uv2ps(rep(0.5, length(hyperparms)),hyperparms) # natural history
+
+parms <- uv2ps(rep(0.5, length(hyperparms)),hyperparms) # natural histor
+rCDR <- 1.04
+CDR <- c(2*parms$CDRa*rCDR/(rCDR +1), 2*parms$CDRa/(rCDR +1))
+parms$CDR <- CDR
+parms$CDRa <- NULL
+
+
+
+
+
+
+
+
+ 
+ 
+
+  
+
+
+
+
+

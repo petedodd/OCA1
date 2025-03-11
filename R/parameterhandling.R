@@ -461,12 +461,12 @@ create_parms <- function(tc = 1970:2020,
                          protdata = list(),
                          tbparms = list(),
                          verbose = FALSE) {
-
+  
   ## === key dims
   nage <- length(OCA1::agz) # number of ages
   ntimes <- length(tc) # number of time data points
   dms <- c(ntimes, nnat, nrisk, npost, nstrain, nprot) # dimensions, bar age/sex which are always fixed
-
+  
   ## === create demographic parameters
   P <- create_demographic_parms(
     tc = tc,
@@ -478,14 +478,54 @@ create_parms <- function(tc = 1970:2020,
     protdata = protdata,
     verbose = verbose
   )
-
+  
   ## === TB specific parameters following similar pattern to above
   ## TODO
   ## probably want a new function for default_tb_parameters (like default_parameters)
   ## perhaps use the same check_dims function
   ## pjd to start with migration x TB
   ## das to start with time/dependent CDR/hazard - NOTE let me know if this impacts speed
+  
+  CDR <- array(0, dim= c(ntimes, nage, 2),
+               dimnames = list(tc,
+                               acat = OCA1::agz,
+                               sex = c("M", "F")))
+  
+ # parms <- source(system.file("extdata", "parameters.R", package = "OCA1"), local = TRUE)$value
+  
+  env <- new.env()
+  source(system.file("extdata", "parameters.R", package = "OCA1"), local = env)
+  parms <- env$parms
 
-  ## === return parameters
-  P
+
+   CDR[,,1] <- parms$CDR[1]
+   CDR[,,2] <- parms$CDR[2]
+
+  # ## === return parameters
+  P$CDR_raw <- CDR
+  
+
+parms<- c(P, parms)  
+parms$CDR <-NULL
+names(parms) <- make.names(names(parms), unique = TRUE)
+
+# default cdr_hzat at default model setting 
+parms$cdr_hz_nat    <- c(1)
+parms$cdr_hz_risk   <- c(1)
+parms$cdr_hz_post   <- c(1)
+parms$cdr_hz_strain <- c(1)
+parms$cdr_hz_prot   <- c(1)
+
+parms
 }
+
+
+# pms <-create_parms()
+
+
+
+
+
+
+
+ 
