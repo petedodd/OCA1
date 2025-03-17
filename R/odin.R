@@ -24,9 +24,9 @@ ocaode_ <- R6::R6Class(
              "Pmigr_post", "Pmigr_prot", "Pmigr_risk", "Pmigr_strain",
              "popdat", "popinitA", "popinitE", "popinitL", "popinitS",
              "popinitT", "popinitU", "r", "RiskHazardData", "ttp",
-             "detect_asymp", "foi", "mortality_treated",
-             "mortality_untreated", "progn_fast", "progn_posttb",
-             "progn_slow", "progn_symp", "relapse", "stabilization",
+             "detect_asymp", "foi", "mortality_treated", "progn_fast",
+             "progn_posttb", "progn_slow", "progn_symp", "relapse",
+             "stabilization", "symptb_CFR", "symptb_inversedurn",
              "tbi_protn", "treatment_inversedurn"),
 
     ## This is never called, but is used to ensure that R finds our

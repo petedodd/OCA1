@@ -204,7 +204,11 @@ default_parameters <- function(parname, dms, verbose=FALSE){
 ## loops over to add missing parameters as default
 add_defaults_if_missing <- function(L, parnames, dms, verbose){
   for(pname in parnames){
-    if(!pname %in% names(L)) L[[pname]] <- default_parameters(pname, dms, verbose)
+    if (!pname %in% names(L)) {
+      L[[pname]] <- default_parameters(pname, dms, verbose)
+    } else {
+      if (verbose) message("Using supplied value for ", pname, "...")
+    }
   }
   L
 }
