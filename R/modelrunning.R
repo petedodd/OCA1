@@ -33,11 +33,33 @@ runmodel <- function(p, times, raw = FALSE, singleout = FALSE) {
   ans # return
 }
 
+check_column_headings <- function(df) {
+
+  all(sapply(colnames(df), function(heading) {
+    is.character(heading) && grepl("\\[", heading) && grepl("\\]", heading)
+  }))
+  
+}
+
+
+  
+  
+
+
 
 ## utility to convert raw array output in to format data.table
 raw2datatable <- function(ans) {
+  
+    if(is.matrix(ans)){
+  
     ans <- data.table::as.data.table(ans)
-    ans <- data.table::melt(ans, id = "t")
+    if(!check_column_headings(ans[,-1])) stop("State information not encoded correctly")
+  
+    if(!all(stringr::str_count(colnames(ans)[-1],",") == 6)) stop("Incorrect number of variables found in object")
+    
+    if(colnames(ans)[1] == "t"){
+      ans <- data.table::melt(ans, id = "t")
+
     ans[, state := gsub("\\[|\\]|,|[[:digit:]]+", "", variable)]
     ans[, vars := gsub("_|\\[|\\]|[[:alpha:]]+", "", variable)]
     ans[, c("astring", "sexstring", "natstring","rskstring","poststring","strainstring","protstring") :=
@@ -58,7 +80,12 @@ raw2datatable <- function(ans) {
     ans$sex <- factor(ans$sex,levels=c("M","F"))
     ans$AgeGrp <- factor(ans$AgeGrp,levels=OCA1::agz)
     ans
+    } else stop("First column to be converted must be called 't'")
+} else stop("Incorrect data type for conversion")
+
 }
+
+
 
 ## for outputting a list of data.tables by output type (var): determined by colnames of type var_nm
 typesplit_raw2datatable <- function(ans) {
