@@ -52,7 +52,7 @@ NOTE need to redo with explicit migration at some point in any case
 library(OCA1)
 
 ## example without nativity class used
-pms <- create_demographic_parms()       #create UK parameters
+pms <- create_parms()       #create UK parameters
 out <- runmodel(pms)                    #run model with these, keep variable types separate
 out$state                               #inspect
 out$rate
