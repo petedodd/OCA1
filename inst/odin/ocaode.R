@@ -79,33 +79,38 @@ mortality_untreated <- user(0.02)   #TODO applies to asymp also? may need to be 
 treatment_inversedurn <- user(0)      #ATM because o/w leak
 progn_posttb[] <- user(0)               #progression thru layers of posttb
 relapse <- user(1e-2)                 #relapse rate
+tbi_protn <- user(0.2)                #protection TBI+ TODO incorporate
 
 ## TODO which need to be arrays?
 
-CDR_raw[,,] <- user() #. time, age, sex
-CDR_intrp[,] <- interpolate(ttp, CDR_raw, "linear")
+CDR_raw[, , , , , , , ] <- user() # . time, age, sex
+dim(CDR_raw) <- c(lttp, nage, 2, nnat, nrisk, npost, nstrain, nprot)
+CDR_array[, , , , , , ] <- interpolate(ttp, CDR_raw, "linear")
 
-dim(CDR_raw) <- c(lttp,nage,2)
-dim(CDR_intrp) <-  c(nage,2)
 
-cdr_hz_nat[]    <- user()
-cdr_hz_risk[]   <- user()
-cdr_hz_post[]   <- user()
-cdr_hz_strain[] <- user()
-cdr_hz_prot[]   <- user()
+## CDR_intrp[,] <- interpolate(ttp, CDR_raw, "linear")
 
-dim(cdr_hz_nat)    <- nnat
-dim(cdr_hz_risk)   <- nrisk
-dim(cdr_hz_post)   <- npost
-dim(cdr_hz_strain) <- nstrain
-dim(cdr_hz_prot)   <- nprot
+## dim(CDR_raw) <- c(lttp,nage,2)
+## dim(CDR_intrp) <-  c(nage,2)
 
-CDR_array[,,,,,,]          <- CDR_intrp[i, j]
-CDR_array[,,1:nnat,,,,]    <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_nat[k]
-CDR_array[,,,1:nrisk,,,]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_risk[l]
-CDR_array[,,,,1:npost,,]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_post[i5]
-CDR_array[,,,,,1:nstrain,] <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_strain[i6]
-CDR_array[,,,,,,1:nprot]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_prot[i7]
+## cdr_hz_nat[]    <- user()
+## cdr_hz_risk[]   <- user()
+## cdr_hz_post[]   <- user()
+## cdr_hz_strain[] <- user()
+## cdr_hz_prot[]   <- user()
+
+## dim(cdr_hz_nat)    <- nnat
+## dim(cdr_hz_risk)   <- nrisk
+## dim(cdr_hz_post)   <- npost
+## dim(cdr_hz_strain) <- nstrain
+## dim(cdr_hz_prot)   <- nprot
+
+## CDR_array[,,,,,,]          <- CDR_intrp[i, j]
+## CDR_array[,,1:nnat,,,,]    <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_nat[k]
+## CDR_array[,,,1:nrisk,,,]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_risk[l]
+## CDR_array[,,,,1:npost,,]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_post[i5]
+## CDR_array[,,,,,1:nstrain,] <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_strain[i6]
+## CDR_array[,,,,,,1:nprot]   <- CDR_array[i,j,k,l,i5,i6,i7] * cdr_hz_prot[i7]
 
 
 detect_symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- CDR_array[i,j,k,l,i5,i6,i7]*(mortality_untreated)/(1-CDR_array[i,j,k,l,i5,i6,i7])

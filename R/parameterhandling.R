@@ -103,6 +103,9 @@ check_dims <- function(parlist, dms){
     if(pname=="RiskHazardData"){
       ans[[pname]] <- all(dim(parlist[[pname]])==c(dms[1], length(OCA1::agz), 2, dms[3]))
     }
+    if(pname=="CDR_raw"){
+      ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2, dms[2:6]))
+    }
   } #end loop over list names
   unlist(ans)
 }
@@ -173,8 +176,26 @@ default_parameters <- function(parname, dms, verbose=FALSE){
       )
     )
   }
+  if (parname == "CDR_raw") {
+    ans <- array(0.7,
+      dim = c(dms[1], length(OCA1::agz), 2, dms[2:6]),
+      dimnames = list(
+        tindex = 1:dms[1],
+        acat = OCA1::agz,
+        sex = c("M", "F"),
+        nativity = 1:dms[2],
+        risk = 1:dms[3],
+        post = 1:dms[4],
+        strain = 1:dms[5],
+        protn = 1:dms[6]
+      )
+    )
+  }
   if (parname == "progn_posttb") {
     ans <- rep(0,dms[4])
+  }
+  if(parname %in% names(OCA1::parms)){ #basic TB parameters
+    ans <- OCA1::parms[[parname]]
   }
   if(is.na(sum(ans))) stop("No default available for ",parname,"!\n") #sum to handle arrays
   ans
@@ -461,12 +482,12 @@ create_parms <- function(tc = 1970:2020,
                          protdata = list(),
                          tbparms = list(),
                          verbose = FALSE) {
-  
+
   ## === key dims
   nage <- length(OCA1::agz) # number of ages
   ntimes <- length(tc) # number of time data points
   dms <- c(ntimes, nnat, nrisk, npost, nstrain, nprot) # dimensions, bar age/sex which are always fixed
-  
+
   ## === create demographic parameters
   P <- create_demographic_parms(
     tc = tc,
@@ -478,54 +499,45 @@ create_parms <- function(tc = 1970:2020,
     protdata = protdata,
     verbose = verbose
   )
-  
+
   ## === TB specific parameters following similar pattern to above
   ## TODO
   ## probably want a new function for default_tb_parameters (like default_parameters)
   ## perhaps use the same check_dims function
   ## pjd to start with migration x TB
   ## das to start with time/dependent CDR/hazard - NOTE let me know if this impacts speed
-  
-  CDR <- array(0, dim= c(ntimes, nage, 2),
-               dimnames = list(tc,
-                               acat = OCA1::agz,
-                               sex = c("M", "F")))
-  
- # parms <- source(system.file("extdata", "parameters.R", package = "OCA1"), local = TRUE)$value
-  
-  env <- new.env()
-  source(system.file("extdata", "parameters.R", package = "OCA1"), local = env)
-  parms <- env$parms
 
+  ## tb parms
+  tbparnames <- names(OCA1::parms)
+  tbparnames <- c(tbparnames, "CDR_raw")
+  ## defaults:
+  tbparms <- add_defaults_if_missing(tbparms, tbparnames, dms, verbose)
 
-   CDR[,,1] <- parms$CDR[1]
-   CDR[,,2] <- parms$CDR[2]
+  ## === TB parm checks
+  ## prob checks
+  if (verbose) message("\n")
+  param_list <- list(
+    "CDR_raw" = tbparms$CDR_raw
+  )
+  checks <- sapply(param_list, check_probabilities)
+  if (all(checks)) {
+    if (verbose) message("All TB parameters containing probabilities were correct\n")
+  } else {
+    stop("TB parameters with problems:", paste(names(param_list)[!checks], collapse = ", "))
+  }
 
-  # ## === return parameters
-  P$CDR_raw <- CDR
-  
+  ## check dimension
+  checks <- check_dims(param_list, dms)
+  if (all(checks)) {
+    if (verbose) message("All TB input parameters dimensions were correct\n")
+  } else {
+    message("TB parameters with dimension problems:", paste(names(param_list)[!checks]))
+  }
 
-parms<- c(P, parms)  
-parms$CDR <-NULL
-names(parms) <- make.names(names(parms), unique = TRUE)
-
-# default cdr_hzat at default model setting 
-parms$cdr_hz_nat    <- c(1)
-parms$cdr_hz_risk   <- c(1)
-parms$cdr_hz_post   <- c(1)
-parms$cdr_hz_strain <- c(1)
-parms$cdr_hz_prot   <- c(1)
-
-parms
+  ## === return combined demographic & TB parameters
+  c(P, tbparms)
 }
 
-
+## CHECK
 # pms <-create_parms()
 
-
-
-
-
-
-
- 

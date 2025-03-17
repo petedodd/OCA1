@@ -2,18 +2,36 @@
 % Please edit documentation in R/outputhandling.R
 \name{plt_TBSnapshots}
 \alias{plt_TBSnapshots}
-\title{Title}
+\title{Visualising Temporal Trends in Demographics and TB Status}
 \usage{
 plt_TBSnapshots(outdata, by_layer)
 }
 \arguments{
-\item{outdata}{modelled output}
+\item{outdata}{A data.table returned by \code{runmodel} with \code{raw=FALSE}}
 
-\item{by_layer}{one of natcat, risk, post, strain, prot}
+\item{by_layer}{One of natcat, risk, post, strain, prot}
 }
 \value{
-Population pyramid
+A \code{ggplot2} plot object showing population distribution over time by age, sex, nativity and TB status
 }
 \description{
-Title
+A short description...
+}
+\details{
+Additional details...
+}
+\examples{
+pms <- create_demographic_parms() #create UK parameters
+out <- runmodel(pms)              #run model with these
+out                               #inspect
+## visualize
+plt_TBSnapshots(out, "natcat") 
+}
+\seealso{
+\code{\link[=plt_DemoGrowth]{plt_DemoGrowth()}}
+
+\code{\link[=plt_TB_rates]{plt_TB_rates()}}
+}
+\author{
+Pete Dodd
 }

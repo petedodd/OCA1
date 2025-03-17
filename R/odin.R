@@ -19,16 +19,15 @@ ocaode_ <- R6::R6Class(
       initmod_desolve = "ocaode_initmod_desolve",
       output_dde = "ocaode_output_dde"),
     dll = "OCA1",
-    user = c("BB", "birthrisk", "cdr_hz_nat", "cdr_hz_post", "cdr_hz_prot",
-             "cdr_hz_risk", "cdr_hz_strain", "CDR_raw", "exmigrate",
-             "immigration", "migrage", "nage", "nnat", "npost", "nprot",
-             "nrisk", "nstrain", "Pmigr_post", "Pmigr_prot", "Pmigr_risk",
-             "Pmigr_strain", "popdat", "popinitA", "popinitE", "popinitL",
-             "popinitS", "popinitT", "popinitU", "r", "RiskHazardData",
-             "ttp", "detect_asymp", "foi", "mortality_treated",
+    user = c("BB", "birthrisk", "CDR_raw", "exmigrate", "immigration",
+             "migrage", "nage", "nnat", "npost", "nprot", "nrisk", "nstrain",
+             "Pmigr_post", "Pmigr_prot", "Pmigr_risk", "Pmigr_strain",
+             "popdat", "popinitA", "popinitE", "popinitL", "popinitS",
+             "popinitT", "popinitU", "r", "RiskHazardData", "ttp",
+             "detect_asymp", "foi", "mortality_treated",
              "mortality_untreated", "progn_fast", "progn_posttb",
              "progn_slow", "progn_symp", "relapse", "stabilization",
-             "treatment_inversedurn"),
+             "tbi_protn", "treatment_inversedurn"),
 
     ## This is never called, but is used to ensure that R finds our
     ## symbols that we will use from the package; without this they
