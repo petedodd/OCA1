@@ -106,7 +106,7 @@ known_parameters("nonsense")           ##throws error as name not known
 known_parameters("CDR_raw")            ##knows this parameter, prints info on it
 known_parameters("CDR_raw",quiet=TRUE) ##knows this parameter, does not print info
 
-## BUG correct:
+## demonstrate with some inputs:
 pms <- create_parms(verbose=TRUE,
                     tbparms=list(treatment_inversedurn=0,
                                  mortality_treated=0,

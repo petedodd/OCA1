@@ -654,10 +654,10 @@ print_helper <- function(parname=NULL,parmlist){
     if(length(parmlist)>0){
       if(is.null(parname)){
         for(nm in names(parmlist)){
-          cat("\t",nm,": ",parmlist[[nm]][[1]],"(",parmlist[[nm]][[2]],")\n")
+          cat("\t",nm,": ",parmlist[[nm]][[1]],"[",parmlist[[nm]][[2]],"]\n")
         }
       } else{
-        cat("\t",parname,": ",parmlist[[parname]][[1]],"(",parmlist[[parname]][[2]],")\n")
+        cat("\t",parname,": ",parmlist[[parname]][[1]],"[",parmlist[[parname]][[2]],"]\n")
       }
     }
   }
@@ -716,9 +716,9 @@ known_parameters <- function(parname=NULL,quiet=FALSE){
   tbparms <- list(
     CDR_raw=list("",c())
   )
-  ## for(nm in OCA1::hyperparms){ #TODO
-  ##   tbparms[[nm]] <- list(hyperparms[[nm]][[3]],c())
-  ## }
+  for(nm in names(OCA1::hyperparms)){
+    tbparms[[nm]] <- list(hyperparms[[nm]][[3]],"scalar")
+  }
   nmzall <- c(
     names(migrationdata),
     names(riskdata),
