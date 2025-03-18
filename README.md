@@ -3,18 +3,6 @@
 # OCA1 <img src="man/figures/logo.png" align="right" height="139" alt="" />
 UK TB transmission model
 
-This uses `odin` vn 1 as this seems to work
-
-
-## Work in progress:
-
-2. introduce TB-related index layers
-3. decide on and start to implement TB model structure
-
-C. End project steps
-1. more realistic input/output handling
-
-
 
 ## Updating
 
@@ -85,12 +73,6 @@ plt_DemoSnapshots(out)
 pms <- create_parms(nnat = 2, nrisk = 2,
                     migrationdata = list(propinitnat = c(0.9,0.1)),
                     riskdata = list(propinitrisk = c(0.9,0.1)))
-                    
-## here we have to specify  two cdr hzr for both nat and risk groups. 
-## Other  hz ratio params are at their default values of 1                  
-pms$cdr_hz_nat    <- c(1, 1.05)    
-pms$cdr_hz_risk    <- c(1, 1.05) 
-
 out <- runmodel(pms)
 out
 
@@ -116,9 +98,25 @@ plt_DemoGrowth(out) #still stable
 
 ```
 
-## TODO
-- How to incorporate this info- the most common countries of birth for those born outside of the UK were India, Pakistan, Romania, Bangladesh and Eritrea
-- Next version should be about using flexible approach to put truncation on haz ratio not to exceed 1 for CDR
+One can get information on known parameters, and check for correct naming as follows:
+
+```r
+known_parameters()                     ##print all info
+known_parameters("nonsense")           ##throws error as name not known
+known_parameters("CDR_raw")            ##knows this parameter, prints info on it
+known_parameters("CDR_raw",quiet=TRUE) ##knows this parameter, does not print info
+
+## BUG correct:
+pms <- create_parms(verbose=TRUE,
+                    tbparms=list(treatment_inversedurn=0,
+                                 mortality_treated=0,
+                                 symptb_inversedurn=3,
+                                 symptb_CFR = 1
+                                 )
+                    )
+
+
+```
 
 ## License
 

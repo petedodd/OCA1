@@ -207,6 +207,7 @@ add_defaults_if_missing <- function(L, parnames, dms, verbose){
     if (!pname %in% names(L)) {
       L[[pname]] <- default_parameters(pname, dms, verbose)
     } else {
+      known_parameters(pname,quiet=TRUE) #test exists
       if (verbose) message("Using supplied value for ", pname, "...")
     }
   }
@@ -545,3 +546,214 @@ create_parms <- function(tc = 1970:2020,
 ## CHECK
 # pms <-create_parms()
 
+
+
+## a utility to construct default values for unsupplied parameters/data
+default_parameters <- function(parname, dms, verbose=FALSE){
+  ## dms = c(ntimes, nnat, nrisk, npost, nstrain, nprot)
+  if(verbose) message("Using default value for ",parname,"...")
+  ans <- NA
+  if(parname %in% c("migrage")){
+    ans <- rep(0,dms[2]) #nnat
+  }
+  if(parname %in% c("propinitnat")){
+    ans <- hotone(dms[2]) #nnat
+  }
+  if(parname %in% c("Pmigr_risk","propinitrisk","birthrisk")){
+    ans <- hotone(dms[3]) #nrisk
+  }
+  if(parname %in% c("Pmigr_post","propinitpost")){
+    ans <- hotone(dms[4]) #npost
+  }
+  if(parname %in% c("Pmigr_strain","propinitstrain")){
+    ans <- hotone(dms[5]) #nstrain
+  }
+  if(parname %in% c("Pmigr_prot","propinitprot")){
+    ans <- hotone(dms[6]) #nprotn
+  }
+  ## these need bumping up to duplicate by sex
+  if(parname %in% c("Pmigr_risk","Pmigr_post","Pmigr_strain","Pmigr_prot")){
+    ans <- rbind(ans,ans) #one for each sex
+  }
+  if(parname %in% c("immigration")){
+    ans <- array(0,
+      dim = c(dms[1], length(OCA1::agz), 2),
+      dimnames = list(
+        tindex = 1:dms[1],
+        acat = OCA1::agz,
+        sex = c("M", "F")
+      )
+      )
+  }
+  if (parname %in% c("exmigrate")) {
+    ans <- array(0,
+      dim = c(dms[1], length(OCA1::agz), 2, dms[2]),
+      dimnames = list(
+        tindex = 1:dms[1],
+        acat = OCA1::agz,
+        sex = c("M", "F"),
+        nativity = 1:dms[2]
+      )
+    )
+  }
+  if(parname == "RiskHazardData"){
+    ans <- array(0,
+      dim = c(dms[1], length(OCA1::agz), 2, dms[3]),
+      dimnames = list(
+        tindex = 1:dms[1],
+        acat = OCA1::agz,
+        sex = c("M", "F"),
+        risk = 1:dms[3]
+      )
+    )
+  }
+  if (parname == "CDR_raw") {
+    ans <- array(0.7,
+      dim = c(dms[1], length(OCA1::agz), 2, dms[2:6]),
+      dimnames = list(
+        tindex = 1:dms[1],
+        acat = OCA1::agz,
+        sex = c("M", "F"),
+        nativity = 1:dms[2],
+        risk = 1:dms[3],
+        post = 1:dms[4],
+        strain = 1:dms[5],
+        protn = 1:dms[6]
+      )
+    )
+  }
+  if (parname == "progn_posttb") {
+    ans <- rep(0,dms[4])
+  }
+  if(parname %in% names(OCA1::parms)){ #basic TB parameters
+    ans <- OCA1::parms[[parname]]
+  }
+  if(is.na(sum(ans))) stop("No default available for ",parname,"!\n") #sum to handle arrays
+  ans
+}
+
+
+
+
+##' A helper function
+##'
+##' See `known_parameters`
+##'
+##' @title A helper function for `known_parameters`
+##' @param parname a specific parameter name (Default NULL)
+##' @param parmlist one of the lists of parameters
+##' @return no return only printing
+##' @author Pete Dodd
+##' @importFrom rlang as_label ensym
+print_helper <- function(parname=NULL,parmlist){
+  parmlistname <- rlang::as_label(rlang::ensym(parmlist))
+  print_here <- ifelse(is.null(parname),TRUE,parname %in% names(parmlist))
+  if(print_here){
+    cat("\n")
+    cat(parmlistname,":\n")
+    if(length(parmlist)>0){
+      if(is.null(parname)){
+        for(nm in names(parmlist)){
+          cat("\t",nm,": ",parmlist[[nm]][[1]],"(",parmlist[[nm]][[2]],")\n")
+        }
+      } else{
+        cat("\t",parname,": ",parmlist[[parname]][[1]],"(",parmlist[[parname]][[2]],")\n")
+      }
+    }
+  }
+}
+
+##' Print info or test known parameters
+##'
+##' This has no return value but can be used to either print info on known parameters (all, or specific parameters),
+##' and will test for unknown parameters.
+##'
+##' Info is returned organised by the parameter list they should be part of, and a short description and the expected
+##' dimensions are printed.
+##'
+##' @title Print/test known parameters
+##' @param parname if supplied consider only this parameter name; otherwise (default) print info on all parameters
+##' @param quiet if TRUE (default) do not print info, only test whether parameter name is known
+##' @return no return value
+##' @author Pete Dodd
+##' @examples
+##' known_parameters()                     ##print all info
+##' known_parameters("nonsense")           ##throws error as name not known
+##' known_parameters("CDR_raw")            ##knows this parameter, prints info on it
+##' known_parameters("CDR_raw",quiet=TRUE) ##knows this parameter, does not print info
+##' @export
+known_parameters <- function(parname=NULL,quiet=FALSE){
+
+  ## relevant data on parameters
+  ## will be docstring + dim string
+  migrationdata <- list(
+    migrage=list("",c()),
+    propinitnat=list("",c()),
+    Pmigr_risk=list("",c()),
+    propinitrisk=list("",c()),
+    birthrisk=list("",c()),
+    Pmigr_post=list("",c()),
+    propinitpost=list("",c()),
+    Pmigr_strain=list("",c()),
+    propinitstrain=list("",c()),
+    Pmigr_prot=list("",c()),
+    propinitprot=list("",c()),
+    Pmigr_risk=list("",c()),
+    Pmigr_post=list("",c()),
+    Pmigr_strain=list("",c()),
+    Pmigr_prot=list("",c()),
+    immigration=list("",c()),
+    exmigrate=list("",c())
+  )
+  riskdata <- list(
+    RiskHazardData=list("",c())
+  )
+  postdata <- list(
+    progn_posttb=list("",c())
+  )
+  straindata <- list()
+  protdata <- list()
+  tbparms <- list(
+    CDR_raw=list("",c())
+  )
+  ## for(nm in OCA1::hyperparms){ #TODO
+  ##   tbparms[[nm]] <- list(hyperparms[[nm]][[3]],c())
+  ## }
+  nmzall <- c(
+    names(migrationdata),
+    names(riskdata),
+    names(postdata),
+    names(straindata),
+    names(protdata),
+    names(tbparms)
+  )
+
+  ## test if recognized:
+  if(!is.null(parname)){
+    if(!parname %in% nmzall){
+      ## NOTE TODO could try to suggest nearest parameter for case of typos
+      stop("Input parameter '", parname,"' not recognized!")
+    }
+  }
+
+  ## print things
+  if(!quiet){
+    if(is.null(parname)){ #no argument given: print mode
+      cat("(No argument given to test, printing parameter info)\n")
+      cat("\n")
+    }
+    print_helper(parname,migrationdata)
+    print_helper(parname,riskdata)
+    print_helper(parname,postdata)
+    print_helper(parname,straindata)
+    print_helper(parname,protdata)
+    print_helper(parname,tbparms)
+    cat("\n")
+  }
+}
+
+
+## known_parameters()
+## known_parameters("nonsense")
+## known_parameters("CDR_raw")
+## known_parameters("CDR_raw",quiet=TRUE)
