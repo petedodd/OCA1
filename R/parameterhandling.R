@@ -684,37 +684,35 @@ print_helper <- function(parname=NULL,parmlist){
 ##' @export
 known_parameters <- function(parname=NULL,quiet=FALSE){
 
+  ## dms = c(ntimes, nnat, nrisk, npost, nstrain, nprot)
   ## relevant data on parameters
   ## will be docstring + dim string
   migrationdata <- list(
-    migrage=list("",c()),
-    propinitnat=list("",c()),
-    Pmigr_risk=list("",c()),
-    propinitrisk=list("",c()),
-    birthrisk=list("",c()),
-    Pmigr_post=list("",c()),
-    propinitpost=list("",c()),
-    Pmigr_strain=list("",c()),
-    propinitstrain=list("",c()),
-    Pmigr_prot=list("",c()),
-    propinitprot=list("",c()),
-    Pmigr_risk=list("",c()),
-    Pmigr_post=list("",c()),
-    Pmigr_strain=list("",c()),
-    Pmigr_prot=list("",c()),
-    immigration=list("",c()),
-    exmigrate=list("",c())
+    migrage=list("Migration ageing rates","nnat"),
+    propinitnat=list("Initial population proportion in each natal layer","nnat"),
+    Pmigr_risk=list("Proportion of in-migrants to each risk layer","nsex, nrisk"),
+    propinitrisk=list("Initial population proportion in each risk layer","nrisk"),
+    birthrisk=list("Proportions of births into each risk layer","nrisk"),
+    Pmigr_post=list("Proportion of in-migrants to each post-TB layer","nsex, npost"),
+    propinitpost=list("Initial population proportion in each post-TB layer","npost"),
+    Pmigr_strain=list("Proportion of in-migrants to each strain layer","nsex, nstrain"),
+    propinitstrain=list("Initial population proportion in each strain layer","nstrain"),
+    Pmigr_prot=list("Proportion of in-migrants to each protection layer","nsex"),
+    propinitprot=list("Initial population proportion in each protection layer","npost"),
+    immigration=list("In-migration numbers over time","ntimes, nage, nsex"),
+    exmigrate=list("Out-migration hazard over time","ntimes, nage, nsex, nnat")
   )
   riskdata <- list(
-    RiskHazardData=list("",c())
+    RiskHazardData=list("Progression hazard from each risk layer over time (last 0)","ntimes, nage, nsex, nrisk")
   )
+  ## TODO introduce checks on 1st/last 0 & maybe harminoze naming: migrage/progn_posttb
   postdata <- list(
-    progn_posttb=list("",c())
+    progn_posttb=list("Post-TB ageing rates (1st/last 0)","npost")
   )
   straindata <- list()
   protdata <- list()
   tbparms <- list(
-    CDR_raw=list("",c())
+    CDR_raw=list("CDR data in each stratum over time","ntimes, nage, nsex, nnat, nrisk, nopst, nstrain, nprot")
   )
   for(nm in names(OCA1::hyperparms)){
     tbparms[[nm]] <- list(hyperparms[[nm]][[3]],"scalar")
@@ -739,7 +737,7 @@ known_parameters <- function(parname=NULL,quiet=FALSE){
   ## print things
   if(!quiet){
     if(is.null(parname)){ #no argument given: print mode
-      cat("(No argument given to test, printing parameter info)\n")
+      cat("(No argument given to test: printing parameter info)\n")
       cat("\n")
     }
     print_helper(parname,migrationdata)
