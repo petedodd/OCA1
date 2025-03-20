@@ -138,8 +138,8 @@ plt_DemoSnapshots <- function(outdata) {
   N <- OCA1::UKdemo$N |>
     dplyr::select(t = Year, AgeGrp,PopMale,PopFemale) |>
     tidyr::pivot_longer(contains("Pop"), values_to = "expected",names_to = "sex") |> 
-    mutate(sex = stringr::str_replace_all(sex,"PopMale","M")) |>
-    mutate(sex = stringr::str_replace_all(sex,"PopFemale","F"))
+    dplyr::mutate(sex = stringr::str_replace_all(sex,"PopMale","M")) |>
+    dplyr::mutate(sex = stringr::str_replace_all(sex,"PopFemale","F"))
    
   ## calculate years at intervals of 5  
   tmz <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 5)
@@ -156,7 +156,7 @@ plt_DemoSnapshots <- function(outdata) {
   
   
     ## make joined data frame for plotting
-    dplyr::combined <- dplyr::left_join(tmpo,N, by = c("t","sex","AgeGrp")) |>
+    combined <- dplyr::left_join(tmpo,N, by = c("t","sex","AgeGrp")) |>
       dplyr::mutate(calculated = ifelse(sex == "M", -calculated,calculated)) |> 
       dplyr::mutate(expected = ifelse(sex == "M", -expected, expected)) |>
       dplyr::filter(t %in% tmz)
