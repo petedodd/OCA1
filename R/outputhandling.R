@@ -133,33 +133,47 @@ plt_DemoSnapshots <- function(outdata) {
   outdat <- getStateFromOut(outdata)
   
   cntry <- "GBR"
-  N <- OCA1::UKdemo$N
+  
+  ## Get expected populations for males and females
+  N <- OCA1::UKdemo$N |>
+    dplyr::select(t = Year, AgeGrp,PopMale,PopFemale) |>
+    tidyr::pivot_longer(contains("Pop"), values_to = "expected",names_to = "sex") |> 
+    mutate(sex = stringr::str_replace_all(sex,"PopMale","M")) |>
+    mutate(sex = stringr::str_replace_all(sex,"PopFemale","F"))
+   
+  ## calculate years at intervals of 5  
   tmz <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 5)
-  tmpo <- outdat[!grepl("rate", state), .(value = sum(value)), by = .(t, sex, AgeGrp)]
-  PL <- list()
-  for (i in 1:length(tmz)) {
-    YR <- tmz[i]
-    (cly <- outdat[which.min(abs(t - YR)), t])
-    tmp <- data.table::melt(N[iso3 == cntry & Year == YR,
-                              .(t = Year, AgeGrp, M = PopMale, F = PopFemale)],
-                            id.vars = c("t", "AgeGrp")
-    )
-    names(tmp)[3] <- "sex"
-    PL[[i]] <- ggplot2::ggplot(tmp, aes(x = AgeGrp, col = sex, shape = sex)) +
-      ggplot2::geom_point(data = tmp[sex == "M"], aes(y = -value), size = 2) +
-      ggplot2::geom_point(data = tmp[sex == "F"], aes(y = value), size = 2) +
-      ggplot2::geom_line(data = tmpo[t == cly & sex == "M"],aes(y = -value, group = 1), alpha = .5) +
-      ggplot2::geom_line(data = tmpo[t == cly & sex == "F"],aes(y = value, group = 1), alpha = .5) +
+  nr <- ceiling(length(tmz) / 4)
+  
+    ## get the calculated populations  
+    tmpo <- outdat[!grepl("rate", state), .(value = sum(value)), by = .(t, sex, AgeGrp)] |>
+    dplyr::mutate(t = round(t)) |>
+    dplyr::group_by(t, sex, AgeGrp) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup() |>
+    dplyr::rename("calculated" = value) |>
+    dplyr::mutate(AgeGrp = as.ordered(AgeGrp))
+  
+  
+    ## make joined data frame for plotting
+    dplyr::combined <- dplyr::left_join(tmpo,N, by = c("t","sex","AgeGrp")) |>
+      dplyr::mutate(calculated = ifelse(sex == "M", -calculated,calculated)) |> 
+      dplyr::mutate(expected = ifelse(sex == "M", -expected, expected)) |>
+      dplyr::filter(t %in% tmz)
+    
+    ggplot2::ggplot(combined, aes(x = AgeGrp, col=sex, shape=sex)) + 
+      ggplot2::geom_point(aes(y = expected,group=sex)) + 
+      ggplot2::geom_line(aes(y = calculated, group = sex)) +
       ggplot2::coord_flip() +
       ggplot2::ylab("Population (in thousands)") +
       ggplot2::xlab("Age group") +
       ggplot2::scale_y_continuous(labels = absspace) +
-      ggplot2::ggtitle(YR) +
       ggplot2::theme_bw() +
-      ggplot2::theme(legend.position = "none") + ggplot2::scale_colour_manual(values = c("#440099","#9ADBE8"))
-  }
-  nr <- ceiling(length(tmz) / 4)
-  ggpubr::ggarrange(plotlist = PL, ncol = 4, nrow = nr)
+      ggplot2::theme(legend.position = "none") + 
+      ggplot2::facet_wrap(~t,ncol = nr)
+      
+  
+
 }
 
 
@@ -193,6 +207,8 @@ plt_TBSnapshots <- function(outdata, by_layer = "natcat") {
   
   mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", 
               "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
+  
+  
   
   
   layer_names <- c(
