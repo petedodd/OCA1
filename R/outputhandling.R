@@ -55,11 +55,11 @@ checkDemoFit <- function(outdata){
     dplyr::rename(Year = 1) |>
     dplyr::mutate(Year = as.numeric(Year))
     
-  N <- nrow(x)
+   n <- nrow(x)
   dplyr::left_join(x,y,by="Year") |>
     dplyr::mutate(error = (pop.x - pop.y)/pop.x, N=dplyr::n()) |>
     dplyr::summarise(sse = sum(error^2)) |>
-    dplyr::mutate(RMSE = sqrt(sse / N))
+    dplyr::mutate(RMSE = sqrt(sse / n))
   
 }
 
@@ -85,7 +85,7 @@ checkDemoFit <- function(outdata){
 ##' @export
 plt_DemoSnapshots <- function(outdata) {
   
-  if(!"state" %in% colnames(outdata)) stop("No state column found in the supplied outdata object. Was this created with raw = TRUE ?")
+  if(!"state" %in% names(outdata)) stop("No state column found in the supplied outdata object. Was this created with raw = TRUE ?")
   
   outdat <- outdata$state
   cntry <- "GBR"
@@ -112,7 +112,7 @@ plt_DemoSnapshots <- function(outdata) {
       ggplot2::scale_y_continuous(labels = absspace) +
       ggplot2::ggtitle(YR) +
       ggplot2::theme_bw() +
-      ggplot2::theme(legend.position = "none")
+      ggplot2::theme(legend.position = "none") + ggplot2::scale_colour_manual(values = c("#440099","#9ADBE8"))
   }
   nr <- ceiling(length(tmz) / 4)
   ggpubr::ggarrange(plotlist = PL, ncol = 4, nrow = nr)
@@ -144,7 +144,7 @@ plt_DemoSnapshots <- function(outdata) {
 
 plt_TBSnapshots <- function(outdata, by_layer = "natcat") {
   
-  if(!"state" %in% colnames(outdata)) stop("No state column found in the supplied outdata object. Was this created with raw = TRUE ?")
+  if(!"state" %in% names(outdata)) stop("No state column found in the supplied outdata object. Was this created with raw = TRUE ?")
   
   outdat <- outdata$state
   mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", 
