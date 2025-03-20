@@ -455,12 +455,13 @@ create_demographic_parms <- function(tc = 1970:2020,
 }
 
 
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
-##'
+
 ##' NOTE this extends the demographic parameters to be more explicit about TB parameters
-##'
+##' @details
+##' Additional details...
+##' @description
+##' A short description...
+##' 
 ##' @title Creates parameters for model
 ##' @param tc TODO
 ##' @param nnat TODO
@@ -638,7 +639,11 @@ default_parameters <- function(parname, dms, verbose=FALSE){
 ##' A helper function
 ##'
 ##' See `known_parameters`
-##'
+##' @details
+##' Additional details...
+##' @description
+##' A short description...
+##' 
 ##' @title A helper function for `known_parameters`
 ##' @param parname a specific parameter name (Default NULL)
 ##' @param parmlist one of the lists of parameters

@@ -37,10 +37,31 @@ plt_DemoGrowth <- function(outdata) {
     ggplot2::ylab("Population (in thousands)") +
     ggplot2::ggtitle(cntry) +
     ggplot2::scale_y_continuous(labels = absspace) +
-    ggplot2::theme_minimal()+
+    ggplot2::theme_bw()+
     ggplot2::expand_limits(y=c(0,NA))
 }
 
+checkDemoFit <- function(outdata){
+  
+  outdat <- outdata$state
+  cntry <- "GBR"
+  N <- OCA1::UKdemo$N
+  tc <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 1)
+  
+  x <- N[iso3 == cntry & Year %in% tc, .(pop = sum(PopTotal)), by = Year]
+  y <- outdat[!grepl("rate", state), .(pop = sum(value)), by = t] |>
+    dplyr::group_by(stringr::str_sub(t, 1, 4)) |>
+    dplyr::summarise(pop  = mean(pop)) |>
+    dplyr::rename(Year = 1) |>
+    dplyr::mutate(Year = as.numeric(Year))
+    
+  N <- nrow(x)
+  dplyr::left_join(x,y,by="Year") |>
+    dplyr::mutate(error = (pop.x - pop.y)/pop.x, N=dplyr::n()) |>
+    dplyr::summarise(sse = sum(error^2)) |>
+    dplyr::mutate(RMSE = sqrt(sse / N))
+  
+}
 
 ##' @title Visualising Demographic snapshots
 ##' @description
@@ -63,6 +84,9 @@ plt_DemoGrowth <- function(outdata) {
 ##' @import data.table
 ##' @export
 plt_DemoSnapshots <- function(outdata) {
+  
+  if(!"state" %in% colnames(outdata)) stop("No state column found in the supplied outdata object. Was this created with raw = TRUE ?")
+  
   outdat <- outdata$state
   cntry <- "GBR"
   N <- OCA1::UKdemo$N
@@ -87,7 +111,7 @@ plt_DemoSnapshots <- function(outdata) {
       ggplot2::xlab("Age group") +
       ggplot2::scale_y_continuous(labels = absspace) +
       ggplot2::ggtitle(YR) +
-      ggplot2::theme_minimal() +
+      ggplot2::theme_bw() +
       ggplot2::theme(legend.position = "none")
   }
   nr <- ceiling(length(tmz) / 4)
@@ -102,7 +126,7 @@ plt_DemoSnapshots <- function(outdata) {
 ##' @details
 ##' Additional details...
 ##' @seealso [plt_DemoGrowth()]
-##' @seealso [plt_TB_rates()]
+##' @seealso [plt_TBRates()]
 ##' @param outdata A data.table returned by `runmodel` with `raw=FALSE`
 ##' @param by_layer One of natcat, risk, post, strain, prot
 ##' @return A `ggplot2` plot object showing population distribution over time by age, sex, nativity and TB status
@@ -118,7 +142,10 @@ plt_DemoSnapshots <- function(outdata) {
 ##' @import data.table
 ##' @export
 
-plt_TBSnapshots <- function(outdata, by_layer) {
+plt_TBSnapshots <- function(outdata, by_layer = "natcat") {
+  
+  if(!"state" %in% colnames(outdata)) stop("No state column found in the supplied outdata object. Was this created with raw = TRUE ?")
+  
   outdat <- outdata$state
   mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", 
               "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
@@ -194,13 +221,13 @@ plt_TBSnapshots <- function(outdata, by_layer) {
 ##' out <- runmodel(pms)              #run model with these
 ##' out                               #inspect
 ##' ## visualize
-##' plt_TB_rates(out, rate_type = "incidence", by_layer = "natcat")
+##' plt_TBRates(out, rate_type = "incidence", by_layer = "natcat")
 ##' @import ggplot2
 ##' @import ggpubr
 ##' @import data.table
 ##' @export
 
-plt_TB_rates <- function(outdata, rate_type, by_layer) {
+plt_TBRates <- function(outdata, rate_type = "incidence", by_layer = "natcat") {
   outdat <- outdata$rate
   # Converuser-friendly rate types to colnames in the dataset
   state_map <- c(
@@ -262,7 +289,7 @@ plt_TB_rates <- function(outdata, rate_type, by_layer) {
     ggplot2::guides(col = guide_legend(ncol = 7))
 }
 
-# plt_TB_rates(out, rate_type = "incidence", by_layer = "natcat")
-# plt_TB_rates(out,rate_type = "notification", by_layer = "risk")
-# plt_TB_rates(out,rate_type = "mortality", by_layer = "post")
+# plt_TBRates(out, rate_type = "incidence", by_layer = "natcat")
+# plt_TBRates(out,rate_type = "notification", by_layer = "risk")
+# plt_TBRates(out,rate_type = "mortality", by_layer = "post")
 

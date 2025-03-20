@@ -15,10 +15,14 @@ print_helper(parname = NULL, parmlist)
 no return only printing
 }
 \description{
-A helper function
+A short description...
 }
 \details{
+A helper function
+
 See \code{known_parameters}
+
+Additional details...
 }
 \author{
 Pete Dodd

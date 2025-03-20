@@ -4,7 +4,7 @@
 \alias{plt_TBSnapshots}
 \title{Visualising Temporal Trends in Demographics and TB Status}
 \usage{
-plt_TBSnapshots(outdata, by_layer)
+plt_TBSnapshots(outdata, by_layer = "natcat")
 }
 \arguments{
 \item{outdata}{A data.table returned by \code{runmodel} with \code{raw=FALSE}}
@@ -30,7 +30,7 @@ plt_TBSnapshots(out, "natcat")
 \seealso{
 \code{\link[=plt_DemoGrowth]{plt_DemoGrowth()}}
 
-\code{\link[=plt_TB_rates]{plt_TB_rates()}}
+\code{\link[=plt_TBRates]{plt_TBRates()}}
 }
 \author{
 Pete Dodd
