@@ -2,20 +2,38 @@
 % Please edit documentation in R/outputhandling.R
 \name{plt_TB_rates}
 \alias{plt_TB_rates}
-\title{Title}
+\title{Visualising TB incidence rates by age and sex over time}
 \usage{
 plt_TB_rates(outdata, rate_type, by_layer)
 }
 \arguments{
-\item{outdata}{model output}
+\item{outdata}{A data.table returned by \code{runmodel} with \code{raw=FALSE}}
 
 \item{rate_type}{One of incidence, notification or mortality}
 
-\item{by_layer}{one of natcat, risk, post, strain, prot}
+\item{by_layer}{One of natcat, risk, post, strain, prot}
 }
 \value{
-ggplot of rates by age and sex stratified by target layer
+a \code{ggplot2} plot object showing changes in TB incidence by age and sex stratified by target layer over time
 }
 \description{
-Title
+A short description...
+}
+\details{
+Additional details...
+}
+\examples{
+pms <- create_demographic_parms() #create UK parameters
+out <- runmodel(pms)              #run model with these
+out                               #inspect
+## visualize
+plt_TB_rates(out, rate_type = "incidence", by_layer = "natcat")
+}
+\seealso{
+\code{\link[=plt_DemoGrowth]{plt_DemoGrowth()}}
+
+\code{\link[=plt_TBSnapshots]{plt_TBSnapshots()}}
+}
+\author{
+Pete Dodd
 }

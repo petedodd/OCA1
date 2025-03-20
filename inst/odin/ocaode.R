@@ -73,41 +73,60 @@ progn_slow <- user(0.003)    #slow progression rate
 progn_fast <- user(0.1)    #fast progression rate
 progn_symp <- user(0.5)    #symptom progression rate
 detect_asymp <- user(0.0)  #detection hazard, asymptomatic
-detect_symp <- user(1.0)   #detection hazard, symptomatic NOTE will need to be interpolated
-mortality_treated <- user(0.0)        #CFR treated TB
-mortality_untreated <- user(0)   #TODO applies to asymp also? may need to be array
-treatment_inversedurn <- user(0)      #ATM because o/w leak
+symptb_inversedurn <- user(3.0)
+symptb_CFR <- user(0.5)
+mortality_treated <- user(0.1)        #CFR treated TB
+treatment_inversedurn <- user(2)      #ATM because o/w leak
 progn_posttb[] <- user(0)               #progression thru layers of posttb
 relapse <- user(1e-2)                 #relapse rate
+tbi_protn <- user(0.2)                #protection TBI+ TODO incorporate
 
-## TODO which need to be arrays?
+## array rates:
+CDR_raw[, , , , , , , ] <- user() #
+dim(CDR_raw) <- c(lttp, nage, 2, nnat, nrisk, npost, nstrain, nprot)
+CDR_array[, , , , , , ] <- interpolate(ttp, CDR_raw, "linear")
+
+## TB outcomes
+## a = 1 / d = rate out with no detection
+## ATT : no-ATT = CDR : (1-CDR)
+## total rate w/detection = a + b; CDR=b/(a+b) -> b = CDR/(1-CDR)* a -> a+b = 1/(1-CDR) / d
+## 1 / ((1-CDR)*d) = rate out with detection
+## notes ~ b * D = (CDR/(1-CDR)) * D / d
+## -> non-notes ~  D / d
+## deaths = cfr * D / d; self-cure = (1-cfr) * D / d
+
+detect_symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- symptb_inversedurn * Symp[i,j,k,l,i5,i6,i7] * CDR_array[i,j,k,l,i5,i6,i7]/(1-CDR_array[i,j,k,l,i5,i6,i7]) #=detection
+symp_tbend[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7] / (1 - CDR_array[i, j, k, l, i5, i6, i7]) # =selfcure + mortality + detection
+dim(CDR_array) <-c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(detect_symp) <-c(nage,2,nnat,nrisk,npost,nstrain,nprot)
+dim(symp_tbend) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
+
 
 ## intervention interpolations:
 ## TODO detection (think costs over time?)
 ## vaccination/TPT
 ## treatment outcomes
 
+
 ## TODO think FPs
 ## TODO post-TB and relapse
-
-## TODO naming convention for non-state-vars
-## TODO modification of mortality rates given TB mortality
 
 ## --- TB dynamics
 ## Uninfected
 deriv(Uninfected[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogU[i,j,k,l,i5,i6,i7] - foi * Uninfected[i,j,k,l,i5,i6,i7]
 
 ## Early TBI
-deriv(Learly[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogE[i,j,k,l,i5,i6,i7] + foi * Uninfected[i,j,k,l,i5,i6,i7] - stabilization * Learly[i,j,k,l,i5,i6,i7] - progn_fast * Learly[i,j,k,l,i5,i6,i7]
+deriv(Learly[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogE[i, j, k, l, i5, i6, i7] + foi * Uninfected[i, j, k, l, i5, i6, i7] - stabilization * Learly[i, j, k, l, i5, i6, i7] - progn_fast * Learly[i, j, k, l, i5, i6, i7] + foi * tbi_protn * Llate[i, j, k, l, i5, i6, i7]
 
 ## Late TBI
-deriv(Llate[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogL[i,j,k,l,i5,i6,i7] + stabilization * Learly[i,j,k,l,i5,i6,i7] - progn_slow * Llate[i,j,k,l,i5,i6,i7] + fromtreatmentL[i,j,k,l,i5,i6,i7] - relapsefrompost[i,j,k,l,i5,i6,i7]
+deriv(Llate[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogL[i, j, k, l, i5, i6, i7] + stabilization * Learly[i, j, k, l, i5, i6, i7] - progn_slow * Llate[i, j, k, l, i5, i6, i7] + fromtreatmentL[i, j, k, l, i5, i6, i7] - relapsefrompost[i, j, k, l, i5, i6, i7] - foi * tbi_protn * Llate[i, j, k, l, i5, i6, i7] + (1 - symptb_CFR) * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
+## TODO wiring to post TB for undetected?
 
 ## Asymptomatic TB disease
 deriv(Asymp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogA[i,j,k,l,i5,i6,i7] + progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7] - progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_asymp * Asymp[i,j,k,l,i5,i6,i7] + fromtreatmentA[i,j,k,l,i5,i6,i7] + relapsefrompost[i,j,k,l,i5,i6,i7]
 
 ## Symptomatic TB disease
-deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k,l,i5,i6,i7] + progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_symp * Symp[i,j,k,l,i5,i6,i7] - mortality_untreated * Symp[i,j,k,l,i5,i6,i7]
+deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k,l,i5,i6,i7] + progn_symp * Asymp[i,j,k,l,i5,i6,i7] - symp_tbend[i,j,k,l,i5,i6,i7]
 
 ## currently on ATT
 deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,k,l,i5,i6,i7] + treatmentstarts[i,j,k,l,i5,i6,i7] - treatmentends[i,j,k,l,i5,i6,i7] #TODO
@@ -127,7 +146,7 @@ output(rate_Notification[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <
 
 
 ## TODO check how it plays with current processing
-rate_TBmortality[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- mortality_treated * treatmentends[i, j, k, l, i5, i6, i7] + mortality_untreated * Symp[i, j, k, l, i5, i6, i7]
+rate_TBmortality[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- mortality_treated * treatmentends[i, j, k, l, i5, i6, i7] + symptb_CFR * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
 output(rate_TBmortality) <- TRUE
 output(rate_Incidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7]) /(totalpops[i,j,k,l,i5,i6,i7]+tol)
 
@@ -137,7 +156,7 @@ dim(rate_TBmortality) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 
 
 ## --- interim quantities
-treatmentstarts[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- detect_asymp * Asymp[i,j,k,l,i5,i6,i7] +  detect_symp * Symp[i,j,k,l,i5,i6,i7]
+treatmentstarts[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- detect_asymp * Asymp[i,j,k,l,i5,i6,i7] +  detect_symp[i,j,k,l,i5,i6,i7]
 totalpops[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- Uninfected[i,j,k,l,i5,i6,i7] + Learly[i,j,k,l,i5,i6,i7] + Llate[i,j,k,l,i5,i6,i7] + Asymp[i,j,k,l,i5,i6,i7] + Symp[i,j,k,l,i5,i6,i7] + Treat[i,j,k,l,i5,i6,i7]
 
 ## treatent ends & destinations

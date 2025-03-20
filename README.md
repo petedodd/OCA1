@@ -3,18 +3,6 @@
 # OCA1 <img src="man/figures/logo.png" align="right" height="139" alt="" />
 UK TB transmission model
 
-This uses `odin` vn 1 as this seems to work
-
-
-## Work in progress:
-
-2. introduce TB-related index layers
-3. decide on and start to implement TB model structure
-
-C. End project steps
-1. more realistic input/output handling
-
-
 
 ## Updating
 
@@ -73,6 +61,8 @@ plt_TB_rates(out,rate_type = "mortality",by_layer = "post")
 
 ## version with 2 static nativity classes
 pms <- create_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
+pms$cdr_hz_nat    <- c(1, 1.05) # two cdr hz required here as we have two nativity classes
+
 out <- runmodel(pms,raw=FALSE)
 out
 
@@ -108,8 +98,25 @@ plt_DemoGrowth(out) #still stable
 
 ```
 
+One can get information on known parameters, and check for correct naming as follows:
+
+```r
+known_parameters()                     ##print all info
+known_parameters("nonsense")           ##throws error as name not known
+known_parameters("CDR_raw")            ##knows this parameter, prints info on it
+known_parameters("CDR_raw",quiet=TRUE) ##knows this parameter, does not print info
+
+## demonstrate with some inputs:
+pms <- create_parms(verbose=TRUE,
+                    tbparms=list(treatment_inversedurn=0,
+                                 mortality_treated=0,
+                                 symptb_inversedurn=3,
+                                 symptb_CFR = 1
+                                 )
+                    )
 
 
+```
 
 ## License
 

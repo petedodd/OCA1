@@ -7,10 +7,10 @@
 plt_DemoGrowth(outdata)
 }
 \arguments{
-\item{outdata}{a data.table returned by \code{runmodel} with \code{raw=FALSE}}
+\item{outdata}{A data.table returned by \code{runmodel} with \code{raw=FALSE}}
 }
 \value{
-a \code{ggplot2} plot object
+A \code{ggplot2} plot object
 }
 \description{
 \code{plt_DemoGrowth} takes an model output object and provides a visualisation to show how the population sizes change over time
