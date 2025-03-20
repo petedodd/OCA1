@@ -94,6 +94,9 @@ check_dims <- function(parlist, dms){
         ans[[pname]] <- (dim(parlist[[pname]])[1] == 2) # nsex
       }
     }
+    if(pname %in% c("migr_TBD","migr_TBI")){
+      ans[[pname]] <- all(dim(parlist[[pname]]) == c(length(OCA1::agz), 2))
+    }
     if(pname %in% c("immigration")){
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2))
     }
@@ -119,6 +122,7 @@ hotone <- function(n){
 
 ## a utility to construct default values for unsupplied parameters/data
 default_parameters <- function(parname, dms, verbose=FALSE){
+
   ## dms = c(ntimes, nnat, nrisk, npost, nstrain, nprot)
   if(verbose) message("Using default value for ",parname,"...")
   ans <- NA
@@ -143,6 +147,22 @@ default_parameters <- function(parname, dms, verbose=FALSE){
   ## these need bumping up to duplicate by sex
   if(parname %in% c("Pmigr_risk","Pmigr_post","Pmigr_strain","Pmigr_prot")){
     ans <- rbind(ans,ans) #one for each sex
+  }
+  if(parname %in% c("migr_TBD","migr_TBI")){
+    ans <- array(1,
+                 dim = c(length(OCA1::agz), 2),
+                 dimnames = list(
+                   acat = OCA1::agz,
+                   sex = c("M", "F")
+                 )
+                 )
+    ans[1:3,] <- 0 #default nothing in children
+    if(parname %in% c("migr_TBD")){
+      ans <- (100/1e5) * ans #default prevalence
+    }
+    if(parname %in% c("migr_TBI")){
+      ans <- 0.3 * ans #default prevalence
+    }
   }
   if(parname %in% c("immigration")){
     ans <- array(0,
@@ -455,12 +475,7 @@ create_demographic_parms <- function(tc = 1970:2020,
 }
 
 
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
-##'
-##' NOTE this extends the demographic parameters to be more explicit about TB parameters
-##'
+
 ##' @title Creates parameters for model
 ##' @param tc TODO
 ##' @param nnat TODO
@@ -514,7 +529,7 @@ create_parms <- function(tc = 1970:2020,
 
   ## tb parms
   tbparnames <- names(OCA1::parms)
-  tbparnames <- c(tbparnames, "CDR_raw")
+  tbparnames <- c(tbparnames, "CDR_raw", "migr_TBD", "migr_TBI")
   ## defaults:
   tbparms <- add_defaults_if_missing(tbparms, tbparnames, dms, verbose)
 
@@ -712,7 +727,9 @@ known_parameters <- function(parname=NULL,quiet=FALSE){
   straindata <- list()
   protdata <- list()
   tbparms <- list(
-    CDR_raw=list("CDR data in each stratum over time","ntimes, nage, nsex, nnat, nrisk, nopst, nstrain, nprot")
+    CDR_raw=list("CDR data in each stratum over time","ntimes, nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
+    migr_TBD=list("TB disease prevalence for immigrants","nage, nsex"),
+    migr_TBI=list("TB infection prevalence for immigrants","nage, nsex")
   )
   for(nm in names(OCA1::hyperparms)){
     tbparms[[nm]] <- list(hyperparms[[nm]][[3]],"scalar")

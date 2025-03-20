@@ -51,12 +51,7 @@ create_parms(
 list of parameter for model
 }
 \description{
-.. content for \description{} (no empty lines) ..
-}
-\details{
-.. content for \details{} ..
-
-NOTE this extends the demographic parameters to be more explicit about TB parameters
+Creates parameters for model
 }
 \author{
 Pete Dodd
