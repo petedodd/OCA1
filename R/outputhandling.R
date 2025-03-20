@@ -4,6 +4,48 @@ absspace <- function(x, ...) {
 }
 
 
+getStateFromOut <- function(outdata){
+  
+## function to get state information in robust manner depending on outdata type
+  
+  if(!is.data.frame(outdata)){
+    
+    if(!"state" %in% names(outdata)) stop("No state information found in the supplied outdata object. Was this created with raw = TRUE ?")
+    
+    outdat <- outdata$state  
+    
+  } else {
+    
+    if(!"state" %in% colnames(outdata)) stop("No state information found in the supplied outdata object. Was this created with raw = TRUE ?")
+    outdat <- outdata
+  }
+  
+  outdat 
+}
+
+getRateFromOut <- function(outdata){
+  
+  ## function to get state information in robust manner depending on outdata type
+  
+  if(!is.data.frame(outdata)){
+    
+    if(!"rate" %in% names(outdata)) stop("No state information found in the supplied outdata object. Was this created with raw = TRUE ?")
+    
+    outdat <- outdata$rate  
+    
+  } else {
+    
+    if(!"rate" %in% colnames(outdata)) stop("No state information found in the supplied outdata object. Was this created with raw = TRUE ?")
+    outdat <- outdata
+  }
+  
+
+  outdat 
+}
+
+
+
+
 ##' @title Visualising demographic growth over time
 ##' @description
 ##' `plt_DemoGrowth` takes an model output object and provides a visualisation to show how the population sizes change over time
@@ -24,7 +66,9 @@ absspace <- function(x, ...) {
 ##' @import data.table
 ##' @export
 plt_DemoGrowth <- function(outdata) {
-  outdat <- outdata$state
+  
+  outdat <- getStateFromOut(outdata)
+
   cntry <- "GBR"
   N <- OCA1::UKdemo$N
   tc <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 1)
@@ -43,7 +87,8 @@ plt_DemoGrowth <- function(outdata) {
 
 checkDemoFit <- function(outdata){
   
-  outdat <- outdata$state
+  outdat <- getStateFromOut(outdata)
+  
   cntry <- "GBR"
   N <- OCA1::UKdemo$N
   tc <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 1)
@@ -85,9 +130,8 @@ checkDemoFit <- function(outdata){
 ##' @export
 plt_DemoSnapshots <- function(outdata) {
   
-  if(!"state" %in% names(outdata)) stop("No state column found in the supplied outdata object. Was this created with raw = TRUE ?")
+  outdat <- getStateFromOut(outdata)
   
-  outdat <- outdata$state
   cntry <- "GBR"
   N <- OCA1::UKdemo$N
   tmz <- seq(from = round(min(outdat$t)), to = round(max(outdat$t)), by = 5)
@@ -144,9 +188,9 @@ plt_DemoSnapshots <- function(outdata) {
 
 plt_TBSnapshots <- function(outdata, by_layer = "natcat") {
   
-  if(!"state" %in% names(outdata)) stop("No state column found in the supplied outdata object. Was this created with raw = TRUE ?")
+  outdat <- getStateFromOut(outdata)
   
-  outdat <- outdata$state
+  
   mycols <- c("lightseagreen", "maroon3", "palevioletred4", "yellow", 
               "palevioletred3", "plum2", "lightsalmon2", "deeppink", "lightblue")
   
@@ -228,7 +272,8 @@ plt_TBSnapshots <- function(outdata, by_layer = "natcat") {
 ##' @export
 
 plt_TBRates <- function(outdata, rate_type = "incidence", by_layer = "natcat") {
-  outdat <- outdata$rate
+  outdat <- getRateFromOut(outdata)
+  
   # Converuser-friendly rate types to colnames in the dataset
   state_map <- c(
     "incidence" = "rate_Incidence",
@@ -249,16 +294,16 @@ plt_TBRates <- function(outdata, rate_type = "incidence", by_layer = "natcat") {
   stopifnot(rate_type %in% names(state_map), by_layer %in% names(layer_names))
   
   # select the target rate
-  tmp <- outdat[state == state_map[[rate_type]]] %>%
+  tmp <- outdat[state == state_map[[rate_type]]] |>
     dplyr::mutate(state = dplyr::recode(state,
                                         rate_Incidence = "Incidence rate",
                                         rate_Notification = "Notification rate",
-                                        rate_TBmortality = "TB mortality rate")) %>%
+                                        rate_TBmortality = "TB mortality rate")) |>
     
-    dplyr::group_by(t, state, AgeGrp, sex, .data[[by_layer]]) %>%
+    dplyr::group_by(t, state, AgeGrp, sex, .data[[by_layer]]) |>
     
     # Compute the mean value for each group, ignoring NA values
-    dplyr::summarise(value = mean(value, na.rm = TRUE), .groups = "drop") %>%
+    dplyr::summarise(value = mean(value, na.rm = TRUE), .groups = "drop") |>
     as.data.table()
   
   # Retrieve the maped layer namer for the selected layer
