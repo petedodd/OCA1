@@ -63,18 +63,21 @@ test_that("default_parameters works", {
   
   X <- matrix(1, nrow = length(OCA1::agz),ncol=2)
   X[1:3,] <- 0
-  X[4:nrow(X)] <- 0.001
+  X[4:nrow(X),] <- 0.001
   rownames(X) <- OCA1::agz
   colnames(X) <- c("M","F")
+  dimnames(X) <- list("acat"=OCA1::agz, "sex"=c("M","F"))
+  
   
   expect_equal(default_parameters("migr_TBD",dms),X)
   
   # Test 'migr_TBI'
   X <- matrix(1, nrow = length(OCA1::agz),ncol=2)
   X[1:3,] <- 0
-  X[4:nrow(X)] <- 0.3
+  X[4:nrow(X),] <- 0.3
   rownames(X) <- OCA1::agz
   colnames(X) <- c("M","F")
+  dimnames(X) <- list("acat"=OCA1::agz, "sex"=c("M","F"))
   
   expect_equal(default_parameters("migr_TBI",dms),X)
   
