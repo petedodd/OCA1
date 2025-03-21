@@ -270,16 +270,18 @@ Pmigr_strain[,] <- user()
 Pmigr_prot[,] <- user()
 immigration[,,] <- user()
 exmigrate[,,,] <- user()
+migr_TBD[,] <- user()
+migr_TBI[,] <- user()
 
 ## where to migrants flow into
 Pmigr_nat[1:nnat] <- if(i==2) 1 else 0
 
-## TODO
-migrU[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- In[i,j] * Pmigr_nat[k] * Pmigr_risk[j,l] * Pmigr_post[j,i5] * Pmigr_strain[j,i6] * Pmigr_prot[j,i7]
-migrE[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0
-migrL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0
-migrA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0
-migrS[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0
+## TODO may wish to adjust splits A/S and E/L
+migrU[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- (1-migr_TBI[i,j]-migr_TBD[i,j]) * In[i,j] * Pmigr_nat[k] * Pmigr_risk[j,l] * Pmigr_post[j,i5] * Pmigr_strain[j,i6] * Pmigr_prot[j,i7]
+migrE[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0.2 * migr_TBI[i,j] * In[i,j] * Pmigr_nat[k] * Pmigr_risk[j,l] * Pmigr_post[j,i5] * Pmigr_strain[j,i6] * Pmigr_prot[j,i7]
+migrL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0.8 * migr_TBI[i,j] * In[i,j] * Pmigr_nat[k] * Pmigr_risk[j,l] * Pmigr_post[j,i5] * Pmigr_strain[j,i6] * Pmigr_prot[j,i7]
+migrA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0.5 * migr_TBD[i,j] * In[i,j] * Pmigr_nat[k] * Pmigr_risk[j,l] * Pmigr_post[j,i5] * Pmigr_strain[j,i6] * Pmigr_prot[j,i7]
+migrS[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0.5 * migr_TBD[i,j] * In[i,j] * Pmigr_nat[k] * Pmigr_risk[j,l] * Pmigr_post[j,i5] * Pmigr_strain[j,i6] * Pmigr_prot[j,i7]
 migrT[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- 0
 
 
@@ -308,6 +310,10 @@ dim(immigration) <- c(lttp, nage, 2)
 dim(exmigrate) <- c(lttp, nage, 2, nnat)
 dim(In) <- c(nage,2)
 dim(OutR) <- c(nage, 2, nnat)
+dim(migr_TBD) <- c(nage,2)
+dim(migr_TBI) <- c(nage,2)
+
+
 
 dim(migrU) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(migrE) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
