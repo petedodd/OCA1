@@ -97,6 +97,51 @@ default_parameters <- function(parname, dms, verbose=FALSE){
       )
     )
   }
+  if (parname == "BETAage") {
+    ans <- array(1.0,
+      dim = c(length(OCA1::agz), length(OCA1::agz)),
+      dimnames = list(
+        acat = OCA1::agz,
+        acat = OCA1::agz
+      )
+    )
+  }
+  if (parname == "BETAsex") {
+    ans <- array(1.0,
+      dim = c(2,2),
+      dimnames = list(
+        sex = c("M", "F"),
+        sex = c("M", "F")
+      )
+    )
+  }
+  if (parname == "BETAnat") {
+    ans <- array(1.0,
+      dim = c(dms[2], dms[2]),
+      dimnames = list(
+        nativity = 1:dms[2],
+        nativity = 1:dms[2]
+      )
+    )
+  }
+  if (parname == "BETArisk") {
+    ans <- array(1.0,
+      dim = c(dms[3], dms[3]),
+      dimnames = list(
+        risk = 1:dms[3],
+        risk = 1:dms[3]
+      )
+    )
+  }
+  if (parname == "BETAstrain") {
+    ans <- array(1.0,
+      dim = c(dms[5],dms[5]),
+      dimnames = list(
+        strain = 1:dms[5],
+        strain = 1:dms[5]
+      )
+    )
+  }
   if (parname == "progn_posttb") {
     ans <- rep(0,dms[4])
   }

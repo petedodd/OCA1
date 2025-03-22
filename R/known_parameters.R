@@ -76,6 +76,11 @@ known_parameters <- function(parname=NULL,quiet=FALSE){
   straindata <- list()
   protdata <- list()
   tbparms <- list(
+    BETAage=list("Beta matrix for age (see vignette for parametrization)","nage, nage"),
+    BETAsex=list("Beta matrix for sex (see vignette for parametrization)","nsex, nsex"),
+    BETAnat=list("Beta matrix for nativity (see vignette for parametrization)","nnat, nnat"),
+    BETArisk=list("Beta matrix for risk (see vignette for parametrization)","nrisk, nrisk"),
+    BETAstrain=list("Beta matrix for strain (see vignette for parametrization)","nstrain, nstrain"),
     CDR_raw=list("CDR data in each stratum over time","ntimes, nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
     migr_TBD=list("TB disease prevalence for immigrants","nage, nsex"),
     migr_TBI=list("TB infection prevalence for immigrants","nage, nsex")

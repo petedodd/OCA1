@@ -3,7 +3,8 @@ agz[length(agz)] <- "80+"
 
 ## === TB hyperparms
 hyperparms <- list(
-  ## staticfoi = 1, #static or dynamic based on >0 or not
+  staticfoi = list(fixed=0,"fixed","Static or dynamic based on >0 or not"),
+  asymp_relinf = list(fixed=1,"fixed","Relative infectiousness of asymptomatic vs symptomatic TB"),
   ## --------------------------------------------------- transmission
   ## bet=list(meanlog=log(10),sdlog=0.75),         #bet,      #beta
   ##psi:protn Andrews

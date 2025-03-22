@@ -46,25 +46,31 @@ create_parms <- function(tc = 1970:2020,
   )
 
   ## === TB specific parameters following similar pattern to above
-  ## TODO
-  ## probably want a new function for default_tb_parameters (like default_parameters)
-  ## perhaps use the same check_dims function
-  ## pjd to start with migration x TB
-  ## das to start with time/dependent CDR/hazard - NOTE let me know if this impacts speed
 
   ## tb parms
   tbparnames <- names(OCA1::parms)
-  tbparnames <- c(tbparnames, "CDR_raw", "migr_TBD", "migr_TBI")
+  tbparnames <- c(tbparnames,
+                  "CDR_raw", "migr_TBD", "migr_TBI",
+                  "BETAage", "BETAsex", "BETAnat", "BETArisk", "BETAstrain")
   ## defaults:
   tbparms <- add_defaults_if_missing(tbparms, tbparnames, dms, verbose)
 
   ## === TB parm checks
   ## prob checks
   if (verbose) message("\n")
+  ## for probability checks
   param_list <- list(
     "CDR_raw" = tbparms$CDR_raw
   )
   checks <- sapply(param_list, check_probabilities)
+  ## 0 <= x <= 1 checks; same but without checking sums are near 1
+  param_list <- list(
+    "migr_TBD" = tbparms$migr_TBD,
+    "migr_TBI" = tbparms$migr_TBI
+  )
+  checks01 <- sapply(param_list, check_probabilities, checksum = FALSE)
+  ## respond to all
+  checks <- c(checks, checks01)
   if (all(checks)) {
     if (verbose) message("All TB parameters containing probabilities were correct\n")
   } else {

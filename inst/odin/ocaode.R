@@ -67,6 +67,7 @@ initial(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- popinitT[
 ## == model dynamics
 
 ## --- TB parameters
+staticfoi <- user(0)
 foi <- user(5e-3)
 stabilization <- user(0.23) #stabilization rate early -> late TBI
 progn_slow <- user(0.003)    #slow progression rate
@@ -85,6 +86,52 @@ tbi_protn <- user(0.2)                #protection TBI+ TODO incorporate
 CDR_raw[, , , , , , , ] <- user() #
 dim(CDR_raw) <- c(lttp, nage, 2, nnat, nrisk, npost, nstrain, nprot)
 CDR_array[, , , , , , ] <- interpolate(ttp, CDR_raw, "linear")
+
+## --- FOI calculations
+## individual component inputs
+BETAage[, ] <- user()
+dim(BETAage) <- c(nage, nage)
+BETAsex[, ] <- user()
+dim(BETAsex) <- c(2, 2)
+BETAnat[, ] <- user()
+dim(BETAnat) <- c(nnat, nnat)
+BETArisk[, ] <- user()
+dim(BETArisk) <- c(nrisk, nrisk)
+## BETApost[, ] <- user()
+## dim(BETApost) <- c(npost, npost)
+BETAstrain[, ] <- user()
+dim(BETAstrain) <- c(nstrain, nstrain)
+## BETAprot[, ] <- user()
+## dim(BETAprot) <- c(nprot, nprot)
+## prevalence across relevant indices: NOTE this denominator so that all 1s in BETA matrices equals random mixing
+asymp_relinf <- user(1) #relative infectiousness of asymptomatic
+PI5[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- (asymp_relinf * sum(Asymp[i, j, k, l, , i5, ]) + sum(Symp[i, j, k, l, , i5, ])) / (sum(totalpops) + tol)
+dim(PI5) <- c(nage, 2, nnat, nrisk, nstrain)
+## treated as tensor product:
+Ha0[1:nage, 1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- BETAage[i, j] * PI5[j, k, l, i5, i6]
+dim(Ha0) <- c(nage, nage, 2, nnat, nrisk, nstrain)
+Ha[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- sum(Ha0[i,,j,k,l,i5]) #matrix product with BETAage
+dim(Ha) <- c(nage, 2, nnat, nrisk, nstrain)
+Hs0[1:nage, 1:2, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- BETAsex[j, k] * Ha[i, k, l, i5, i6]
+dim(Hs0) <- c(nage, 2, 2, nnat, nrisk, nstrain)
+Hs[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- sum(Hs0[i, j, , k, l, i5]) # matrix product with BETAsex
+dim(Hs) <- c(nage, 2, nnat, nrisk, nstrain)
+Hn0[1:nage, 1:2, 1:nnat, 1:nnat, 1:nrisk, 1:nstrain] <- BETAnat[k, l] * Hs[i, j, l, i5, i6]
+dim(Hn0) <- c(nage, 2, nnat, nnat, nrisk, nstrain)
+Hn[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- sum(Hn0[i, j, k, , l, i5]) # matrix product with BETAnat
+dim(Hn) <- c(nage, 2, nnat, nrisk, nstrain)
+Hr0[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nrisk, 1:nstrain] <- BETArisk[l,i5] * Hn[i, j, k, i5, i6]
+dim(Hr0) <- c(nage, 2, nnat, nrisk, nrisk, nstrain)
+Hr[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- sum(Hr0[i, j, k, l, , i5]) # matrix product with BETArisk
+dim(Hr) <- c(nage, 2, nnat, nrisk, nstrain)
+Ht0[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nrisk, 1:nstrain] <- BETAstrain[i5, i6] * Hr[i, j, k, i5, i6]
+dim(Ht0) <- c(nage, 2, nnat, nrisk, nrisk, nstrain)
+Ht[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- sum(Ht0[i, j, k, l, i5, ]) # matrix product with BETAstrain
+dim(Ht) <- c(nage, 2, nnat, nrisk, nstrain)
+## hazard of infection (CHECK syntax)
+HI[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- if (staticfoi > 0) Ht[i, j, k, l, i6] else foi
+dim(HI) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
+
 
 ## TB outcomes
 ## a = 1 / d = rate out with no detection
@@ -113,13 +160,13 @@ dim(symp_tbend) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 
 ## --- TB dynamics
 ## Uninfected
-deriv(Uninfected[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogU[i,j,k,l,i5,i6,i7] - foi * Uninfected[i,j,k,l,i5,i6,i7]
+deriv(Uninfected[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogU[i,j,k,l,i5,i6,i7] - HI[i,j,k,l,i5,i6,i7] * Uninfected[i,j,k,l,i5,i6,i7]
 
 ## Early TBI
-deriv(Learly[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogE[i, j, k, l, i5, i6, i7] + foi * Uninfected[i, j, k, l, i5, i6, i7] - stabilization * Learly[i, j, k, l, i5, i6, i7] - progn_fast * Learly[i, j, k, l, i5, i6, i7] + foi * tbi_protn * Llate[i, j, k, l, i5, i6, i7]
+deriv(Learly[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogE[i, j, k, l, i5, i6, i7] + HI[i,j,k,l,i5,i6,i7] * Uninfected[i, j, k, l, i5, i6, i7] - stabilization * Learly[i, j, k, l, i5, i6, i7] - progn_fast * Learly[i, j, k, l, i5, i6, i7] + HI[i,j,k,l,i5,i6,i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7]
 
 ## Late TBI
-deriv(Llate[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogL[i, j, k, l, i5, i6, i7] + stabilization * Learly[i, j, k, l, i5, i6, i7] - progn_slow * Llate[i, j, k, l, i5, i6, i7] + fromtreatmentL[i, j, k, l, i5, i6, i7] - relapsefrompost[i, j, k, l, i5, i6, i7] - foi * tbi_protn * Llate[i, j, k, l, i5, i6, i7] + (1 - symptb_CFR) * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
+deriv(Llate[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogL[i, j, k, l, i5, i6, i7] + stabilization * Learly[i, j, k, l, i5, i6, i7] - progn_slow * Llate[i, j, k, l, i5, i6, i7] + fromtreatmentL[i, j, k, l, i5, i6, i7] - relapsefrompost[i, j, k, l, i5, i6, i7] - HI[i,j,k,l,i5,i6,i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7] + (1 - symptb_CFR) * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
 ## TODO wiring to post TB for undetected?
 
 ## Asymptomatic TB disease

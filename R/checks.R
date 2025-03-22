@@ -1,7 +1,7 @@
 
 
 ## a utility to check probabilities are valid
-check_probabilities <- function(params) {
+check_probabilities <- function(params, checksum = TRUE) {
   # 1. Check for numeric type:
   if (!all(is.numeric(params))) {
     message("All parameters must be numeric.")
@@ -12,16 +12,19 @@ check_probabilities <- function(params) {
     message("All parameters must be probabilities between 0 and 1.")
     return(FALSE)
   }
-  if(is.vector(params)){
-  # 3. Check if the sum is (approximately) equal to 1
-    if (abs(sum(params) - 1) > .Machine$double.eps^0.5) {
-      message("The sum of parameters must be approximately equal to 1.")
-      return(FALSE)
+  if (checksum) {
+    if (is.vector(params)) {
+      # 3. Check if the sum is (approximately) equal to 1
+      if (abs(sum(params) - 1) > .Machine$double.eps^0.5) {
+        message("The sum of parameters must be approximately equal to 1.")
+        return(FALSE)
+      }
+    } else if (is.matrix(params)) {
+      test <- apply(params, 1, function(x) abs(sum(x) - 1) > .Machine$double.eps^0.5)
+      if (any(test)) {
+        return(FALSE)
+      }
     }
-  }
-  else if(is.matrix(params)){
-    test <- apply(params, 1, function(x) abs(sum(x) - 1) > .Machine$double.eps^0.5)
-    if(any(test)) return(FALSE)
   }
   return(TRUE) # Return TRUE if all checks pass
 }
@@ -72,6 +75,21 @@ check_dims <- function(parlist, dms){
     }
     if(pname=="CDR_raw"){
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2, dms[2:6]))
+    }
+    if (pname == "BETAage") {
+      ans[[pname]] <- all(dim(parlist[[pname]]) == rep(length(OCA1::agz), 2))
+    }
+    if (pname == "BETAsex") {
+      ans[[pname]] <- all(dim(parlist[[pname]]) == rep(2, 2))
+    }
+    if (pname == "BETAnat") {
+      ans[[pname]] <- all(dim(parlist[[pname]]) == rep(dms[2], 2)) #nnat
+    }
+    if (pname == "BETArisk") {
+      ans[[pname]] <- all(dim(parlist[[pname]]) == rep(dms[3], 2)) # nrisk
+    }
+    if (pname == "BETAstrain") {
+      ans[[pname]] <- all(dim(parlist[[pname]]) == rep(dms[5], 2)) # nstrain
     }
   } #end loop over list names
   unlist(ans)
