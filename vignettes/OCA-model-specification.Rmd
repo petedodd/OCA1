@@ -1,6 +1,6 @@
 ---
-title: "OCA-model-specification"
-author: "people"
+title: "OCA1 model specification"
+author: "P.J. Dodd, M. Dunning, N. Mafirakureva, D.A. Shaweno"
 # output: rmarkdown::html_vignette
 output:
   pdf_document:
@@ -24,11 +24,162 @@ knitr::opts_chunk$set(
 
 # Purpose
 
-TODO 
+This R package supplies a tuberculosis (TB) transmission model that represents UK population dynamics and is intended to be flexible in what structural aspects it represents for particular problems. The aim is to provide an analytical tool to evaluate the economic and epidemiological impact of policy options. 
+
+# Structure
+
+The overall strcture is represented in Figure 1. The TB layers follow a fairly standard pattern:
+
+- Uninfected: those with not evidence of TB infection
+- Latent fast: those with evidence of recent TB infection at higher risk of progression to TB disease
+- Latent slow: those with evidence of older TB infection at lower risk of progression to TB disease
+- Asymptomatic TB disease: those with TB disease who are not aware of symptoms
+- Symptomatic TB disease: those with TB disease who are aware of symptoms
+- TB treatment: those receiving anti-TB treatment
 
 ![Model diagram.](model.png)
 
-# demography
+## Layers
+
+Other aspects of structure are represented as layers, most of which have have numbers which can be specified by users. Technically, layers represent index values in multidimensional arrays. 
+The following 7 aspects of structure are represented as layers:
+
+- Age (fixed): there are 17 5-year age groups, 0-4 years up to 80+ years 
+- Sex (fixed): there are two genders (male, female)
+- Natal class (variable): this is to represent population sectors arriving from higher TB risk countries
+- Risk group (variable): this is to population sectors with social risk factors, or HIV/ART etc. 
+- Post-TB (variable): this is to represent people who have previously had TB
+- Strain (variable): this is for explicit representation of drug-resistant strains
+- Protection (variable): this is to represent interventions like preventive therapy
+
+# Installation and use
+
+The model is maintained on GitHub at: [https://github.com/petedodd/OCA1](https://github.com/petedodd/OCA1). 
+
+
+## Installation
+
+Installing the package requires R to be setup to compile C code. If the R package `devtools` has been installed, `OCA1` can be installed by running:
+
+
+```{r, eval=FALSE}
+devtools::install_github("petedodd/OCA1")
+```
+
+If the argument `build_vignettes=TRUE` is added to the above, this document will be generated and can be found via 
+
+```{r,eval=FALSE}
+browseVignettes(package = "OCA1")
+```
+If it is not possible to compile C code on your system, you may ask a user of the same operating system to generate you a binary version of the package.
+
+## Creating model parameters
+
+Having installed the package, it can be loaded in the usual way and the `known_parameters()` function gives a read out with the parameters available for specification associated with each element of the structure:
+```{r setup}
+library(OCA1) #load the package
+
+##what parameters are available [with what dimensions]
+known_parameters()
+```
+In addition many of the functions have their own R man pages guiding use, although some are still in draft.
+
+We have tried to minimize the load required by a user to specify parameters through a system of defaults:
+```{r}
+## example without nativity class used
+pms <- create_parms(verbose=TRUE) #create UK parameters
+```
+By default, there is only one layer for each of the variable structure elements. The more layers there are, the more ordinary differential equations (ODEs) the model uses, and therefore the slower it is.
+
+Going beyond defaults means specifying the number of layers for each aspect of structure, and providing parameter data associated with this structure within a separate list. The input lists are:
+
+- `migrationdata`: parameters to define migration dynamics
+- `riskdata`: parameters to define risk structure and dynamics 
+- `postdata`: parameters to define post-TB structure and dynamics
+- `straindata`: parameters to define aspects of strain structure
+- `protdata`: paraneters to define protection structure and dynamics
+- `tbparms`: these are TB-specific parameters, not necessarily associated with layer dimensions
+
+where lists, or items within lists, are not provided, appropriate dimension defaul values will be provided.
+
+
+For example, to speciy 2 natal classes with 90% of people initially in the native-born layer, one would use:
+```{r}
+# version with 2 static nativity classes
+pms <- create_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
+```
+
+
+To have two layers in the natal class and risk dimensions, one would use:
+```{r}
+## version with 2 static nativity classes and 2 static risk classes
+pms <- create_parms(nnat = 2, nrisk = 2,
+                    migrationdata = list(propinitnat = c(0.9,0.1)),
+                    riskdata = list(propinitrisk = c(0.9,0.1)))
+```
+
+If `verbose=TRUE`, the number of strata is stated. Having 2 layers in every dimension means having thousands of ODEs. 
+```{r}
+## go big version with all strata to some degree:
+pms <- create_parms(
+  nnat = 2, nrisk = 2, npost = 2, nstrain = 2, nprot = 2,
+  migrationdata = list(propinitnat = c(0.9,0.1)),
+  riskdata = list(propinitrisk = c(0.9,0.1)),
+  straindata = list(propinitstrain = c(0.9,0.1)),
+  protdata = list(propinitprot = c(0.9,0.1)))
+```
+It is not really intended that all layers should be used at once, and doing so may easily result in a model that is not possible to run, or not possible to run fast enough to be practically useful.
+
+The years run over are set via the `tc` argument to `create_parms` which is `tc=1970:2020` by default. Some input parameters (e.g. migration rates, case detection rates) are arrays with a time dimension to capture their dynamics. These variables are automatically linearly interpolated within the model based on input data. 
+
+As far as possible, we have tried to design checks for parameters provided to ensure that they make sense for the intended model structure.
+
+## Running the model
+
+For a given set of parameters, `runmodel` will run the model. By default, the output will be split into a list of `data.table` objects which represent model output in 'long' format
+
+```{r}
+## example without nativity class used
+pms <- create_parms(tbparms=list(staticfoi=1, foi=1e-2)) #create UK parameters
+
+out <- runmodel(pms)              #run model with these
+out                               #inspect
+```
+
+
+## Visualizing model output
+
+We have provided a few plotting utilities for inspecting model output.
+
+In the case of demography, these compare model output (lines) against UK data (points) for total population :
+```{r}
+## visualize
+plt_DemoGrowth(out)               #total population over time
+```
+
+and also for age/sex strata:
+```{r,fig.dim = c(8, 6)}
+plt_DemoSnapshots(out)            #snapshots
+```
+
+There are analogous plotters for some TB aspects, which can specify splits by certain layers:
+```{r}
+plt_TBSnapshots(out, by_layer = "natcat")
+```
+
+Similarly for the different rates outputted by the model:
+```{r}
+
+plt_TBRates(out,rate_type = "incidence",by_layer = "natcat")
+```
+
+# Example use
+
+TODO
+
+
+# Mathematical specification
+
 
 $$
 \frac{\mathrm{d}}{\mathrm{d}t}N_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)
@@ -83,44 +234,6 @@ $$
 
 
 
-# Example
-
-```{r setup}
-library(OCA1)
-
-## example without nativity class used
-pms <- create_parms(verbose=TRUE) #create UK parameters
-```
-
-
-explanation
-```{r}
-out <- runmodel(pms)              #run model with these
-out                               #inspect
-```
-
-explanation
-```{r}
-## visualize
-plt_DemoGrowth(out)               #total population over time
-```
-
-explanation
-
-```{r,fig.dim = c(8, 6)}
-plt_DemoSnapshots(out)            #snapshots
-```
-
-TODO
-
-- purpose
-- strata structure
-- TB structure
-
-TODO where to put figures
-TODO model figure
-
-
 
 
 $$
@@ -142,8 +255,5 @@ And also
 $$
 \frac{\mathrm{d}}{\mathrm{d}t}X_t(s,a) = {b}_t(s) - \bar{\mu}^0_t(s,a)X_t(s,a)
 $$
-
-
-
 
 

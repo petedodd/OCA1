@@ -53,16 +53,14 @@ plt_TBSnapshots(out, by_layer = "natcat")
 plt_TBSnapshots(out, by_layer = "risk") # pyramid
 plt_TBSnapshots(out, by_layer = "post") # pyramid
 
-plt_TB_rates(out,rate_type = "incidence",by_layer = "natcat")
-plt_TB_rates(out,rate_type = "notification",by_layer = "risk")
-plt_TB_rates(out,rate_type = "mortality",by_layer = "post")
+plt_TBRates(out,rate_type = "incidence",by_layer = "natcat")
+plt_TBRates(out,rate_type = "notification",by_layer = "risk")
+plt_TBRates(out,rate_type = "mortality",by_layer = "post")
 
 
 
 ## version with 2 static nativity classes
 pms <- create_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
-pms$cdr_hz_nat    <- c(1, 1.05) # two cdr hz required here as we have two nativity classes
-
 out <- runmodel(pms,raw=FALSE)
 out
 
