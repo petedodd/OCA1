@@ -10,25 +10,41 @@
 ##' @param times vector of times to run the model over - if not given, will construct from p
 ##' @param raw return the raw matrix ODE output or a data.table? (default FALSE)
 ##' @param singleout (default FALSE) return a single output, or a list of data.tables split by variable type (only if raw=FALSE)
+##' @param verbose if TRUE, the time taken to run model and model fit metrics will be printed
 ##' @return a matrix of timeseries
 ##' @author Pete Dodd
 ##' @useDynLib OCA1, .registration = TRUE
 ##' @import data.table
 ##' @export
-runmodel <- function(p, times, raw = FALSE, singleout = FALSE) {
+runmodel <- function(p, times, raw = FALSE, singleout = FALSE, verbose = FALSE) {
   if (missing(times)) {
     times <- seq(from = min(p$ttp), to = max(p$ttp), by = 0.1) # default times if not given
   }
   ## create model
   mdl <- ocaode$new(user=p)
   ## run
+  start_time <- Sys.time()
   ans <- mdl$run(times)
+  end_time <- Sys.time()
+  
   if (!raw) { # convert to data.table
     if (singleout) {
       ans <- raw2datatable(ans)
     } else {
       ans <- typesplit_raw2datatable(ans)
     }
+  }
+  
+  if(verbose) {
+    execution_time_m <- difftime(end_time,start_time,units = "mins")
+    execution_time_s <- difftime(end_time,start_time,units = "secs")
+    execution_time <- ifelse(execution_time_m < 1, execution_time_s,execution_time_m)
+    unit <- ifelse(execution_time_m < 1, "seconds","minutes")
+      
+    print(paste("Execution time:", round(execution_time,2), unit))
+    print("Model Fit:")
+    print(checkDemoFit(out))
+    
   }
   ans # return
 }

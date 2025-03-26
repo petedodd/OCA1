@@ -108,6 +108,7 @@ checkDemoFit <- function(outdata){
   
 }
 
+
 ##' @title Visualising Demographic snapshots
 ##' @description
 ##' A short description...
@@ -127,6 +128,7 @@ checkDemoFit <- function(outdata){
 ##' @import ggplot2
 ##' @import ggpubr
 ##' @import data.table
+##' @import dplyr
 ##' @export
 plt_DemoSnapshots <- function(outdata) {
   
