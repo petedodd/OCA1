@@ -26,7 +26,7 @@ runmodel <- function(p, times, raw = FALSE, singleout = FALSE, verbose = FALSE) 
   start_time <- Sys.time()
   ans <- mdl$run(times)
   end_time <- Sys.time()
-  
+
   if (!raw) { # convert to data.table
     if (singleout) {
       ans <- raw2datatable(ans)
@@ -34,17 +34,17 @@ runmodel <- function(p, times, raw = FALSE, singleout = FALSE, verbose = FALSE) 
       ans <- typesplit_raw2datatable(ans)
     }
   }
-  
+
   if(verbose) {
     execution_time_m <- difftime(end_time,start_time,units = "mins")
     execution_time_s <- difftime(end_time,start_time,units = "secs")
     execution_time <- ifelse(execution_time_m < 1, execution_time_s,execution_time_m)
     unit <- ifelse(execution_time_m < 1, "seconds","minutes")
-      
-    print(paste("Execution time:", round(execution_time,2), unit))
-    print("Model Fit:")
+    ## output
+    cat("Running from ",min(times)," to ",max(times),"\n")
+    cat(paste("Execution time:", round(execution_time,2), unit),"\n")
+    cat("Model fit to total population:\n")
     print(checkDemoFit(out))
-    
   }
   ans # return
 }
