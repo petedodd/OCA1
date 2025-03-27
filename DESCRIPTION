@@ -15,8 +15,8 @@ Imports:
     data.table,
     odin,
     ggplot2,
-    ggpubr,
-    rlang
+    stringr,
+    tidyr
 Depends: 
     R (>= 3.5)
 LazyData: true

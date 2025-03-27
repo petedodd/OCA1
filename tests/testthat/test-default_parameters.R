@@ -25,7 +25,7 @@ test_that("default_parameters works", {
   # Test 'propinitnat'
   expect_equal(length(default_parameters("propinitnat", dms)), dms[2])
   expect_equal(default_parameters("propinitnat", dms), hotone(dms[2]))
-  
+
 
   # Test 'progn_posttb'
   expect_equal(length(default_parameters("progn_posttb",dms)), dms[4])
