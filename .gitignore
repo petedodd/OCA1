@@ -3,6 +3,10 @@
 *.o
 *.dll
 
+
+# mainly for vignette testing
+*.log
+
 # Mac users
 .DS_Store
 

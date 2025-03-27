@@ -76,6 +76,11 @@ known_parameters <- function(parname=NULL,quiet=FALSE){
   straindata <- list()
   protdata <- list()
   tbparms <- list(
+    propinitE = list("Initial proportions early latent","nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
+    propinitL = list("Initial proportions late latent","nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
+    propinitA = list("Initial proportions symptomatic TB disease","nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
+    propinitS = list("Initial proportions symptomatic TB disease","nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
+    propinitT = list("Initial proportions on TB treatment","nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
     BETAage=list("Beta matrix for age (see vignette for parametrization)","nage, nage"),
     BETAsex=list("Beta matrix for sex (see vignette for parametrization)","nsex, nsex"),
     BETAnat=list("Beta matrix for nativity (see vignette for parametrization)","nnat, nnat"),

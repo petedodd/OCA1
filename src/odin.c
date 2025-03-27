@@ -7222,7 +7222,7 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
           for (int i5 = 1; i5 <= internal->npost; ++i5) {
             for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
               for (int i7 = 1; i7 <= internal->nprot; ++i7) {
-                internal->HI[i - 1 + internal->dim_HI_1 * (j - 1) + internal->dim_HI_12 * (k - 1) + internal->dim_HI_123 * (l - 1) + internal->dim_HI_1234 * (i5 - 1) + internal->dim_HI_12345 * (i6 - 1) + internal->dim_HI_123456 * (i7 - 1)] = (internal->staticfoi > 0 ? internal->Ht[internal->dim_Ht_1234 * (i6 - 1) + internal->dim_Ht_123 * (l - 1) + internal->dim_Ht_12 * (k - 1) + internal->dim_Ht_1 * (j - 1) + i - 1] : internal->foi);
+                internal->HI[i - 1 + internal->dim_HI_1 * (j - 1) + internal->dim_HI_12 * (k - 1) + internal->dim_HI_123 * (l - 1) + internal->dim_HI_1234 * (i5 - 1) + internal->dim_HI_12345 * (i6 - 1) + internal->dim_HI_123456 * (i7 - 1)] = (internal->staticfoi > 0 ? internal->foi : internal->Ht[internal->dim_Ht_1234 * (i6 - 1) + internal->dim_Ht_123 * (l - 1) + internal->dim_Ht_12 * (k - 1) + internal->dim_Ht_1 * (j - 1) + i - 1]);
               }
             }
           }

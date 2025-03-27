@@ -33,8 +33,6 @@ devtools::install('my.local.path/OCA1')
 
 ## Using
 
-NOTE need to redo with explicit migration at some point in any case
-
 ```r
 ##load
 library(OCA1)

@@ -231,16 +231,6 @@ create_demographic_parms <- function(tc = 1970:2020,
     popinit[, , , , , , i7] <- popinit[, , , , , , i7] * propinitprot[i7]
   }
 
-  ## TB splits etc:
-  ## TODO temporary split:
-  popinitU <- popinit
-  popinitE <- popinit * 0
-  popinitL <- popinit * 0
-  popinitA <- popinit * 0
-  popinitS <- popinit * 0
-  popinitT <- popinit * 0
-
-
   ## make parameter object
   list(
     nage = nage,
@@ -254,12 +244,7 @@ create_demographic_parms <- function(tc = 1970:2020,
     ttp = tc,
     popdat = popdat,
     BB = BB,
-    popinitU = popinitU,
-    popinitE = popinitE,
-    popinitL = popinitL,
-    popinitA = popinitA,
-    popinitS = popinitS,
-    popinitT = popinitT,
+    popinit = popinit,
     ## migration data:
     migrage = migrage,
     Pmigr_risk = Pmigr_risk,

@@ -51,7 +51,8 @@ create_parms <- function(tc = 1970:2020,
   tbparnames <- names(OCA1::parms)
   tbparnames <- c(tbparnames,
                   "CDR_raw", "migr_TBD", "migr_TBI",
-                  "BETAage", "BETAsex", "BETAnat", "BETArisk", "BETAstrain")
+                  "BETAage", "BETAsex", "BETAnat", "BETArisk", "BETAstrain",
+                  "propinitE","propinitL","propinitA","propinitS","propinitT")
   ## defaults:
   tbparms <- add_defaults_if_missing(tbparms, tbparnames, dms, verbose)
 
@@ -65,8 +66,9 @@ create_parms <- function(tc = 1970:2020,
   checks <- sapply(param_list, check_probabilities)
   ## 0 <= x <= 1 checks; same but without checking sums are near 1
   param_list <- list(
-    "migr_TBD" = tbparms$migr_TBD,
-    "migr_TBI" = tbparms$migr_TBI
+    "migr_TBD" = tbparms$migr_TBD, "migr_TBI" = tbparms$migr_TBI,
+    "propinitE" = tbparms$propinitE, "propinitL" = tbparms$propinitL, "propinitA" = tbparms$propinitA,
+    "propinitS" = tbparms$propinitS, "propinitT" = tbparms$propinitT
   )
   checks01 <- sapply(param_list, check_probabilities, checksum = FALSE)
   ## respond to all
@@ -84,6 +86,20 @@ create_parms <- function(tc = 1970:2020,
   } else {
     message("TB parameters with dimension problems:", paste(names(param_list)[!checks]))
   }
+
+  ## --- complete TB initial states
+  ## create new split pops
+  tbparms$popinitU <- P$popinit * (1-tbparms$propinitE-tbparms$propinitL-
+                                   tbparms$propinitA-tbparms$propinitS-tbparms$propinitT)
+  tbparms$popinitE <- P$popinit * tbparms$propinitE
+  tbparms$popinitL <- P$popinit * tbparms$propinitL
+  tbparms$popinitA <- P$popinit * tbparms$propinitA
+  tbparms$popinitS <- P$popinit * tbparms$propinitS
+  tbparms$popinitT <- P$popinit * tbparms$propinitT
+  ## remove unnecessary data:
+  P$popinit <- NULL
+  tbparms$propinitE <- tbparms$propinitL <- tbparms$propinitA <-
+    tbparms$propinitS <- tbparms$propinitT <- NULL
 
   ## === return combined demographic & TB parameters
   c(P, tbparms)

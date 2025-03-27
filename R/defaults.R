@@ -145,6 +145,39 @@ default_parameters <- function(parname, dms, verbose=FALSE){
   if (parname == "progn_posttb") {
     ans <- rep(0,dms[4])
   }
+  if(parname %in% c("propinitE","propinitL","propinitA","propinitS","propinitT")){
+    ## template
+    L <- 1-exp(-seq(from=2.5,by=5,length.out = length(OCA1::agz)) * 2.5e-3) #distribute by FOI flat prev ~10%
+    T <- array(1.0,
+               dim = c(length(OCA1::agz), 2, dms[2:6]),
+               dimnames = list(
+                 acat = OCA1::agz,
+                 sex = c("M", "F"),
+                 nativity = 1:dms[2],
+                 risk = 1:dms[3],
+                 post = 1:dms[4],
+                 strain = 1:dms[5],
+                 protn = 1:dms[6]
+               )
+               )
+    ELAST <- c(0.1-15e-5,0.9,5e-5,5e-5,5e-5) #props
+    ## sum(ELAST) #check
+    if(parname == "propinitE"){
+      ans <- ELAST[1] * T
+    }
+    if(parname == "propinitL"){
+      ans <- ELAST[2] * T
+    }
+    if(parname == "propinitA"){
+      ans <- ELAST[3] * T
+    }
+    if(parname == "propinitS"){
+      ans <- ELAST[4] * T
+    }
+    if(parname == "propinitT"){
+      ans <- ELAST[5] * T
+    }
+  }
   if(parname %in% names(OCA1::parms)){ #basic TB parameters
     ans <- OCA1::parms[[parname]]
   }

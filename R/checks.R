@@ -76,6 +76,9 @@ check_dims <- function(parlist, dms){
     if(pname=="CDR_raw"){
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2, dms[2:6]))
     }
+    if(pname %in% c("propinitE","propinitL","propinitA","propinitS","propinitT")){ #ALL non-time dims
+      ans[[pname]] <- all(dim(parlist[[pname]]) == c(length(OCA1::agz), 2, dms[2:6]))
+    }
     if (pname == "BETAage") {
       ans[[pname]] <- all(dim(parlist[[pname]]) == rep(length(OCA1::agz), 2))
     }

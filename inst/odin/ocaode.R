@@ -127,9 +127,10 @@ dim(Hr) <- c(nage, 2, nnat, nrisk, nstrain)
 Ht0[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nrisk, 1:nstrain] <- BETAstrain[i5, i6] * Hr[i, j, k, i5, i6]
 dim(Ht0) <- c(nage, 2, nnat, nrisk, nrisk, nstrain)
 Ht[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- sum(Ht0[i, j, k, l, i5, ]) # matrix product with BETAstrain
+## Ht[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- foi #testing
 dim(Ht) <- c(nage, 2, nnat, nrisk, nstrain)
-## hazard of infection (CHECK syntax)
-HI[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- if (staticfoi > 0) Ht[i, j, k, l, i6] else foi
+## hazard of infection
+HI[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- if (staticfoi > 0) foi else Ht[i, j, k, l, i6]
 dim(HI) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 
 
