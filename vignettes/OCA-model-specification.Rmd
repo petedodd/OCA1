@@ -232,28 +232,86 @@ $$
 \end{aligned}
 $$
 
-
-
-
-
-$$
-\begin{aligned}
-    & \left(\frac{\partial}{\partial t}+\frac{\partial}{\partial a}\right) N_t(s,a,h,r) = \overbrace{b_t(s)\delta(a)}^{\mathrm{births}} -\overbrace{ \mu^0_t(s,a)N_t(s,a,h,r)}^{\mathrm{background~deaths}} + \overbrace{m_t(s,a)}^{\mathrm{net~migration}}\\
-    & -\chi_{h>0}\chi_{r=0}\times\mu^H(s,a,h)N_t(s,a,h,r)\\
-    &-\chi_{h>0}\chi_{r>0}\times\mu^A(s,a,h,r)N_t(s,a,h,r)  \\
-    & -H(t)\pi^H_t(s,a,h)\left[\chi_{h=r=0} - \chi_{h>0}\right]\\
-    & -A(t)\pi^A_t(s,a,h)\left[\chi_{r'=0} - \chi_{r'=1}\right]\\
-    & -\chi_{r=0}\left[\chi_{h>0}R^H(s,a,h)N_t(s,a,h,r) - \chi_{h>1}R^H(s,a,h-1)N_t(s,a,h-1,r)\right]\\
-    & -\chi_{r>0}\left[R^A(r)N_t(s,a,h,r) -R^A(r-1)N_t(s,a,h,r-1)\right]\label{eqn:artprogn}
-\end{aligned}
-$$
-
-
-
 And also
 
 $$
 \frac{\mathrm{d}}{\mathrm{d}t}X_t(s,a) = {b}_t(s) - \bar{\mu}^0_t(s,a)X_t(s,a)
 $$
+
+## Example of implementing in-migration and out-migration 
+
+First let's generate  dummy migration data. Assuming that both in-migration and out-migration follow a polynomial distribution as  function of year :
+
+$$
+Y(t) = \beta_0 + \beta_1 t + \beta_2 t^2 
+$$
+
+Plugging the following  $\beta$ coefficients into the above equation, we can generate in-migration and outmigration dummy data as in below: 
+
+### Overall migration
+
+```{r}
+pms <- create_parms(nnat = 2, 
+                    migrationdata = list(propinitnat = c(0.9,0.1)))
+Year   <-1970:2020
+inmigr <- 5.114998e+05 - 5.238264e+02*Year +  1.341414e-01*Year^2
+emigr  <- 3.127034e+05 - 3.170702e+02*Year +  8.043165e-02*Year^2
+
+exmigrans <-data.frame(British= 0.35, foreign=0.65)
+prop_males <- c(rep(c(1,2,3.5,5.5,5,3,2,1), each=2),1)/100
+prop_females <-c(rep(c(1,2,4,6,5,3.5,2.5,1.5), each=2),2)/100
+
+imig <- array(0, dim= dim(pms[["immigration"]]), 
+              dimnames =dimnames(pms[["immigration"]]))
+emig <- array(0, dim= dim(pms[["exmigrate"]]), 
+               dimnames =dimnames(pms[["exmigrate"]]))
+
+for (year in 1:51) {
+  imig[year, , 1] <- inmigr[year] * prop_males  
+  imig[year, , 2] <- inmigr[year] * prop_females  
+}
+
+prop_uk_born= 0.35 # assuming 35% of emigranst are UK born
+
+# propagate by nationality
+for (year in 1:51) {
+  emig[year, , ,1] <- emigr[year] * prop_uk_born  
+  emig[year, , ,2] <- emigr[year] * (1-prop_uk_born)  
+}
+
+# propagate into age and sex
+for (year in 1:51) {
+  emig[year, , 1, ] <- emig[year, , 1, ] * prop_males  # Males
+  emig[year, , 2, ] <- emig[year, , 2, ] * prop_females  # Females
+}
+
+```
+
+We can now call the parameter generating function and update the migration inputs as below:
+
+```{r}
+pms <- create_parms(nnat = 2, 
+                    migrationdata = list(propinitnat = c(0.9,0.1)))
+
+
+pms$immigration <- imig
+pms$exmigrate <- emig
+
+out <- runmodel(pms)
+plt_DemoGrowth(out)  
+
+```
+
+### Country specific migration
+
+If a particular country say India contributes 10% of immigrants, the model can be run for that scenario as follows:
+
+```{r}
+pms$immigration <- imig*0.1
+out <- runmodel(pms)
+plt_DemoGrowth(out)  
+```
+
+
 
 
