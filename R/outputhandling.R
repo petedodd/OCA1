@@ -185,7 +185,9 @@ plt_DemoSnapshots <- function(outdata) {
 ##' @seealso [plt_DemoGrowth()]
 ##' @seealso [plt_TBRates()]
 ##' @param outdata A data.table returned by `runmodel` with `raw=FALSE`
-##' @param by_layer One of natcat, risk, post, strain, prot
+##' @param by_layer One of `natcat`, `risk`, `post`, `strain`, `prot`
+##' @param starting_year An initial year to start the visualisation at (default 1970)
+##' @param year_increment Make another plot in multiples of this many years after the starting point (default 5)
 ##' @return A `ggplot2` plot object showing population distribution over time by age, sex, nativity and TB status
 ##' @author Pete Dodd
 ##' @examples
@@ -198,7 +200,10 @@ plt_DemoSnapshots <- function(outdata) {
 ##' @import data.table
 ##' @export
 
-plt_TBSnapshots <- function(outdata, by_layer = "natcat") {
+plt_TBSnapshots <- function(outdata, 
+                            by_layer = "natcat",
+                            starting_year = 1970,
+                            year_increment = 5) {
 
   outdat <- getStateFromOut(outdata)
 
@@ -222,9 +227,13 @@ plt_TBSnapshots <- function(outdata, by_layer = "natcat") {
   # Define dyn_name specific to the selected layer
   #dyn_name <- paste(new_layer_name, "layer")
   dyn_name <- new_layer_name
-  tmp <- outdat[t > 1970]
+  tmp <- outdat[t >= starting_year]
 
-  tmp <- tmp[t %% 5 == 0]
+  
+  tmp <- tmp[t %% year_increment == 0]
+  
+  
+  
 
   # Aggregate population values by year, age group, sex, TB state, and the selected layer
   tmp <- tmp[(state != "Uninfected" & !grepl("rate", state)), 
