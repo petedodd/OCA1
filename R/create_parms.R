@@ -91,6 +91,7 @@ create_parms <- function(tc = 1970:2020,
   ## create new split pops
   tbparms$popinitU <- P$popinit * (1-tbparms$propinitE-tbparms$propinitL-
                                    tbparms$propinitA-tbparms$propinitS-tbparms$propinitT)
+  tbparms$popinitU[tbparms$popinitU<0] <- 0 #safety
   tbparms$popinitE <- P$popinit * tbparms$propinitE
   tbparms$popinitL <- P$popinit * tbparms$propinitL
   tbparms$popinitA <- P$popinit * tbparms$propinitA
