@@ -164,14 +164,14 @@ dim(symp_tbend) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 deriv(Uninfected[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogU[i,j,k,l,i5,i6,i7] - HI[i,j,k,l,i5,i6,i7] * Uninfected[i,j,k,l,i5,i6,i7]
 
 ## Early TBI
-deriv(Learly[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogE[i, j, k, l, i5, i6, i7] + HI[i,j,k,l,i5,i6,i7] * Uninfected[i, j, k, l, i5, i6, i7] - stabilization * Learly[i, j, k, l, i5, i6, i7] - progn_fast * Learly[i, j, k, l, i5, i6, i7] + HI[i,j,k,l,i5,i6,i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7]
+deriv(Learly[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogE[i, j, k, l, i5, i6, i7] + HI[i, j, k, l, i5, i6, i7] * Uninfected[i, j, k, l, i5, i6, i7] - stabilization * Learly[i, j, k, l, i5, i6, i7] - fastprog[i, j, k, l, i5, i6, i7] * Learly[i, j, k, l, i5, i6, i7] + HI[i, j, k, l, i5, i6, i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7]
 
 ## Late TBI
-deriv(Llate[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogL[i, j, k, l, i5, i6, i7] + stabilization * Learly[i, j, k, l, i5, i6, i7] - progn_slow * Llate[i, j, k, l, i5, i6, i7] + fromtreatmentL[i, j, k, l, i5, i6, i7] - relapsefrompost[i, j, k, l, i5, i6, i7] - HI[i,j,k,l,i5,i6,i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7] + (1 - symptb_CFR) * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
+deriv(Llate[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogL[i, j, k, l, i5, i6, i7] + stabilization * Learly[i, j, k, l, i5, i6, i7] - slowprog[i, j, k, l, i5, i6, i7] * Llate[i, j, k, l, i5, i6, i7] + fromtreatmentL[i, j, k, l, i5, i6, i7] - relapsefrompost[i, j, k, l, i5, i6, i7] - HI[i,j,k,l,i5,i6,i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7] + (1 - symptb_CFR) * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
 ## TODO wiring to post TB for undetected?
 
 ## Asymptomatic TB disease
-deriv(Asymp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogA[i,j,k,l,i5,i6,i7] + progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7] - progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_asymp * Asymp[i,j,k,l,i5,i6,i7] + fromtreatmentA[i,j,k,l,i5,i6,i7] + relapsefrompost[i,j,k,l,i5,i6,i7]
+deriv(Asymp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogA[i,j,k,l,i5,i6,i7] + fastprog[i, j, k, l, i5, i6, i7] * Learly[i,j,k,l,i5,i6,i7] + slowprog[i, j, k, l, i5, i6, i7] * Llate[i,j,k,l,i5,i6,i7] - progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_asymp * Asymp[i,j,k,l,i5,i6,i7] + fromtreatmentA[i,j,k,l,i5,i6,i7] + relapsefrompost[i,j,k,l,i5,i6,i7]
 
 ## Symptomatic TB disease
 deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k,l,i5,i6,i7] + progn_symp * Asymp[i,j,k,l,i5,i6,i7] - symp_tbend[i,j,k,l,i5,i6,i7]
@@ -185,6 +185,12 @@ deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,
 ##  i5 = post-TB   (compulsory)
 ##  i6 = strain    (optional)
 ##  i7 = protection from TPT + vaccination (optional)
+
+## --- progression relative rates
+fastprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_fast
+slowprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_slow
+dim(fastprog) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
+dim(slowprog) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 
 
 

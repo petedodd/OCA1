@@ -4,12 +4,21 @@
 \alias{plt_TBSnapshots}
 \title{Visualising Temporal Trends in Demographics and TB Status}
 \usage{
-plt_TBSnapshots(outdata, by_layer = "natcat")
+plt_TBSnapshots(
+  outdata,
+  by_layer = "natcat",
+  starting_year = 1970,
+  year_increment = 5
+)
 }
 \arguments{
 \item{outdata}{A data.table returned by \code{runmodel} with \code{raw=FALSE}}
 
-\item{by_layer}{One of natcat, risk, post, strain, prot}
+\item{by_layer}{One of \code{natcat}, \code{risk}, \code{post}, \code{strain}, \code{prot}}
+
+\item{starting_year}{An initial year to start the visualisation at (default 1970)}
+
+\item{year_increment}{Make another plot in multiples of this many years after the starting point (default 5)}
 }
 \value{
 A \code{ggplot2} plot object showing population distribution over time by age, sex, nativity and TB status

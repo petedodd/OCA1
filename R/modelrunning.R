@@ -44,7 +44,7 @@ runmodel <- function(p, times, raw = FALSE, singleout = FALSE, verbose = FALSE) 
     cat("Running from ",min(times)," to ",max(times),"\n")
     cat(paste("Execution time:", round(execution_time,2), unit),"\n")
     cat("Model fit to total population:\n")
-    print(checkDemoFit(out))
+    print(checkDemoFit(ans))
   }
   ans # return
 }
