@@ -49,10 +49,10 @@ check_dims <- function(parlist, dms){
     if(pname %in% c("Pmigr_post","propinitpost","progn_posttb")){
       ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[4]) #npost
     }
-    if(pname %in% c("Pmigr_strain","propinitstrain")){
+    if(pname %in% c("Pmigr_strain","propinitstrain", "IRRstrain")){
       ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[5]) #nstrain
     }
-    if(pname %in% c("Pmigr_prot","propinitprot")){
+    if(pname %in% c("Pmigr_prot","propinitprot", "IRRprotn")){
       ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[6]) #nprotn
     }
     ## now test dim 1s:

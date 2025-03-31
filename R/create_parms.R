@@ -49,10 +49,13 @@ create_parms <- function(tc = 1970:2020,
 
   ## tb parms
   tbparnames <- names(OCA1::parms)
-  tbparnames <- c(tbparnames,
-                  "CDR_raw", "migr_TBD", "migr_TBI",
-                  "BETAage", "BETAsex", "BETAnat", "BETArisk", "BETAstrain",
-                  "propinitE","propinitL","propinitA","propinitS","propinitT")
+  xtra_tbparms <- c(
+    "CDR_raw", "migr_TBD", "migr_TBI",
+    "BETAage", "BETAsex", "BETAnat", "BETArisk", "BETAstrain",
+    "propinitE", "propinitL", "propinitA", "propinitS", "propinitT",
+    "IRRstrain", "IRRprotn"
+  )
+  tbparnames <- c(tbparnames, xtra_tbparms)
   ## defaults:
   tbparms <- add_defaults_if_missing(tbparms, tbparnames, dms, verbose)
 
@@ -80,11 +83,15 @@ create_parms <- function(tc = 1970:2020,
   }
 
   ## check dimension
+  ## add in extra parms for dim checks:
+  for(nm in xtra_tbparms){
+    param_list[[nm]] <- tbparms[[nm]]
+  }
   checks <- check_dims(param_list, dms)
   if (all(checks)) {
     if (verbose) message("All TB input parameters dimensions were correct\n")
   } else {
-    message("TB parameters with dimension problems:", paste(names(param_list)[!checks]))
+    message("TB parameters with dimension problems:", paste(names(param_list)[!checks],collapse = ", "))
   }
 
   ## --- complete TB initial states

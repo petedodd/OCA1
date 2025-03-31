@@ -73,8 +73,12 @@ known_parameters <- function(parname=NULL,quiet=FALSE){
   postdata <- list(
     progn_posttb=list("Post-TB ageing rates (1st/last 0)","npost")
   )
-  straindata <- list()
-  protdata <- list()
+  straindata <- list(
+    IRRstrain = list("IRR for progression to TB disease by strain", "nstrain")
+  )
+  protdata <- list(
+    IRRprotn = list("IRR for progression to TB disease by protection", "nprot")
+  )
   tbparms <- list(
     propinitE = list("Initial proportions early latent","nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
     propinitL = list("Initial proportions late latent","nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),

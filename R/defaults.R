@@ -143,7 +143,13 @@ default_parameters <- function(parname, dms, verbose=FALSE){
     )
   }
   if (parname == "progn_posttb") {
-    ans <- rep(0,dms[4])
+    ans <- rep(0,dms[4]) #npost
+  }
+  if (parname == "IRRstrain") {
+    ans <- rep(1, dms[5]) #nstrain
+  }
+  if (parname == "IRRprotn") {
+    ans <- rep(1, dms[6]) #nprot
   }
   if(parname %in% c("propinitE","propinitL","propinitA","propinitS","propinitT")){
     ## template

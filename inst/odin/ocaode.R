@@ -187,8 +187,12 @@ deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,
 ##  i7 = protection from TPT + vaccination (optional)
 
 ## --- progression relative rates
-fastprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_fast
-slowprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_slow
+IRRstrain[] <- user()
+IRRprotn[] <- user()
+dim(IRRstrain) <- nstrain
+dim(IRRprotn) <- nprot
+fastprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_fast * IRRstrain[i6] * IRRprotn[i7]
+slowprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_slow * IRRstrain[i6] * IRRprotn[i7]
 dim(fastprog) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 dim(slowprog) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 
