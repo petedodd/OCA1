@@ -17,7 +17,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  tidy.opts = list(width.cutoff = 60), tidy = TRUE
 )
 ```
 
@@ -66,7 +67,7 @@ Installing the package requires R to be setup to compile C code. If the R packag
 devtools::install_github("petedodd/OCA1")
 ```
 
-If the argument `build_vignettes=TRUE` is added to the above, this document will be generated and can be found via 
+If the argument `build_vignettes=TRUE` is added to the above, and you have a working LaTeX installation, this document will be generated and can be found via 
 
 ```{r,eval=FALSE}
 browseVignettes(package = "OCA1")
@@ -142,9 +143,10 @@ For a given set of parameters, `runmodel` will run the model. By default, the ou
 ## example without nativity class used
 pms <- create_parms(tbparms=list(staticfoi=1, foi=1e-2)) #create UK parameters
 
-out <- runmodel(pms)              #run model with these
+out <- runmodel(pms,verbose=TRUE)              #run model with these
 out                               #inspect
 ```
+With `verbose=TRUE` the model returns information including metrics of fit to the overall growth of the total population.
 
 
 ## Visualizing model output
@@ -175,72 +177,14 @@ plt_TBRates(out,rate_type = "incidence",by_layer = "natcat")
 
 # Example use
 
-TODO
+The following cases provide toy examples of particular use cases.
 
+WIP
 
-# Mathematical specification
-
-
-$$
-\frac{\mathrm{d}}{\mathrm{d}t}N_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)
-$$
-
-where $a$ is age, $s$ is sez, $n$ is natal class, $r$ is risk group, $p$ is protection, and $q$ is strain.
-
-$$
-\begin{aligned}
-& \frac{\mathrm{d}}{\mathrm{d}t}U_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
-& \frac{\mathrm{d}}{\mathrm{d}t}E_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
-& \frac{\mathrm{d}}{\mathrm{d}t}L_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
-& \frac{\mathrm{d}}{\mathrm{d}t}A_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
-& \frac{\mathrm{d}}{\mathrm{d}t}D_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
-& \frac{\mathrm{d}}{\mathrm{d}t}T_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)
-\end{aligned}
-$$
-
-TODO other stuff
-
-
-$$
-\begin{aligned}
-    & \frac{\mathrm{d}}{\mathrm{d}t}N_{a,s,n,r,p,q}(t) = {b}_{a,s,n,r,p,q}(t) - \bar{\mu}N_{a,s,n,r,p,q}(t)\\
-    & N_t(s,a,h,r) = \overbrace{b_t(s)\delta(a)}^{\mathrm{births}} -\overbrace{ \mu^0_t(s,a)N_t(s,a,h,r)}^{\mathrm{background~deaths}} + \overbrace{m_t(s,a)}^{\mathrm{net~migration}}\\
-    & -\chi_{h>0}\chi_{r=0}\times\mu^H(s,a,h)N_t(s,a,h,r)\\
-    &-\chi_{h>0}\chi_{r>0}\times\mu^A(s,a,h,r)N_t(s,a,h,r)  \\
-    & -H(t)\pi^H_t(s,a,h)\left[\chi_{h=r=0} - \chi_{h>0}\right]\\
-    & -A(t)\pi^A_t(s,a,h)\left[\chi_{r'=0} - \chi_{r'=1}\right]\\
-    & -\chi_{r=0}\left[\chi_{h>0}R^H(s,a,h)N_t(s,a,h,r) - \chi_{h>1}R^H(s,a,h-1)N_t(s,a,h-1,r)\right]\\
-    & -\chi_{r>0}\left[R^A(r)N_t(s,a,h,r) -R^A(r-1)N_t(s,a,h,r-1)\right]\label{eqn:artprogn}
-\end{aligned}
-$$
-
-
-
-## yet more
-
-aaa
-
-$$
-\begin{aligned}
-    & \left(\frac{\partial}{\partial t}+\frac{\partial}{\partial a}\right) N_t(s,a,h,r) = \overbrace{b_t(s)\delta(a)}^{\mathrm{births}} -\overbrace{ \mu^0_t(s,a)N_t(s,a,h,r)}^{\mathrm{background~deaths}} + \overbrace{m_t(s,a)}^{\mathrm{net~migration}}\\
-    & -\chi_{h>0}\chi_{r=0}\times\mu^H(s,a,h)N_t(s,a,h,r)\\
-    &-\chi_{h>0}\chi_{r>0}\times\mu^A(s,a,h,r)N_t(s,a,h,r)  \\
-    & -H(t)\pi^H_t(s,a,h)\left[\chi_{h=r=0} - \chi_{h>0}\right]\\
-    & -A(t)\pi^A_t(s,a,h)\left[\chi_{r'=0} - \chi_{r'=1}\right]\\
-    & -\chi_{r=0}\left[\chi_{h>0}R^H(s,a,h)N_t(s,a,h,r) - \chi_{h>1}R^H(s,a,h-1)N_t(s,a,h-1,r)\right]\\
-    & -\chi_{r>0}\left[R^A(r)N_t(s,a,h,r) -R^A(r-1)N_t(s,a,h,r-1)\right]\label{eqn:artprogn}
-\end{aligned}
-$$
-
-And also
-
-$$
-\frac{\mathrm{d}}{\mathrm{d}t}X_t(s,a) = {b}_t(s) - \bar{\mu}^0_t(s,a)X_t(s,a)
-$$
 
 ## Example of implementing in-migration and out-migration 
 
-First let's generate  dummy migration data. Assuming that both in-migration and out-migration follow a polynomial distribution as  function of year :
+First let's generate dummy migration data. Assuming that both in-migration and out-migration follow a polynomial distribution as  function of year :
 
 $$
 Y(t) = \beta_0 + \beta_1 t + \beta_2 t^2 
@@ -248,42 +192,34 @@ $$
 
 Plugging the following  $\beta$ coefficients into the above equation, we can generate in-migration and outmigration dummy data as in below: 
 
-### Overall migration
 
 ```{r}
+## create dummy parameters with 2 natal classes:
 pms <- create_parms(nnat = 2, 
                     migrationdata = list(propinitnat = c(0.9,0.1)))
-Year   <-1970:2020
-inmigr <- 5.114998e+05 - 5.238264e+02*Year +  1.341414e-01*Year^2
-emigr  <- 3.127034e+05 - 3.170702e+02*Year +  8.043165e-02*Year^2
 
-exmigrans <-data.frame(British= 0.35, foreign=0.65)
+## dummy data:
+Year   <-1970:2020
+## in-migration numbers from countries of interest
+inmigr <- (5.114998e+05 - 5.238264e+02*Year +  1.341414e-01*Year^2)/10
+## out-migration hazard for countries of interest
+emigr  <- (3.127034e+05 - 3.170702e+02*Year +  8.043165e-02*Year^2)/1e6
+
+plot(Year,inmigr,type="l") #look
+
+## age/sex patterns (use same pattern in/out)
 prop_males <- c(rep(c(1,2,3.5,5.5,5,3,2,1), each=2),1)/100
 prop_females <-c(rep(c(1,2,4,6,5,3.5,2.5,1.5), each=2),2)/100
 
+## create toy data
 imig <- array(0, dim= dim(pms[["immigration"]]), 
               dimnames =dimnames(pms[["immigration"]]))
 emig <- array(0, dim= dim(pms[["exmigrate"]]), 
                dimnames =dimnames(pms[["exmigrate"]]))
-
-for (year in 1:51) {
-  imig[year, , 1] <- inmigr[year] * prop_males  
-  imig[year, , 2] <- inmigr[year] * prop_females  
-}
-
-prop_uk_born= 0.35 # assuming 35% of emigranst are UK born
-
-# propagate by nationality
-for (year in 1:51) {
-  emig[year, , ,1] <- emigr[year] * prop_uk_born  
-  emig[year, , ,2] <- emigr[year] * (1-prop_uk_born)  
-}
-
-# propagate into age and sex
-for (year in 1:51) {
-  emig[year, , 1, ] <- emig[year, , 1, ] * prop_males  # Males
-  emig[year, , 2, ] <- emig[year, , 2, ] * prop_females  # Females
-}
+imig[, , 1] <- inmigr * prop_males  
+imig[, , 2] <- inmigr * prop_females  
+emig[, , 1, 2] <- emigr * prop_males  # Males
+emig[, , 2, 2] <- emigr * prop_females  # Females
 
 ```
 
@@ -291,26 +227,90 @@ We can now call the parameter generating function and update the migration input
 
 ```{r}
 pms <- create_parms(nnat = 2, 
-                    migrationdata = list(propinitnat = c(0.9,0.1)))
+                    migrationdata = 
+                    list(propinitnat = c(0.9,0.1),
+                    immigration = imig,
+                    exmigrate = emig))
 
-
-pms$immigration <- imig
-pms$exmigrate <- emig
-
-out <- runmodel(pms)
-plt_DemoGrowth(out)  
+out <- runmodel(pms,verbose=TRUE) 
 
 ```
+The model fit to overall demographic growth remains good (see fit statistics). 
+Further refinement would be needed to specify the prevalence of TB infection and disease among in-migrants.
+Interventions would then be specified via time-dependent rates for the relevant parameters.
+More complex natal structures are possible, e.g. `nnat=3` with ageing through from 'recent' arrivals to 'established', with corresponding waning in the relative risk of progression to TB disease.
 
-### Country specific migration
 
-If a particular country say India contributes 10% of immigrants, the model can be run for that scenario as follows:
 
-```{r}
-pms$immigration <- imig*0.1
-out <- runmodel(pms)
-plt_DemoGrowth(out)  
-```
+# Mathematical specification
+
+We use the index notation: $a$ is age, $s$ is sex, $n$ is natal class, $r$ is risk group, $p$ is protection, and $q$ is strain. For simplicity however, we suppress the indices $a,s,n,r,p,q$ wherever possible in the following. Similarly, many states and rates depend on time ($t$), but we do not make this dependence explicit except where seeking to emphasize it.
+
+We use the following notation for TB states:
+
+- Uninfected: $U$
+- Latent fast: $E$
+- Latent slow: $L$
+- Asymptomatic TB disease: $A$
+- Symptomatic TB disease: $D$
+- TB treatment: $T$
+
+The ODEs in shorthand notation are then
+
+
+$$
+\begin{aligned}
+& \frac{\mathrm{d}}{\mathrm{d}t}U(t) = \Delta U - \lambda U\\
+& \frac{\mathrm{d}}{\mathrm{d}t}E(t) =  \Delta E + \lambda U - (s+p)E + \lambda v L\\
+& \frac{\mathrm{d}}{\mathrm{d}t}L(t) =  \Delta L + s E - \epsilon L + TL - \mathbb{1}(p=2)\rho L_p - \lambda v L + (1-\psi)D/\tau\\
+& \frac{\mathrm{d}}{\mathrm{d}t}A(t) =  \Delta A + pE + \epsilon L - fA - \delta^A A + TA + \mathbb{1}(p=2)\rho L_p\\
+& \frac{\mathrm{d}}{\mathrm{d}t}D(t) =  \Delta D + fA - \omega D\\
+& \frac{\mathrm{d}}{\mathrm{d}t}T(t) =  \Delta T + TS - T/d
+\end{aligned}
+$$
+We use $\mathbb{1}(Y)$ to be an indicator function returning 1 if and only if the statement arguments are all true, and zero otherwise.
+
+Here, the parameters have the following meanings:
+
+- $s$: stabilization rate
+- $p$: fast progression rate
+- $v$: partial protection from TB infection
+- $\rho$: relapse rate
+- $\psi$: CFR for untreated TB
+- $\tau$: natural duration for untreated TB
+- $f$: symptom progression rate
+- $\delta^A$: asymptomatic TB detection rate
+- $\omega$: symtompatic TB detection + self-cure + mortality rate
+- $d$: durations of TB treatment
+- $TS$: treatment starts (TODO see below) 
+- $TL$: flow to latent from treatment completion (TODO see below)
+- $TA$: flow to asymptomatic from treatment completion (TODO see below)
+
+
+
+The non-TB dynamical terms $\Delta X$ (where $X$ represents a TB state) follow the pattern:
+$$
+\begin{aligned}
+& \Delta X = \overbrace{r_{a-1} X_{a-1} - r_{a} X_{a}}^{\mathrm{ageing}} + \overbrace{\mathbb{1}(a=1,X=U,n=1)b_{s,p,q}}^{\mathrm{births}} + \overbrace{\mathbb{1}(n=2)\iota^X_{a,s}\iota_{s,r,p,q}I_{a,s}}^{\mathrm{in-migration}} - \overbrace{\Omega_{a,s,n} X_{a,s,n}}^{\mathrm{out-migration}} - \overbrace{\bar{\mu}_{a,s}X_{a,s}}^{\mathrm{rest}} \\
+& + \underbrace{m_{n-1}X_{n-1}-m_n X_n}_{\mathrm{natal~ageing}} + \underbrace{h_{a,s,r-1}(t)X_{a,s,r-1} - h_{a,s,r}(t)X_{a,s,r}}_{\mathrm{risk~progression}} + \underbrace{\pi_{p-1} X_{p-1} - \pi_p X_{p}}_{\mathrm{PostTB-ageing}}
+\end{aligned}
+$$
+
+The force-of-infection, $\lambda$, if not running in static mode, 
+$$
+\lambda_{asnrqp}(t) = \sum_{a's'n'r'q'p'}\beta_{asnrqp;a's'n'r'q'p'}\left(\frac{\alpha A_{a's'n'r'q'p'}+D_{a's'n'r'q'p'}}{N}\right) 
+$$
+This parametrization is used so that random mixing matrices are more easily specified without knowing relative subpopulation sizes.
+
+Mixing is assumed to depend on age, sex, natal class, risk group and strain, with the effective contact rate modelled as a tensor product:
+
+$$
+\beta = \beta^{\mathrm{age}}\otimes\beta^{\mathrm{sex}}\otimes\beta^{\mathrm{natal}}\otimes\beta^{\mathrm{risk}}\otimes\beta^{\mathrm{strain}}
+$$
+
+
+The table below (TODO) relates this notation of this section to the naming conventions used in the model.
+
 
 
 
