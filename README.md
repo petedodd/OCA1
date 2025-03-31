@@ -4,34 +4,21 @@
 UK TB transmission model
 
 
-## Updating
-
-I'm using `usethis`, `devtools`, and `odin` to update package changes, like:
-```r
-library(here)
-library(devtools)
-library(usethis)
-
-odin::odin_package('.')
-devtools::document()
-
-```
-
 ## Installing
 
-This may work depending on config:
+If you have an R tool chain that can compile C, it should be possible to install this package using:
 ```r
-devtools::install_github('petedodd/OCA1')
+devtools::install_github("petedodd/OCA1")
 ```
 
-If not - clone the repo and install from local copy:
+If not, we may be able to create a platform-specific binary for you to install.
 
-```r
-devtools::install('my.local.path/OCA1')
-```
+Note: this package is still under development and it would be wise to consult us if intending to use in anger.
 
 
-## Using
+## Use
+
+Once installed, basic examples of use are as follows:
 
 ```r
 ##load
