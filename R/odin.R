@@ -26,10 +26,11 @@ ocaode_ <- R6::R6Class(
              "Pmigr_prot", "Pmigr_risk", "Pmigr_strain", "popdat",
              "popinitA", "popinitE", "popinitL", "popinitS", "popinitT",
              "popinitU", "r", "RiskHazardData", "ttp", "asymp_relinf",
-             "detect_asymp", "foi", "mortality_treated", "progn_fast",
-             "progn_posttb", "progn_slow", "progn_symp", "relapse",
-             "stabilization", "staticfoi", "symptb_CFR",
-             "symptb_inversedurn", "tbi_protn", "treatment_inversedurn"),
+             "detect_asymp", "foi", "migr_splitAS", "migr_splitEL",
+             "mortality_treated", "progn_fast", "progn_posttb", "progn_slow",
+             "progn_symp", "relapse", "stabilization", "staticfoi",
+             "symptb_CFR", "symptb_inversedurn", "tbi_protn",
+             "treatment_inversedurn"),
 
     ## This is never called, but is used to ensure that R finds our
     ## symbols that we will use from the package; without this they

@@ -1,3 +1,16 @@
+## data-raw/parameters.R
+## Regenerates data/agz.rda, data/hyperparms.rda and data/parms.rda.
+## Run with: Rscript -e 'devtools::load_all(); source("data-raw/parameters.R")'
+## (load_all() needed so uv2ps()/qfun() from R/hyperparms.R are
+## available without a full reinstall first)
+##
+## Previously this content lived in inst/extdata/parameters.R, which
+## was never actually sourced anywhere -- data/hyperparms.rda and
+## data/parms.rda were static, hand-saved files that had drifted out
+## of sync with that source. This script is now the single source of
+## truth; re-run it (then devtools::document() + reinstall) whenever
+## hyperparms changes.
+
 agz <- paste0(seq(from = 0, by = 5, len = 17), "-", seq(from = 4, by = 5, len = 17))
 agz[length(agz)] <- "80+"
 
@@ -38,37 +51,27 @@ hyperparms <- list(
   progn_symp = list(meanlog=-0.693,sdlog=0.97,
                     "Progression rate Asymp->Symp TB (per year)"),
   ## mHR = list(meanlog=0.131,sdlog=0.071),             #post-TB mortality HR
-  treatment_inversedurn = list(fixed=2,"fixed","Inverse ATT duration (per year)")
+  treatment_inversedurn = list(fixed=2,"fixed","Inverse ATT duration (per year)"),
+  ## --------------------------------------------------- migration
+  ## previously hardcoded (0.2/0.8, 0.5/0.5) in ocaode.R; neither
+  ## split is well pinned down by available UK surveillance data
+  ## (time-since-arrival speaks to time since immigration, not time
+  ## since infection or symptom status on arrival), so both are
+  ## free/fitted parameters with weakly-informative priors centred
+  ## on the previous defaults
+  migr_splitEL=list(shape1=4,shape2=16,
+    "Fraction of migrant LTBI that is early/fast-progression risk"),
+  migr_splitAS=list(shape1=5,shape2=5,
+    "Fraction of migrant active TB that is asymptomatic at arrival")
   ## late_post_time=2,    #duration defining early post-TB
   ## mort=0.02,            #mortality rate
   ## hrqolptb=list(meanlog=-3.324,sdlog=0.486), # HRQoL decrement while post TB
-  ## hrqol = list(shape1 = 21.15177, shape2 = 42.36706) # GBD decrement 0.333 (0.224–0.454)
+  ## hrqol = list(shape1 = 21.15177, shape2 = 42.36706) # GBD decrement 0.333 (0.224-0.454)
   )
 
-qfun <- function(u,L){
-  x <- NULL
-  if(names(L)[1]=='meanlog') x <- qlnorm(u,L[[1]],L[[2]])
-  if(names(L)[1]=='shape1') x <- qbeta(u,L[[1]],L[[2]])
-  if(names(L)[1]=='mean') x <- qnorm(u,L[[1]],L[[2]])
-  if(names(L)[1]=='shape') x <- qgamma(u,L[[1]],scale=L[[2]])
-  if(is.null(x)) x <- u[[1]] #not formatted numbers differently
-  x
-}
+## === tb parms: point estimate at the median of every prior
+parms <- uv2ps(rep(0.5, length(hyperparms)), hyperparms) # natural history
 
-uv2ps <- function(u,HP,returnlist=TRUE){
-  for(i in 1:length(HP)){
-    if(is.list(HP[[i]])){
-      u[i] <- qfun(u[i],HP[[i]])
-    } else { #fixed value
-      u[i] <- HP[[i]]
-    }
-  }
-  if(returnlist){
-    u <- as.list(u)
-    names(u) <- names(HP)
-  }
-  u
-}
-
-## === tb parms
-parms <- uv2ps(rep(0.5, length(hyperparms)),hyperparms) # natural history
+usethis::use_data(agz, overwrite = TRUE)
+usethis::use_data(hyperparms, overwrite = TRUE)
+usethis::use_data(parms, overwrite = TRUE)
