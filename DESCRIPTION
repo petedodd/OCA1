@@ -10,11 +10,12 @@ Description: This R package supplies a tuberculosis (TB) transmission model that
 License: CC BY 4.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Imports: 
+Imports:
     data.table,
+    dplyr,
     odin,
     ggplot2,
+    rlang,
     stringr,
     tidyr
 Depends: 
@@ -26,3 +27,4 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Config/roxygen2/version: 8.0.0

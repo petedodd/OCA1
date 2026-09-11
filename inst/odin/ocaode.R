@@ -219,8 +219,9 @@ totalpops[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- Uninfected[i,j
 
 ## treatent ends & destinations
 treatmentends[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- treatment_inversedurn * Treat[i,j,k,l,i5,i6,i7]
-fromtreatmentL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nprot,1:nprot] <- if(i5==2) sum(treatmentends[i,j,k,l,1:npost,i6,i7]) else if(npost==1) (1-relapse) * treatmentends[i,j,k,l,i5,i6,i7] / (1-mortality_treated) else 0 #if post-TB layers, put in
-fromtreatmentA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(npost==1) relapse * treatmentends[i,j,k,l,i5,i6,i7] / (1-mortality_treated) else 0 #if no post-TB layers, put here
+## treatmentends is the total (all-cause) exit rate from Treat 
+fromtreatmentL[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nprot,1:nprot] <- if(i5==2) sum(treatmentends[i,j,k,l,1:npost,i6,i7]) else if(npost==1) (1-mortality_treated) * (1-relapse) * treatmentends[i,j,k,l,i5,i6,i7] else 0 #if post-TB layers, put in
+fromtreatmentA[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(npost==1) (1-mortality_treated) * relapse * treatmentends[i,j,k,l,i5,i6,i7] else 0 #if no post-TB layers, put here
 relapsefrompost[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5==2) relapse * Llate[i,j,k,l,i5,i6,i7] else 0
 
 ## NOTE on relapse (see above):
@@ -228,9 +229,10 @@ relapsefrompost[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot] <- if(i5==2
 ## if npost > 1, relapse will go from L x (post == 1)
 ## note that relapse is treated as probability for npost==1 and as rate for npost>1
 
-## TODO post-TB progression and relapse from post-TB
-## TODO convertions CFRs and mortality hazards
-## TODO tot up TB mortality and also introduce a correction to overall mortality
+## TODO post-TB progression and relapse from post-TB (npost>1 case
+## generally: fromtreatmentL's i5==2 branch above still routes all
+## post-TB-layer treatment exits to Llate with no relapse/mortality
+## split, unlike the npost==1 case)
 
 
 ## dims
