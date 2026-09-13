@@ -6928,7 +6928,7 @@ void ocaode_rhs(ocaode_internal* internal, double t, double * state, double * ds
       for (int k = 1; k <= internal->nnat; ++k) {
         for (int l = 1; l <= internal->nrisk; ++l) {
           for (int i5 = 1; i5 <= internal->npost; ++i5) {
-            for (int i6 = 1; i6 <= internal->nprot; ++i6) {
+            for (int i6 = 1; i6 <= internal->nstrain; ++i6) {
               for (int i7 = 1; i7 <= internal->nprot; ++i7) {
                 internal->fromtreatmentL[i - 1 + internal->dim_fromtreatmentL_1 * (j - 1) + internal->dim_fromtreatmentL_12 * (k - 1) + internal->dim_fromtreatmentL_123 * (l - 1) + internal->dim_fromtreatmentL_1234 * (i5 - 1) + internal->dim_fromtreatmentL_12345 * (i6 - 1) + internal->dim_fromtreatmentL_123456 * (i7 - 1)] = (i5 == 2 ? odin_sum7(internal->treatmentends, i - 1, i, j - 1, j, k - 1, k, l - 1, l, 0, internal->npost, i6 - 1, i6, i7 - 1, i7, internal->dim_treatmentends_1, internal->dim_treatmentends_12, internal->dim_treatmentends_123, internal->dim_treatmentends_1234, internal->dim_treatmentends_12345, internal->dim_treatmentends_123456) : (internal->npost == 1 ? (1 - internal->mortality_treated) * (1 - internal->relapse) * internal->treatmentends[internal->dim_treatmentends_123456 * (i7 - 1) + internal->dim_treatmentends_12345 * (i6 - 1) + internal->dim_treatmentends_1234 * (i5 - 1) + internal->dim_treatmentends_123 * (l - 1) + internal->dim_treatmentends_12 * (k - 1) + internal->dim_treatmentends_1 * (j - 1) + i - 1] : 0));
               }
