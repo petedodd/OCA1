@@ -55,28 +55,26 @@ test_that("default_parameters works", {
   expect_true(all(default_parameters("Pmigr_strain", dms)[,-1]==0))
   
   
-  # Test 'migr_TBD'
-  
+  # Test 'migr_TBD_raw' (time-varying: constant default across dms[1]
+  # time points, same age/sex pattern as before)
+
   X <- matrix(1, nrow = length(OCA1::agz),ncol=2)
   X[1:3,] <- 0
   X[4:nrow(X),] <- 0.001
-  rownames(X) <- OCA1::agz
-  colnames(X) <- c("M","F")
-  dimnames(X) <- list("acat"=OCA1::agz, "sex"=c("M","F"))
-  
-  
-  expect_equal(default_parameters("migr_TBD",dms),X)
-  
-  # Test 'migr_TBI'
+  Xt <- array(rep(as.vector(X), each = dms[1]),
+              dim = c(dms[1], length(OCA1::agz), 2))
+
+  expect_equal(default_parameters("migr_TBD_raw",dms),Xt)
+
+  # Test 'migr_TBI_raw'
   X <- matrix(1, nrow = length(OCA1::agz),ncol=2)
   X[1:3,] <- 0
   X[4:nrow(X),] <- 0.3
-  rownames(X) <- OCA1::agz
-  colnames(X) <- c("M","F")
-  dimnames(X) <- list("acat"=OCA1::agz, "sex"=c("M","F"))
-  
-  expect_equal(default_parameters("migr_TBI",dms),X)
-  
+  Xt <- array(rep(as.vector(X), each = dms[1]),
+              dim = c(dms[1], length(OCA1::agz), 2))
+
+  expect_equal(default_parameters("migr_TBI_raw",dms),Xt)
+
   
   # Test 'immigration'
   expect_equal(dim(default_parameters("immigration", dms)), c(dms[1], length(OCA1::agz), 2))

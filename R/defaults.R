@@ -34,21 +34,27 @@ default_parameters <- function(parname, dms, verbose=FALSE){
   if(parname %in% c("Pmigr_risk","Pmigr_post","Pmigr_strain","Pmigr_prot")){
     ans <- rbind(ans,ans) #one for each sex
   }
-  if(parname %in% c("migr_TBD","migr_TBI")){
-    ans <- array(1,
+  if(parname %in% c("migr_TBD_raw","migr_TBI_raw")){
+    ## default is CONSTANT over time (dms[1] = ntimes) -- same
+    ## age/sex prevalence pattern as before, just replicated across
+    ## the time dimension so callers who don't need time-variation
+    ## get identical behaviour to the pre-time-varying version
+    base <- array(1,
                  dim = c(length(OCA1::agz), 2),
                  dimnames = list(
                    acat = OCA1::agz,
                    sex = c("M", "F")
                  )
                  )
-    ans[1:3,] <- 0 #default nothing in children
-    if(parname %in% c("migr_TBD")){
-      ans <- (100/1e5) * ans #default prevalence
+    base[1:3,] <- 0 #default nothing in children
+    if(parname %in% c("migr_TBD_raw")){
+      base <- (100/1e5) * base #default prevalence
     }
-    if(parname %in% c("migr_TBI")){
-      ans <- 0.3 * ans #default prevalence
+    if(parname %in% c("migr_TBI_raw")){
+      base <- 0.3 * base #default prevalence
     }
+    ans <- array(rep(as.vector(base), each = dms[1]),
+                 dim = c(dms[1], length(OCA1::agz), 2))
   }
   if(parname %in% c("immigration")){
     ans <- array(0,

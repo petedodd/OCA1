@@ -61,8 +61,8 @@ check_dims <- function(parlist, dms){
         ans[[pname]] <- (dim(parlist[[pname]])[1] == 2) # nsex
       }
     }
-    if(pname %in% c("migr_TBD","migr_TBI")){
-      ans[[pname]] <- all(dim(parlist[[pname]]) == c(length(OCA1::agz), 2))
+    if(pname %in% c("migr_TBD_raw","migr_TBI_raw")){
+      ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2))
     }
     if(pname %in% c("immigration")){
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2))

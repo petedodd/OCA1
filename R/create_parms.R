@@ -50,7 +50,7 @@ create_parms <- function(tc = 1970:2020,
   ## tb parms
   tbparnames <- names(OCA1::parms)
   xtra_tbparms <- c(
-    "CDR_raw", "migr_TBD", "migr_TBI",
+    "CDR_raw", "migr_TBD_raw", "migr_TBI_raw",
     "BETAage", "BETAsex", "BETAnat", "BETArisk", "BETAstrain",
     "propinitE", "propinitL", "propinitA", "propinitS", "propinitT",
     "IRRstrain", "IRRprotn"
@@ -69,7 +69,7 @@ create_parms <- function(tc = 1970:2020,
   checks <- sapply(param_list, check_probabilities)
   ## 0 <= x <= 1 checks; same but without checking sums are near 1
   param_list <- list(
-    "migr_TBD" = tbparms$migr_TBD, "migr_TBI" = tbparms$migr_TBI,
+    "migr_TBD_raw" = tbparms$migr_TBD_raw, "migr_TBI_raw" = tbparms$migr_TBI_raw,
     "propinitE" = tbparms$propinitE, "propinitL" = tbparms$propinitL, "propinitA" = tbparms$propinitA,
     "propinitS" = tbparms$propinitS, "propinitT" = tbparms$propinitT
   )

@@ -330,8 +330,17 @@ Pmigr_strain[,] <- user()
 Pmigr_prot[,] <- user()
 immigration[,,] <- user()
 exmigrate[,,,] <- user()
-migr_TBD[,] <- user()
-migr_TBI[,] <- user()
+## migr_TBD/migr_TBI (disease/infection prevalence among arriving
+## migrants) are time-varying, interpolated the same way as
+## CDR_raw/immigration -- the true quantity varies substantially
+## over time as migrant country-of-origin composition shifts (see
+## UKTB_fitting's R/explore/migration_composition_check.R), which a
+## flat age/sex-only constant could not represent regardless of how
+## it was fitted.
+migr_TBD_raw[,,] <- user()
+migr_TBI_raw[,,] <- user()
+migr_TBD[,] <- interpolate(ttp, migr_TBD_raw, "linear")
+migr_TBI[,] <- interpolate(ttp, migr_TBI_raw, "linear")
 
 ## where to migrants flow into
 Pmigr_nat[1:nnat] <- if(i==2) 1 else 0
@@ -374,6 +383,8 @@ dim(immigration) <- c(lttp, nage, 2)
 dim(exmigrate) <- c(lttp, nage, 2, nnat)
 dim(In) <- c(nage,2)
 dim(OutR) <- c(nage, 2, nnat)
+dim(migr_TBD_raw) <- c(lttp, nage, 2)
+dim(migr_TBI_raw) <- c(lttp, nage, 2)
 dim(migr_TBD) <- c(nage,2)
 dim(migr_TBI) <- c(nage,2)
 
