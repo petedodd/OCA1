@@ -13,7 +13,7 @@
 ##' @param postdata TODO
 ##' @param straindata TODO
 ##' @param protdata TODO
-##' @param tbparms TODO
+##' @param tbparms list of TB parameters; any not supplied take defaults (see \code{known_parameters()}). Time-varying entries (one row per \code{tc}) include \code{CDR_raw}, \code{migr_TBD_raw}, \code{migr_TBI_raw} and \code{betat_raw} (a length \code{length(tc)} multiplier on the force of infection, default all ones)
 ##' @param verbose give more feedback
 ##' @return list of parameter for model
 ##' @author Pete Dodd
@@ -50,7 +50,7 @@ create_parms <- function(tc = 1970:2020,
   ## tb parms
   tbparnames <- names(OCA1::parms)
   xtra_tbparms <- c(
-    "CDR_raw", "migr_TBD_raw", "migr_TBI_raw",
+    "CDR_raw", "migr_TBD_raw", "migr_TBI_raw", "betat_raw",
     "BETAage", "BETAsex", "BETAnat", "BETArisk", "BETAstrain",
     "propinitE", "propinitL", "propinitA", "propinitS", "propinitT",
     "IRRstrain", "IRRprotn"
@@ -74,12 +74,16 @@ create_parms <- function(tc = 1970:2020,
     "propinitS" = tbparms$propinitS, "propinitT" = tbparms$propinitT
   )
   checks01 <- sapply(param_list, check_probabilities, checksum = FALSE)
+  ## non-negativity for the transmission multiplier
+  checks_nn <- c("betat_raw" = is.numeric(tbparms$betat_raw) &&
+                   all(tbparms$betat_raw >= 0))
+  if (!checks_nn) message("betat_raw must be numeric and non-negative.")
   ## respond to all
-  checks <- c(checks, checks01)
+  checks <- c(checks, checks01, checks_nn)
   if (all(checks)) {
     if (verbose) message("All TB parameters containing probabilities were correct\n")
   } else {
-    stop("TB parameters with problems:", paste(names(param_list)[!checks], collapse = ", "))
+    stop("TB parameters with problems:", paste(names(checks)[!checks], collapse = ", "))
   }
 
   ## check dimension

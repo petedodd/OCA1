@@ -43,7 +43,7 @@ create_parms(
 
 \item{protdata}{TODO}
 
-\item{tbparms}{TODO}
+\item{tbparms}{list of TB parameters; any not supplied take defaults (see \code{known_parameters()}). Time-varying entries (one row per \code{tc}) include \code{CDR_raw}, \code{migr_TBD_raw}, \code{migr_TBI_raw} and \code{betat_raw} (a length \code{length(tc)} multiplier on the force of infection, default all ones)}
 
 \item{verbose}{give more feedback}
 }

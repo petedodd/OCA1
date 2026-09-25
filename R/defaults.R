@@ -56,6 +56,9 @@ default_parameters <- function(parname, dms, verbose=FALSE){
     ans <- array(rep(as.vector(base), each = dms[1]),
                  dim = c(dms[1], length(OCA1::agz), 2))
   }
+  if(parname %in% c("betat_raw")){
+    ans <- rep(1, dms[1]) #ntimes; all ones = no change to transmission
+  }
   if(parname %in% c("immigration")){
     ans <- array(0,
       dim = c(dms[1], length(OCA1::agz), 2),

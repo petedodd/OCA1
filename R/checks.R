@@ -64,6 +64,10 @@ check_dims <- function(parlist, dms){
     if(pname %in% c("migr_TBD_raw","migr_TBI_raw")){
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2))
     }
+    if(pname %in% c("betat_raw")){
+      ans[[pname]] <- is.null(dim(parlist[[pname]])) &&
+        length(parlist[[pname]]) == dms[1] #ntimes
+    }
     if(pname %in% c("immigration")){
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2))
     }
