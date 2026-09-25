@@ -101,6 +101,11 @@ dim(BETArisk) <- c(nrisk, nrisk)
 ## dim(BETApost) <- c(npost, npost)
 BETAstrain[, ] <- user()
 dim(BETAstrain) <- c(nstrain, nstrain)
+## time-varying multiplier on transmission (e.g. external data on
+## contact changes); one value per ttp, default all ones = no effect
+betat_raw[] <- user()
+dim(betat_raw) <- lttp
+betat <- interpolate(ttp, betat_raw, "linear")
 ## BETAprot[, ] <- user()
 ## dim(BETAprot) <- c(nprot, nprot)
 ## prevalence across relevant indices: NOTE this denominator so that all 1s in BETA matrices equals random mixing
@@ -130,7 +135,8 @@ Ht[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- sum(Ht0[i, j, k, l, i5, ]) # matr
 ## Ht[1:nage, 1:2, 1:nnat, 1:nrisk, 1:nstrain] <- foi #testing
 dim(Ht) <- c(nage, 2, nnat, nrisk, nstrain)
 ## hazard of infection
-HI[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- if (staticfoi > 0) foi else Ht[i, j, k, l, i6]
+## NB betat scales the dynamic foi only: staticfoi is a fixed test/override value
+HI[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- if (staticfoi > 0) foi else betat * Ht[i, j, k, l, i6]
 dim(HI) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 
 
