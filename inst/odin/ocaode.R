@@ -195,10 +195,14 @@ deriv(Treat[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogT[i,j,
 ## --- progression relative rates
 IRRstrain[] <- user()
 IRRprotn[] <- user()
+## by nativity class, e.g. elevated progression shortly after migration
+## (natcat 2); default all ones = no effect
+IRRnat[] <- user()
 dim(IRRstrain) <- nstrain
 dim(IRRprotn) <- nprot
-fastprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_fast * IRRstrain[i6] * IRRprotn[i7]
-slowprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_slow * IRRstrain[i6] * IRRprotn[i7]
+dim(IRRnat) <- nnat
+fastprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_fast * IRRnat[k] * IRRstrain[i6] * IRRprotn[i7]
+slowprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_slow * IRRnat[k] * IRRstrain[i6] * IRRprotn[i7]
 dim(fastprog) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 dim(slowprog) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 
@@ -212,7 +216,10 @@ output(rate_Notification[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <
 ## TODO check how it plays with current processing
 rate_TBmortality[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- mortality_treated * treatmentends[i, j, k, l, i5, i6, i7] + symptb_CFR * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
 output(rate_TBmortality) <- TRUE
-output(rate_Incidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(progn_fast * Learly[i,j,k,l,i5,i6,i7] + progn_slow * Llate[i,j,k,l,i5,i6,i7]) /(totalpops[i,j,k,l,i5,i6,i7]+tol)
+## uses the stratum-specific fastprog/slowprog (so IRRstrain, IRRprotn
+## and IRRnat are included); previously used progn_fast/progn_slow
+## directly, which ignored the IRRs in this output (dynamics were right)
+output(rate_Incidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(fastprog[i,j,k,l,i5,i6,i7] * Learly[i,j,k,l,i5,i6,i7] + slowprog[i,j,k,l,i5,i6,i7] * Llate[i,j,k,l,i5,i6,i7]) /(totalpops[i,j,k,l,i5,i6,i7]+tol)
 
 dim(rate_Incidence) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(rate_Notification) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
