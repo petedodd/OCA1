@@ -93,7 +93,8 @@ known_parameters <- function(parname=NULL,quiet=FALSE){
     CDR_raw=list("CDR data in each stratum over time","ntimes, nage, nsex, nnat, nrisk, nopst, nstrain, nprot"),
     migr_TBD_raw=list("TB disease prevalence for immigrants over time (interpolated)","ntimes, nage, nsex"),
     migr_TBI_raw=list("TB infection prevalence for immigrants over time (interpolated)","ntimes, nage, nsex"),
-    betat_raw=list("Time-varying multiplier on transmission (force of infection)","ntimes")
+    betat_raw=list("Time-varying multiplier on transmission (force of infection)","ntimes"),
+    IRRnat=list("IRR for progression to TB disease by nativity class","nnat")
   )
   for(nm in names(OCA1::hyperparms)){
     tbparms[[nm]] <- list(hyperparms[[nm]][[3]],"scalar")

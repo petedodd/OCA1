@@ -40,7 +40,7 @@ check_dims <- function(parlist, dms){
   ans <- list()
   for(pname in parnames){
     ans[[pname]] <- FALSE
-    if(pname %in% c("migrage","propinitnat")){
+    if(pname %in% c("migrage","propinitnat","IRRnat")){
       ans[[pname]] <- (length(parlist[[pname]])==dms[2]) #nnat
     }
     if(pname %in% c("Pmigr_risk","propinitrisk","birthrisk")){

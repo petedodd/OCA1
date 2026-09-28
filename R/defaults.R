@@ -160,6 +160,9 @@ default_parameters <- function(parname, dms, verbose=FALSE){
   if (parname == "IRRprotn") {
     ans <- rep(1, dms[6]) #nprot
   }
+  if (parname == "IRRnat") {
+    ans <- rep(1, dms[2]) #nnat
+  }
   if(parname %in% c("propinitE","propinitL","propinitA","propinitS","propinitT")){
     ## template
     L <- 1-exp(-seq(from=2.5,by=5,length.out = length(OCA1::agz)) * 2.5e-3) #distribute by FOI flat prev ~10%
