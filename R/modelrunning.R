@@ -11,20 +11,27 @@
 ##' @param raw return the raw matrix ODE output or a data.table? (default FALSE)
 ##' @param singleout (default FALSE) return a single output, or a list of data.tables split by variable type (only if raw=FALSE)
 ##' @param verbose if TRUE, the time taken to run model and model fit metrics will be printed
+##' @param rtol relative error tolerance for the ODE solver (default NULL: the solver's own default, 1e-6 for deSolve)
+##' @param atol absolute error tolerance for the ODE solver (default NULL: the solver's own default, 1e-6 for deSolve)
+##' @details The solver adapts its internal steps to meet \code{rtol} and \code{atol}. With the defaults, outputs can change by small discrete amounts when a parameter changes slightly, which is harmless for a single run but makes finite-difference gradients (e.g. in optimisation for calibration) noisy. Tighter tolerances (e.g. \code{rtol = 1e-8, atol = 1e-8}) remove this at a modest cost in run time.
 ##' @return a matrix of timeseries
 ##' @author Pete Dodd
 ##' @useDynLib OCA1, .registration = TRUE
 ##' @import data.table
 ##' @export
-runmodel <- function(p, times, raw = FALSE, singleout = FALSE, verbose = FALSE) {
+runmodel <- function(p, times, raw = FALSE, singleout = FALSE, verbose = FALSE,
+                     rtol = NULL, atol = NULL) {
   if (missing(times)) {
     times <- seq(from = min(p$ttp), to = max(p$ttp), by = 0.1) # default times if not given
   }
   ## create model
   mdl <- ocaode$new(user=p)
+  ## solver tolerances: only passed on if given, so defaults are unchanged
+  tol <- list(rtol = rtol, atol = atol)
+  tol <- tol[!vapply(tol, is.null, logical(1))]
   ## run
   start_time <- Sys.time()
-  ans <- mdl$run(times)
+  ans <- do.call(mdl$run, c(list(times), tol))
   end_time <- Sys.time()
 
   if (!raw) { # convert to data.table
