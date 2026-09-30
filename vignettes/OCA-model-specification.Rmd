@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 
 # Purpose
 
-This R package supplies a tuberculosis (TB) transmission model that represents UK population dynamics and is intended to be flexible in what structural aspects it represents for particular problems. The aim is to provide an analytical tool to evaluate the economic and epidemiological impact of policy options. 
+This R package supplies a tuberculosis (TB) transmission model that represents UK population dynamics and is intended to be flexible in what structural aspects it represents for particular problems. The aim is to provide an analytical tool to evaluate the economic and epidemiological impact of policy options.
 
 # Structure
 
@@ -42,20 +42,20 @@ The overall strcture is represented in Figure 1. The TB layers follow a fairly s
 
 ## Layers
 
-Other aspects of structure are represented as layers, most of which have have numbers which can be specified by users. Technically, layers represent index values in multidimensional arrays. 
+Other aspects of structure are represented as layers, most of which have have numbers which can be specified by users. Technically, layers represent index values in multidimensional arrays.
 The following 7 aspects of structure are represented as layers:
 
-- Age (fixed): there are 17 5-year age groups, 0-4 years up to 80+ years 
+- Age (fixed): there are 17 5-year age groups, 0-4 years up to 80+ years
 - Sex (fixed): there are two genders (male, female)
 - Natal class (variable): this is to represent population sectors arriving from higher TB risk countries
-- Risk group (variable): this is to population sectors with social risk factors, or HIV/ART etc. 
+- Risk group (variable): this is to population sectors with social risk factors, or HIV/ART etc.
 - Post-TB (variable): this is to represent people who have previously had TB
 - Strain (variable): this is for explicit representation of drug-resistant strains
 - Protection (variable): this is to represent interventions like preventive therapy
 
 # Installation and use
 
-The model is maintained on GitHub at: [https://github.com/petedodd/OCA1](https://github.com/petedodd/OCA1). 
+The model is maintained on GitHub at: [https://github.com/petedodd/OCA1](https://github.com/petedodd/OCA1).
 
 
 ## Installation
@@ -64,10 +64,10 @@ Installing the package requires R to be setup to compile C code. If the R packag
 
 
 ```{r, eval=FALSE}
-devtools::install_github("petedodd/OCA1")
+pak::pkg_install("petedodd/OCA1")
 ```
 
-If the argument `build_vignettes=TRUE` is added to the above, and you have a working LaTeX installation, this document will be generated and can be found via 
+If the argument `build_vignettes = TRUE` is added to the above, and you have a working LaTeX installation, this document will be generated and can be found via
 
 ```{r,eval=FALSE}
 browseVignettes(package = "OCA1")
@@ -78,9 +78,9 @@ If it is not possible to compile C code on your system, you may ask a user of th
 
 Having installed the package, it can be loaded in the usual way and the `known_parameters()` function gives a read out with the parameters available for specification associated with each element of the structure:
 ```{r setup}
-library(OCA1) #load the package
+library(OCA1) # load the package
 
-##what parameters are available [with what dimensions]
+## what parameters are available [with what dimensions]
 known_parameters()
 ```
 In addition many of the functions have their own R man pages guiding use, although some are still in draft.
@@ -88,14 +88,14 @@ In addition many of the functions have their own R man pages guiding use, althou
 We have tried to minimize the load required by a user to specify parameters through a system of defaults:
 ```{r}
 ## example without nativity class used
-pms <- create_parms(verbose=TRUE) #create UK parameters
+pms <- create_parms(verbose = TRUE) # create UK parameters
 ```
 By default, there is only one layer for each of the variable structure elements. The more layers there are, the more ordinary differential equations (ODEs) the model uses, and therefore the slower it is.
 
 Going beyond defaults means specifying the number of layers for each aspect of structure, and providing parameter data associated with this structure within a separate list. The input lists are:
 
 - `migrationdata`: parameters to define migration dynamics
-- `riskdata`: parameters to define risk structure and dynamics 
+- `riskdata`: parameters to define risk structure and dynamics
 - `postdata`: parameters to define post-TB structure and dynamics
 - `straindata`: parameters to define aspects of strain structure
 - `protdata`: paraneters to define protection structure and dynamics
@@ -107,31 +107,34 @@ where lists, or items within lists, are not provided, appropriate dimension defa
 For example, to speciy 2 natal classes with 90% of people initially in the native-born layer, one would use:
 ```{r}
 # version with 2 static nativity classes
-pms <- create_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9,0.1)))
+pms <- create_parms(nnat = 2, migrationdata = list(propinitnat = c(0.9, 0.1)))
 ```
 
 
 To have two layers in the natal class and risk dimensions, one would use:
 ```{r}
 ## version with 2 static nativity classes and 2 static risk classes
-pms <- create_parms(nnat = 2, nrisk = 2,
-                    migrationdata = list(propinitnat = c(0.9,0.1)),
-                    riskdata = list(propinitrisk = c(0.9,0.1)))
+pms <- create_parms(
+  nnat = 2, nrisk = 2,
+  migrationdata = list(propinitnat = c(0.9, 0.1)),
+  riskdata = list(propinitrisk = c(0.9, 0.1))
+)
 ```
 
-If `verbose=TRUE`, the number of strata is stated. Having 2 layers in every dimension means having thousands of ODEs. 
+If `verbose=TRUE`, the number of strata is stated. Having 2 layers in every dimension means having thousands of ODEs.
 ```{r}
 ## go big version with all strata to some degree:
 pms <- create_parms(
   nnat = 2, nrisk = 2, npost = 2, nstrain = 2, nprot = 2,
-  migrationdata = list(propinitnat = c(0.9,0.1)),
-  riskdata = list(propinitrisk = c(0.9,0.1)),
-  straindata = list(propinitstrain = c(0.9,0.1)),
-  protdata = list(propinitprot = c(0.9,0.1)))
+  migrationdata = list(propinitnat = c(0.9, 0.1)),
+  riskdata = list(propinitrisk = c(0.9, 0.1)),
+  straindata = list(propinitstrain = c(0.9, 0.1)),
+  protdata = list(propinitprot = c(0.9, 0.1))
+)
 ```
 It is not really intended that all layers should be used at once, and doing so may easily result in a model that is not possible to run, or not possible to run fast enough to be practically useful.
 
-The years run over are set via the `tc` argument to `create_parms` which is `tc=1970:2020` by default. Some input parameters (e.g. migration rates, case detection rates) are arrays with a time dimension to capture their dynamics. These variables are automatically linearly interpolated within the model based on input data. 
+The years run over are set via the `tc` argument to `create_parms` which is `tc=1970:2020` by default. Some input parameters (e.g. migration rates, case detection rates) are arrays with a time dimension to capture their dynamics. These variables are automatically linearly interpolated within the model based on input data.
 
 As far as possible, we have tried to design checks for parameters provided to ensure that they make sense for the intended model structure.
 
@@ -141,12 +144,14 @@ For a given set of parameters, `runmodel` will run the model. By default, the ou
 
 ```{r}
 ## example without nativity class used
-pms <- create_parms(tbparms=list(staticfoi=1, foi=1e-2)) #create UK parameters
+pms <- create_parms(
+  tbparms = list(staticfoi = 1, foi = 1e-2)
+) # create UK parameters
 
-out <- runmodel(pms,verbose=TRUE)              #run model with these
-out                               #inspect
+out <- runmodel(pms, verbose = TRUE) # run model with these
+out # inspect
 ```
-With `verbose=TRUE` the model returns information including metrics of fit to the overall growth of the total population.
+With `verbose = TRUE` the model returns information including metrics of fit to the overall growth of the total population.
 
 
 ## Visualizing model output
@@ -156,12 +161,12 @@ We have provided a few plotting utilities for inspecting model output.
 In the case of demography, these compare model output (lines) against UK data (points) for total population :
 ```{r}
 ## visualize
-plt_DemoGrowth(out)               #total population over time
+plt_DemoGrowth(out) # total population over time
 ```
 
 and also for age/sex strata:
 ```{r,fig.dim = c(8, 6)}
-plt_DemoSnapshots(out)            #snapshots
+plt_DemoSnapshots(out) # snapshots
 ```
 
 There are analogous plotters for some TB aspects, which can specify splits by certain layers:
@@ -170,75 +175,270 @@ plt_TBSnapshots(out, by_layer = "natcat")
 ```
 
 Similarly for the different rates outputted by the model:
-```{r}
+```{r, eval = FALSE}
+## (not run since nonsense without better parameters)
+plt_TBRates(out, rate_type = "incidence", by_layer = "natcat")
+```
 
-plt_TBRates(out,rate_type = "incidence",by_layer = "natcat")
+## Solver tolerances
+
+`runmodel` solves the ODEs with an adaptive solver, which chooses its internal time steps to meet relative and absolute error tolerances (`rtol`, `atol`; by default the solver's own, 1e-6). With the defaults, outputs can change by small discrete amounts when a parameter changes very slightly. This is harmless for a single run, but it makes finite-difference gradients noisy, which matters when the model is calibrated by optimisation. Tighter tolerances remove the noise at a modest cost in run time:
+```{r}
+pms <- create_parms(tbparms = list(staticfoi = 1, foi = 1e-2))
+last_asymp <- function(o) sum(o[nrow(o), grep("^Asymp", colnames(o))])
+o_default <- runmodel(pms, raw = TRUE)
+o_tight <- runmodel(pms, raw = TRUE, rtol = 1e-8, atol = 1e-8)
+## relative difference in total asymptomatic TB at the end of the run
+last_asymp(o_tight) / last_asymp(o_default) - 1
 ```
 
 # Example use
 
-The following cases provide toy examples of particular use cases.
+The following cases provide examples of particular use cases:
 
-WIP
+- implementing in-migration and out-migration (a toy example);
+- time-varying TB inputs and a nativity-specific progression risk (a toy example);
+- a single run at parameter values calibrated to UK data, compared with notifications.
+
+The examples below use `data.table` and `ggplot2`:
+```{r, message=FALSE}
+library(data.table)
+library(ggplot2)
+```
 
 
-## Example of implementing in-migration and out-migration 
+## Example of implementing in-migration and out-migration
 
 First let's generate dummy migration data. Assuming that both in-migration and out-migration follow a polynomial distribution as  function of year :
 
 $$
-Y(t) = \beta_0 + \beta_1 t + \beta_2 t^2 
+Y(t) = \beta_0 + \beta_1 t + \beta_2 t^2
 $$
 
-Plugging the following  $\beta$ coefficients into the above equation, we can generate in-migration and outmigration dummy data as in below: 
+Plugging the following  $\beta$ coefficients into the above equation, we can generate in-migration and outmigration dummy data as in below:
 
 
 ```{r}
 ## create dummy parameters with 2 natal classes:
-pms <- create_parms(nnat = 2, 
-                    migrationdata = list(propinitnat = c(0.9,0.1)))
+pms <- create_parms(
+  nnat = 2,
+  migrationdata = list(propinitnat = c(0.9, 0.1))
+)
+
 
 ## dummy data:
-Year   <-1970:2020
+Year <- 1970:2020
 ## in-migration numbers from countries of interest
-inmigr <- (5.114998e+05 - 5.238264e+02*Year +  1.341414e-01*Year^2)/10
-## out-migration hazard for countries of interest
-emigr  <- (3.127034e+05 - 3.170702e+02*Year +  8.043165e-02*Year^2)/1e6
+inmigr <- (5.114998e+05 - 5.238264e+02 * Year + 1.341414e-01 * Year^2) / 10
 
-plot(Year,inmigr,type="l") #look
+## out-migration hazard for countries of interest
+emigr <- (3.127034e+05 - 3.170702e+02 * Year + 8.043165e-02 * Year^2) / 1e6
+
+plot(Year, inmigr, type = "l") # look
 
 ## age/sex patterns (use same pattern in/out)
-prop_males <- c(rep(c(1,2,3.5,5.5,5,3,2,1), each=2),1)/100
-prop_females <-c(rep(c(1,2,4,6,5,3.5,2.5,1.5), each=2),2)/100
+prop_males <- c(rep(c(1, 2, 3.5, 5.5, 5, 3, 2, 1), each = 2), 1) / 100
+prop_females <- c(rep(c(1, 2, 4, 6, 5, 3.5, 2.5, 1.5), each = 2), 2) / 100
+
 
 ## create toy data
-imig <- array(0, dim= dim(pms[["immigration"]]), 
-              dimnames =dimnames(pms[["immigration"]]))
-emig <- array(0, dim= dim(pms[["exmigrate"]]), 
-               dimnames =dimnames(pms[["exmigrate"]]))
-imig[, , 1] <- inmigr * prop_males  
-imig[, , 2] <- inmigr * prop_females  
-emig[, , 1, 2] <- emigr * prop_males  # Males
-emig[, , 2, 2] <- emigr * prop_females  # Females
+imig <- array(0,
+  dim = dim(pms[["immigration"]]),
+  dimnames = dimnames(pms[["immigration"]])
+)
 
+emig <- array(0,
+  dim = dim(pms[["exmigrate"]]),
+  dimnames = dimnames(pms[["exmigrate"]])
+)
+imig[, , 1] <- inmigr * prop_males
+imig[, , 2] <- inmigr * prop_females
+emig[, , 1, 2] <- emigr * prop_males # Males
+emig[, , 2, 2] <- emigr * prop_females # Females
 ```
 
 We can now call the parameter generating function and update the migration inputs as below:
 
 ```{r}
-pms <- create_parms(nnat = 2, 
-                    migrationdata = 
-                    list(propinitnat = c(0.9,0.1),
-                    immigration = imig,
-                    exmigrate = emig))
+pms <- create_parms(
+  nnat = 2,
+  migrationdata =
+    list(
+      propinitnat = c(0.9, 0.1),
+      immigration = imig,
+      exmigrate = emig
+    )
+)
 
-out <- runmodel(pms,verbose=TRUE) 
 
+out <- runmodel(pms, verbose = TRUE)
 ```
-The model fit to overall demographic growth remains good (see fit statistics). 
+The model fit to overall demographic growth remains good (see fit statistics).
 Further refinement would be needed to specify the prevalence of TB infection and disease among in-migrants.
 Interventions would then be specified via time-dependent rates for the relevant parameters.
-More complex natal structures are possible, e.g. `nnat=3` with ageing through from 'recent' arrivals to 'established', with corresponding waning in the relative risk of progression to TB disease.
+More complex natal structures are possible, e.g. `nnat = 3` with ageing through from 'recent' arrivals to 'established', with corresponding waning in the relative risk of progression to TB disease.
+
+## Example of time-varying TB inputs and nativity-specific progression
+
+Several TB inputs can vary over time. They are given with one row per year of `tc` and are linearly interpolated within the model:
+
+- `betat_raw`: a multiplier on the force of infection (length `length(tc)`, default all ones), e.g. for reduced contact during COVID-19 restrictions;
+- `CDR_raw`: the case detection ratio, by time, age, sex and nativity class;
+- `migr_TBD_raw`, `migr_TBI_raw`: the prevalence of TB disease and TB infection among arriving migrants, by time, age and sex.
+
+In addition, `IRRnat` (length `nnat`, default all ones) multiplies the rates of progression from both latent states by nativity class, e.g. for a higher risk of progression soon after migration.
+
+These are all passed through `tbparms`. Continuing the migration example above, the following doubles progression in natal class 2, reduces transmission by 20% in 2020, and reduces case detection by 10% in 2020:
+```{r}
+tc <- 1970:2020
+cdr <- pms$CDR_raw
+cdr[tc == 2020, , , , , , , ] <- 0.9 * cdr[tc == 2020, , , , , , , ]
+pms_tv <- create_parms(
+  nnat = 2,
+  migrationdata =
+    list(
+      propinitnat = c(0.9, 0.1),
+      immigration = imig,
+      exmigrate = emig
+    ),
+  tbparms = list(
+    IRRnat = c(1, 2),
+    betat_raw = ifelse(tc == 2020, 0.8, 1),
+    CDR_raw = cdr
+  )
+)
+```
+
+Notification counts by natal class can be computed from the notification rate output (per 100,000) and the population (in thousands). The rate is annualised, so the model is run with annual output times (`times = tc`) rather than the default steps of 0.1 years:
+```{r}
+notifications_by_natcat <- function(out) {
+  strat <- c(
+    "t", "AgeGrp", "sex", "natcat", "risk", "post", "strain",
+    "prot"
+  )
+  pop <- out$state[, .(pop = sum(value)), by = strat]
+  nr <- merge(out$rate[state == "rate_Notification"], pop, by = strat)
+  nr[, .(notifications = sum(1000 * value / 1e5 * pop)),
+    by = .(year = round(t), natcat)
+  ]
+}
+
+both <- rbind(
+  cbind(
+    scenario = "baseline",
+    notifications_by_natcat(runmodel(pms, times = tc))
+  ),
+  cbind(
+    scenario = "time-varying inputs",
+    notifications_by_natcat(runmodel(pms_tv, times = tc))
+  )
+)
+```
+```{r, fig.dim = c(8, 4)}
+ggplot(both[year >= 2000], aes(year, notifications, colour = scenario)) +
+  geom_line() +
+  facet_wrap(~natcat, scales = "free_y", labeller = label_both) +
+  ylab("Notifications per year") +
+  xlab("") +
+  theme_light() +
+  theme(legend.position = "top", legend.title = element_blank())
+```
+
+## Example of a single run at calibrated values, compared with UK data
+
+The package includes a complete parameter set from a calibration of the model to England TB notifications by place of birth, 2000 to 2024 (the separate UKTB_fitting project). It is a maximum a posteriori (MAP) point estimate, not a posterior, and it will change as that calibration develops; `data-raw/uk_calibrated_example.R` rebuilds it. The structure is `nnat = 3`: UK born, recent arrivals (about the first 5 years) and established arrivals, with migration inputs from ONS and Home Office data, time-varying arrival prevalence, pre-entry screening, and COVID-19 terms for detection and transmission.
+```{r}
+ex <- readRDS(
+  system.file("extdata", "uk_calibrated_example.rds",
+    package = "OCA1"
+  )
+)
+
+ex$source
+p <- ex$parms
+p$IRRnat # progression rate ratios by natal class
+data.frame(
+  year = 2018:2023,
+  betat = p$betat_raw[p$ttp %in% 2018:2023],
+  CDR = p$CDR_raw[p$ttp %in% 2018:2023, 1, 1, 1, 1, 1, 1, 1]
+)
+```
+
+Some of the fitted values (natural scale):
+```{r}
+fp <- c(
+  ex$fitted$tbparms[c(
+    "progn_fast", "progn_slow", "stabilization",
+    "relapse", "progn_symp", "symptb_inversedurn"
+  )],
+  ex$fitted$extra[c(
+    "irr_recent", "irr_established",
+    "migr_TBI_mult", "migr_TBD_mult",
+    "transmission_scale", "secular_decline"
+  )]
+)
+
+knitr::kable(data.frame(parameter = names(fp), value = signif(unlist(fp), 3)),
+  row.names = FALSE
+)
+```
+
+The model is run as usual (here with tight solver tolerances, as in the calibration):
+```{r}
+out_uk <- runmodel(p, times = 1950:2024, rtol = 1e-8, atol = 1e-8)
+nt <- notifications_by_natcat(out_uk)[year >= 2000]
+nt <- nt[, .(oca1 = sum(notifications)),
+  by = .(year, nativity = ifelse(natcat == 1, "ukborn", "nonukborn"))
+]
+```
+
+The model represents the UK, while the data are for England, and the calibration applies some terms outside the model. The comparison with data therefore needs these observation terms (in `ex$adjust` and `ex$targets`):
+
+- `england_scale`: the England / UK population ratio (about 0.84 to 0.86);
+- `secular_mult`: a shared decline in notifications from 2011, fitted in the calibration, for all nativity classes (a term acting on the output only);
+- `hiv_nonuk`: HIV-associated TB, added to non-UK-born notifications from surveillance data (the model has no HIV stratum);
+- `known_share`: the share of notifications with a known place of birth, since the data by place of birth exclude the rest (15% in 2000, 1% from 2017).
+
+```{r}
+d <- merge(nt, ex$adjust, by = "year")
+d <- merge(d, ex$targets, by = c("year", "nativity"))
+d[, `:=`(
+  scaled = oca1 * england_scale * known_share,
+  calibrated = (oca1 * england_scale * secular_mult +
+    ifelse(nativity == "nonukborn", hiv_nonuk, 0)) *
+    known_share
+)]
+
+## check: reproduces the calibration's own expected counts
+chk <- merge(d, ex$sim,
+  by = c("year", "nativity"),
+  suffixes = c("", "_map")
+)
+
+max(abs(chk[, calibrated / known_share / n_notified_map - 1]))
+```
+```{r, fig.dim = c(8, 4)}
+pd <- melt(d[, .(year, nativity, scaled, calibrated)],
+  id.vars = c("year", "nativity"), variable.name = "model"
+)
+
+lab <- c(
+  scaled = "OCA1 output, England scaled",
+  calibrated = "with calibration's observation terms"
+)
+
+pd[, model := lab[as.character(model)]]
+ggplot(pd, aes(year, value)) +
+  geom_line(aes(colour = model, linetype = model)) +
+  scale_linetype_manual(values = setNames(c("dashed", "solid"), lab)) +
+  geom_point(data = d, aes(y = n_notified)) +
+  facet_wrap(~nativity, scales = "free_y") +
+  ylab("Notifications per year (known place of birth)") +
+  xlab("") +
+  theme_light() +
+  theme(legend.position = "top", legend.title = element_blank())
+```
+Points are the UKHSA data (TB in England 2025, Supplementary Table 9). The dashed line is the model itself, and shows what the model's own dynamics produce; the solid line adds the terms applied outside the model. Most of the difference after 2011 is the shared secular decline, which has no mechanism in the model yet.
 
 
 
@@ -282,7 +482,7 @@ Here, the parameters have the following meanings:
 - $\delta^A$: asymptomatic TB detection rate
 - $\omega$: symtompatic TB detection + self-cure + mortality rate
 - $d$: durations of TB treatment
-- $TS$: treatment starts (TODO see below) 
+- $TS$: treatment starts (TODO see below)
 - $TL$: flow to latent from treatment completion (TODO see below)
 - $TA$: flow to asymptomatic from treatment completion (TODO see below)
 
@@ -296,11 +496,13 @@ $$
 \end{aligned}
 $$
 
-The force-of-infection, $\lambda$, if not running in static mode, 
+The force-of-infection, $\lambda$, if not running in static mode,
 $$
-\lambda_{asnrqp}(t) = \sum_{a's'n'r'q'p'}\beta_{asnrqp;a's'n'r'q'p'}\left(\frac{\alpha A_{a's'n'r'q'p'}+D_{a's'n'r'q'p'}}{N}\right) 
+\lambda_{asnrqp}(t) = \sum_{a's'n'r'q'p'}\beta_{asnrqp;a's'n'r'q'p'}\left(\frac{\alpha A_{a's'n'r'q'p'}+D_{a's'n'r'q'p'}}{N}\right)
 $$
-This parametrization is used so that random mixing matrices are more easily specified without knowing relative subpopulation sizes.
+This parametrization is used so that random mixing matrices are more easily specified without knowing relative subpopulation sizes. The force of infection is further multiplied by a time-varying factor $\beta_t(t)$ (`betat_raw`, default 1).
+
+The progression rates $p$ (from $E$) and $\epsilon$ (from $L$) are multiplied by rate ratios by natal class, $\kappa_n$ (`IRRnat`, default 1), as well as by strain and protection (`IRRstrain`, `IRRprotn`).
 
 Mixing is assumed to depend on age, sex, natal class, risk group and strain, with the effective contact rate modelled as a tensor product:
 
@@ -309,7 +511,31 @@ $$
 $$
 
 
-The table below (TODO) relates this notation of this section to the naming conventions used in the model.
+The table below relates the notation of this section to the names used in the model (see also `known_parameters()` and `OCA1::hyperparms`). This is a draft: entries marked (check) need confirming against `inst/odin/ocaode.R`.
+
+| Symbol | Name in model | Meaning |
+|---|---|---|
+| $s$ | `stabilization` | stabilization rate, fast to slow latent (per year) |
+| $p$ | `progn_fast` | fast latent progression rate to TB disease (per year) |
+| $\epsilon$ | `progn_slow` | slow latent progression rate to TB disease (per year) |
+| $\kappa_n$ | `IRRnat` | progression rate ratio by natal class |
+| $v$ | `tbi_protn` | protection against reinfection disease from TB infection |
+| $\rho$ | `relapse` | relapse rate (per year) |
+| $\psi$ | `symptb_CFR` | case fatality ratio for untreated TB |
+| $1/\tau$ | `symptb_inversedurn` | inverse natural duration of untreated symptomatic TB |
+| $f$ | `progn_symp` | progression rate, asymptomatic to symptomatic TB (per year) |
+| $\delta^A$ | `detect_asymp` | detection rate of asymptomatic TB (default 0) |
+| $\omega$ | `symptb_inversedurn / (1 - CDR)` | exit rate from symptomatic TB: detection, self-cure and death, with `CDR_raw` the share detected |
+| $1/d$ | `treatment_inversedurn` | inverse duration of TB treatment |
+| $\alpha$ | `asymp_relinf` | relative infectiousness of asymptomatic TB |
+| $\beta^{\cdot}$ | `BETAage`, `BETAsex`, `BETAnat`, `BETArisk`, `BETAstrain` | mixing matrices |
+| $\beta_t(t)$ | `betat_raw` | time-varying multiplier on the force of infection |
+| $b$ | `BB` | births (check) |
+| $I$, $\iota$ | `immigration`, `migr_TBI_raw`, `migr_TBD_raw`, `migr_splitEL`, `migr_splitAS` | in-migration numbers, and TB infection and disease among arrivals, split early/late and asymptomatic/symptomatic |
+| $\Omega$ | `exmigrate` | out-migration hazard |
+| $m_n$ | `migrage` | rate of moving between natal classes |
+| $h$ | `RiskHazardData` | risk group progression hazard (check) |
+| $\pi$ | `progn_posttb` | progression through post-TB layers |
 
 
 
