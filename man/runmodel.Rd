@@ -4,7 +4,15 @@
 \alias{runmodel}
 \title{runmodel}
 \usage{
-runmodel(p, times, raw = FALSE, singleout = FALSE, verbose = FALSE)
+runmodel(
+  p,
+  times,
+  raw = FALSE,
+  singleout = FALSE,
+  verbose = FALSE,
+  rtol = NULL,
+  atol = NULL
+)
 }
 \arguments{
 \item{p}{parameter list}
@@ -16,6 +24,10 @@ runmodel(p, times, raw = FALSE, singleout = FALSE, verbose = FALSE)
 \item{singleout}{(default FALSE) return a single output, or a list of data.tables split by variable type (only if raw=FALSE)}
 
 \item{verbose}{if TRUE, the time taken to run model and model fit metrics will be printed}
+
+\item{rtol}{relative error tolerance for the ODE solver (default NULL: the solver's own default, 1e-6 for deSolve)}
+
+\item{atol}{absolute error tolerance for the ODE solver (default NULL: the solver's own default, 1e-6 for deSolve)}
 }
 \value{
 a matrix of timeseries
@@ -25,6 +37,8 @@ A Simple Wrapper to Run Model
 }
 \details{
 content for details here
+
+The solver adapts its internal steps to meet \code{rtol} and \code{atol}. With the defaults, outputs can change by small discrete amounts when a parameter changes slightly, which is harmless for a single run but makes finite-difference gradients (e.g. in optimisation for calibration) noisy. Tighter tolerances (e.g. \code{rtol = 1e-8, atol = 1e-8}) remove this at a modest cost in run time.
 }
 \author{
 Pete Dodd
