@@ -170,14 +170,14 @@ dim(symp_tbend) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
 deriv(Uninfected[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogU[i,j,k,l,i5,i6,i7] - HI[i,j,k,l,i5,i6,i7] * Uninfected[i,j,k,l,i5,i6,i7]
 
 ## Early TBI
-deriv(Learly[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogE[i, j, k, l, i5, i6, i7] + HI[i, j, k, l, i5, i6, i7] * Uninfected[i, j, k, l, i5, i6, i7] - stabilization * Learly[i, j, k, l, i5, i6, i7] - fastprog[i, j, k, l, i5, i6, i7] * Learly[i, j, k, l, i5, i6, i7] + HI[i, j, k, l, i5, i6, i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7]
+deriv(Learly[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogE[i, j, k, l, i5, i6, i7] + HI[i, j, k, l, i5, i6, i7] * Uninfected[i, j, k, l, i5, i6, i7] - stabilization * Learly[i, j, k, l, i5, i6, i7] - fastprog[i, j, k, l, i5, i6, i7] * progt_fast[i, k] * Learly[i, j, k, l, i5, i6, i7] + HI[i, j, k, l, i5, i6, i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7]
 
 ## Late TBI
-deriv(Llate[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogL[i, j, k, l, i5, i6, i7] + stabilization * Learly[i, j, k, l, i5, i6, i7] - slowprog[i, j, k, l, i5, i6, i7] * Llate[i, j, k, l, i5, i6, i7] + fromtreatmentL[i, j, k, l, i5, i6, i7] - relapsefrompost[i, j, k, l, i5, i6, i7] - HI[i,j,k,l,i5,i6,i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7] + (1 - symptb_CFR) * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
+deriv(Llate[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot]) <- demogL[i, j, k, l, i5, i6, i7] + stabilization * Learly[i, j, k, l, i5, i6, i7] - slowprog[i, j, k, l, i5, i6, i7] * progt_slow[i, k] * Llate[i, j, k, l, i5, i6, i7] + fromtreatmentL[i, j, k, l, i5, i6, i7] - relapsefrompost[i, j, k, l, i5, i6, i7] - HI[i,j,k,l,i5,i6,i7] * tbi_protn * Llate[i, j, k, l, i5, i6, i7] + (1 - symptb_CFR) * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
 ## TODO wiring to post TB for undetected?
 
 ## Asymptomatic TB disease
-deriv(Asymp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogA[i,j,k,l,i5,i6,i7] + fastprog[i, j, k, l, i5, i6, i7] * Learly[i,j,k,l,i5,i6,i7] + slowprog[i, j, k, l, i5, i6, i7] * Llate[i,j,k,l,i5,i6,i7] - progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_asymp * Asymp[i,j,k,l,i5,i6,i7] + fromtreatmentA[i,j,k,l,i5,i6,i7] + relapsefrompost[i,j,k,l,i5,i6,i7]
+deriv(Asymp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogA[i,j,k,l,i5,i6,i7] + fastprog[i, j, k, l, i5, i6, i7] * progt_fast[i, k] * Learly[i,j,k,l,i5,i6,i7] + slowprog[i, j, k, l, i5, i6, i7] * progt_slow[i, k] * Llate[i,j,k,l,i5,i6,i7] - progn_symp * Asymp[i,j,k,l,i5,i6,i7] - detect_asymp * Asymp[i,j,k,l,i5,i6,i7] + fromtreatmentA[i,j,k,l,i5,i6,i7] + relapsefrompost[i,j,k,l,i5,i6,i7]
 
 ## Symptomatic TB disease
 deriv(Symp[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <- demogS[i,j,k,l,i5,i6,i7] + progn_symp * Asymp[i,j,k,l,i5,i6,i7] - symp_tbend[i,j,k,l,i5,i6,i7]
@@ -201,6 +201,21 @@ IRRnat[] <- user()
 dim(IRRstrain) <- nstrain
 dim(IRRprotn) <- nprot
 dim(IRRnat) <- nnat
+## time-varying multipliers on progression by age and nativity class,
+## e.g. a secular change in reactivation risk with population health;
+## one row per ttp, default all ones = no effect. progt_slow_raw acts
+## on slow progression (reactivation, from Llate), progt_fast_raw on
+## fast progression (from Learly). Applied where fastprog/slowprog
+## are used (not inside them) so that those full arrays stay constant
+## and are not recomputed at every step.
+progt_slow_raw[, , ] <- user()
+progt_fast_raw[, , ] <- user()
+dim(progt_slow_raw) <- c(lttp, nage, nnat)
+dim(progt_fast_raw) <- c(lttp, nage, nnat)
+progt_slow[, ] <- interpolate(ttp, progt_slow_raw, "linear")
+progt_fast[, ] <- interpolate(ttp, progt_fast_raw, "linear")
+dim(progt_slow) <- c(nage, nnat)
+dim(progt_fast) <- c(nage, nnat)
 fastprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_fast * IRRnat[k] * IRRstrain[i6] * IRRprotn[i7]
 slowprog[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- progn_slow * IRRnat[k] * IRRstrain[i6] * IRRprotn[i7]
 dim(fastprog) <- c(nage, 2, nnat, nrisk, npost, nstrain, nprot)
@@ -217,9 +232,9 @@ output(rate_Notification[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <
 rate_TBmortality[1:nage, 1:2, 1:nnat, 1:nrisk, 1:npost, 1:nstrain, 1:nprot] <- mortality_treated * treatmentends[i, j, k, l, i5, i6, i7] + symptb_CFR * symptb_inversedurn * Symp[i, j, k, l, i5, i6, i7]
 output(rate_TBmortality) <- TRUE
 ## uses the stratum-specific fastprog/slowprog (so IRRstrain, IRRprotn
-## and IRRnat are included); previously used progn_fast/progn_slow
+## and IRRnat are included) and the progt multipliers; previously used progn_fast/progn_slow
 ## directly, which ignored the IRRs in this output (dynamics were right)
-output(rate_Incidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(fastprog[i,j,k,l,i5,i6,i7] * Learly[i,j,k,l,i5,i6,i7] + slowprog[i,j,k,l,i5,i6,i7] * Llate[i,j,k,l,i5,i6,i7]) /(totalpops[i,j,k,l,i5,i6,i7]+tol)
+output(rate_Incidence[1:nage,1:2,1:nnat,1:nrisk,1:npost,1:nstrain,1:nprot]) <-  1e5*(fastprog[i,j,k,l,i5,i6,i7] * progt_fast[i, k] * Learly[i,j,k,l,i5,i6,i7] + slowprog[i,j,k,l,i5,i6,i7] * progt_slow[i, k] * Llate[i,j,k,l,i5,i6,i7]) /(totalpops[i,j,k,l,i5,i6,i7]+tol)
 
 dim(rate_Incidence) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)
 dim(rate_Notification) <- c(nage,2,nnat,nrisk,npost,nstrain,nprot)

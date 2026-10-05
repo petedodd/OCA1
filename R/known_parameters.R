@@ -94,6 +94,8 @@ known_parameters <- function(parname=NULL,quiet=FALSE){
     migr_TBD_raw=list("TB disease prevalence for immigrants over time (interpolated)","ntimes, nage, nsex"),
     migr_TBI_raw=list("TB infection prevalence for immigrants over time (interpolated)","ntimes, nage, nsex"),
     betat_raw=list("Time-varying multiplier on transmission (force of infection)","ntimes"),
+    progt_slow_raw=list("Time-varying multiplier on slow progression (reactivation) by age and nativity class","ntimes, nage, nnat"),
+    progt_fast_raw=list("Time-varying multiplier on fast progression by age and nativity class","ntimes, nage, nnat"),
     IRRnat=list("IRR for progression to TB disease by nativity class","nnat")
   )
   for(nm in names(OCA1::hyperparms)){
