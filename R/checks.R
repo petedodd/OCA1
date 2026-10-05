@@ -1,5 +1,3 @@
-
-
 ## a utility to check probabilities are valid
 check_probabilities <- function(params, checksum = TRUE) {
   # 1. Check for numeric type:
@@ -34,53 +32,57 @@ lenordim2 <- function(X) ifelse(is.null(dim(X)), length(X), dim(X)[2])
 
 
 ## utility to check lengths
-check_dims <- function(parlist, dms){
+check_dims <- function(parlist, dms) {
   ## dms = c(ntimes, nnat, nrisk, npost, nstrain, nprot)
   parnames <- names(parlist)
   ans <- list()
-  for(pname in parnames){
+  for (pname in parnames) {
     ans[[pname]] <- FALSE
-    if(pname %in% c("migrage","propinitnat","IRRnat")){
-      ans[[pname]] <- (length(parlist[[pname]])==dms[2]) #nnat
+    if (pname %in% c("migrage", "propinitnat", "IRRnat")) {
+      ans[[pname]] <- (length(parlist[[pname]]) == dms[2]) # nnat
     }
-    if(pname %in% c("Pmigr_risk","propinitrisk","birthrisk")){
-      ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[3]) #nrisk
+    if (pname %in% c("Pmigr_risk", "propinitrisk", "birthrisk")) {
+      ans[[pname]] <- (lenordim2(parlist[[pname]]) == dms[3]) # nrisk
     }
-    if(pname %in% c("Pmigr_post","propinitpost","progn_posttb")){
-      ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[4]) #npost
+    if (pname %in% c("Pmigr_post", "propinitpost", "progn_posttb")) {
+      ans[[pname]] <- (lenordim2(parlist[[pname]]) == dms[4]) # npost
     }
-    if(pname %in% c("Pmigr_strain","propinitstrain", "IRRstrain")){
-      ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[5]) #nstrain
+    if (pname %in% c("Pmigr_strain", "propinitstrain", "IRRstrain")) {
+      ans[[pname]] <- (lenordim2(parlist[[pname]]) == dms[5]) # nstrain
     }
-    if(pname %in% c("Pmigr_prot","propinitprot", "IRRprotn")){
-      ans[[pname]] <- (lenordim2(parlist[[pname]])==dms[6]) #nprotn
+    if (pname %in% c("Pmigr_prot", "propinitprot", "IRRprotn")) {
+      ans[[pname]] <- (lenordim2(parlist[[pname]]) == dms[6]) # nprotn
     }
     ## now test dim 1s:
-    if(pname %in% c("Pmigr_risk","Pmigr_post","Pmigr_strain","Pmigr_prot")){
-      if (ans[[pname]]) {                                       #passed on dim 2
+    if (pname %in% c("Pmigr_risk", "Pmigr_post", "Pmigr_strain", "Pmigr_prot")) {
+      if (ans[[pname]]) { # passed on dim 2
         ans[[pname]] <- (dim(parlist[[pname]])[1] == 2) # nsex
       }
     }
-    if(pname %in% c("migr_TBD_raw","migr_TBI_raw")){
+    if (pname %in% c("migr_TBD_raw", "migr_TBI_raw")) {
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2))
     }
-    if(pname %in% c("betat_raw")){
-      ans[[pname]] <- is.null(dim(parlist[[pname]])) &&
-        length(parlist[[pname]]) == dms[1] #ntimes
+    if (pname %in% c("progt_slow_raw", "progt_fast_raw")) {
+      ans[[pname]] <- all(dim(parlist[[pname]]) ==
+        c(dms[1], length(OCA1::agz), dms[2])) # ntimes, nage, nnat
     }
-    if(pname %in% c("immigration")){
+    if (pname %in% c("betat_raw")) {
+      ans[[pname]] <- is.null(dim(parlist[[pname]])) &&
+        length(parlist[[pname]]) == dms[1] # ntimes
+    }
+    if (pname %in% c("immigration")) {
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2))
     }
     if (pname %in% c("exmigrate")) {
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2, dms[2]))
     }
-    if(pname=="RiskHazardData"){
-      ans[[pname]] <- all(dim(parlist[[pname]])==c(dms[1], length(OCA1::agz), 2, dms[3]))
+    if (pname == "RiskHazardData") {
+      ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2, dms[3]))
     }
-    if(pname=="CDR_raw"){
+    if (pname == "CDR_raw") {
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(dms[1], length(OCA1::agz), 2, dms[2:6]))
     }
-    if(pname %in% c("propinitE","propinitL","propinitA","propinitS","propinitT")){ #ALL non-time dims
+    if (pname %in% c("propinitE", "propinitL", "propinitA", "propinitS", "propinitT")) { # ALL non-time dims
       ans[[pname]] <- all(dim(parlist[[pname]]) == c(length(OCA1::agz), 2, dms[2:6]))
     }
     if (pname == "BETAage") {
@@ -90,7 +92,7 @@ check_dims <- function(parlist, dms){
       ans[[pname]] <- all(dim(parlist[[pname]]) == rep(2, 2))
     }
     if (pname == "BETAnat") {
-      ans[[pname]] <- all(dim(parlist[[pname]]) == rep(dms[2], 2)) #nnat
+      ans[[pname]] <- all(dim(parlist[[pname]]) == rep(dms[2], 2)) # nnat
     }
     if (pname == "BETArisk") {
       ans[[pname]] <- all(dim(parlist[[pname]]) == rep(dms[3], 2)) # nrisk
@@ -98,6 +100,6 @@ check_dims <- function(parlist, dms){
     if (pname == "BETAstrain") {
       ans[[pname]] <- all(dim(parlist[[pname]]) == rep(dms[5], 2)) # nstrain
     }
-  } #end loop over list names
+  } # end loop over list names
   unlist(ans)
 }

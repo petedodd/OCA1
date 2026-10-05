@@ -1,65 +1,68 @@
-
 ## utility for defaults: [1,0,0,...] or just 1
-hotone <- function(n){
-  ans <- rep(0,n)
+hotone <- function(n) {
+  ans <- rep(0, n)
   ans[1] <- 1
   ans
 }
 
 ## a utility to construct default values for unsupplied parameters/data
-default_parameters <- function(parname, dms, verbose=FALSE){
-
+default_parameters <- function(parname, dms, verbose = FALSE) {
   ## dms = c(ntimes, nnat, nrisk, npost, nstrain, nprot)
-  if(verbose) message("Using default value for ",parname,"...")
+  if (verbose) message("Using default value for ", parname, "...")
   ans <- NA
-  if(parname %in% c("migrage")){
-    ans <- rep(0,dms[2]) #nnat
+  if (parname %in% c("migrage")) {
+    ans <- rep(0, dms[2]) # nnat
   }
-  if(parname %in% c("propinitnat")){
-    ans <- hotone(dms[2]) #nnat
+  if (parname %in% c("propinitnat")) {
+    ans <- hotone(dms[2]) # nnat
   }
-  if(parname %in% c("Pmigr_risk","propinitrisk","birthrisk")){
-    ans <- hotone(dms[3]) #nrisk
+  if (parname %in% c("Pmigr_risk", "propinitrisk", "birthrisk")) {
+    ans <- hotone(dms[3]) # nrisk
   }
-  if(parname %in% c("Pmigr_post","propinitpost")){
-    ans <- hotone(dms[4]) #npost
+  if (parname %in% c("Pmigr_post", "propinitpost")) {
+    ans <- hotone(dms[4]) # npost
   }
-  if(parname %in% c("Pmigr_strain","propinitstrain")){
-    ans <- hotone(dms[5]) #nstrain
+  if (parname %in% c("Pmigr_strain", "propinitstrain")) {
+    ans <- hotone(dms[5]) # nstrain
   }
-  if(parname %in% c("Pmigr_prot","propinitprot")){
-    ans <- hotone(dms[6]) #nprotn
+  if (parname %in% c("Pmigr_prot", "propinitprot")) {
+    ans <- hotone(dms[6]) # nprotn
   }
   ## these need bumping up to duplicate by sex
-  if(parname %in% c("Pmigr_risk","Pmigr_post","Pmigr_strain","Pmigr_prot")){
-    ans <- rbind(ans,ans) #one for each sex
+  if (parname %in% c("Pmigr_risk", "Pmigr_post", "Pmigr_strain", "Pmigr_prot")) {
+    ans <- rbind(ans, ans) # one for each sex
   }
-  if(parname %in% c("migr_TBD_raw","migr_TBI_raw")){
+  if (parname %in% c("migr_TBD_raw", "migr_TBI_raw")) {
     ## default is CONSTANT over time (dms[1] = ntimes) -- same
     ## age/sex prevalence pattern as before, just replicated across
     ## the time dimension so callers who don't need time-variation
     ## get identical behaviour to the pre-time-varying version
     base <- array(1,
-                 dim = c(length(OCA1::agz), 2),
-                 dimnames = list(
-                   acat = OCA1::agz,
-                   sex = c("M", "F")
-                 )
-                 )
-    base[1:3,] <- 0 #default nothing in children
-    if(parname %in% c("migr_TBD_raw")){
-      base <- (100/1e5) * base #default prevalence
+      dim = c(length(OCA1::agz), 2),
+      dimnames = list(
+        acat = OCA1::agz,
+        sex = c("M", "F")
+      )
+    )
+    base[1:3, ] <- 0 # default nothing in children
+    if (parname %in% c("migr_TBD_raw")) {
+      base <- (100 / 1e5) * base # default prevalence
     }
-    if(parname %in% c("migr_TBI_raw")){
-      base <- 0.3 * base #default prevalence
+    if (parname %in% c("migr_TBI_raw")) {
+      base <- 0.3 * base # default prevalence
     }
     ans <- array(rep(as.vector(base), each = dms[1]),
-                 dim = c(dms[1], length(OCA1::agz), 2))
+      dim = c(dms[1], length(OCA1::agz), 2)
+    )
   }
-  if(parname %in% c("betat_raw")){
-    ans <- rep(1, dms[1]) #ntimes; all ones = no change to transmission
+  if (parname %in% c("betat_raw")) {
+    ans <- rep(1, dms[1]) # ntimes; all ones = no change to transmission
   }
-  if(parname %in% c("immigration")){
+  if (parname %in% c("progt_slow_raw", "progt_fast_raw")) {
+    ## ntimes x nage x nnat; all ones = no change to progression
+    ans <- array(1, dim = c(dms[1], length(OCA1::agz), dms[2]))
+  }
+  if (parname %in% c("immigration")) {
     ans <- array(0,
       dim = c(dms[1], length(OCA1::agz), 2),
       dimnames = list(
@@ -67,7 +70,7 @@ default_parameters <- function(parname, dms, verbose=FALSE){
         acat = OCA1::agz,
         sex = c("M", "F")
       )
-      )
+    )
   }
   if (parname %in% c("exmigrate")) {
     ans <- array(0,
@@ -80,7 +83,7 @@ default_parameters <- function(parname, dms, verbose=FALSE){
       )
     )
   }
-  if(parname == "RiskHazardData"){
+  if (parname == "RiskHazardData") {
     ans <- array(0,
       dim = c(dms[1], length(OCA1::agz), 2, dms[3]),
       dimnames = list(
@@ -117,7 +120,7 @@ default_parameters <- function(parname, dms, verbose=FALSE){
   }
   if (parname == "BETAsex") {
     ans <- array(1.0,
-      dim = c(2,2),
+      dim = c(2, 2),
       dimnames = list(
         sex = c("M", "F"),
         sex = c("M", "F")
@@ -144,7 +147,7 @@ default_parameters <- function(parname, dms, verbose=FALSE){
   }
   if (parname == "BETAstrain") {
     ans <- array(1.0,
-      dim = c(dms[5],dms[5]),
+      dim = c(dms[5], dms[5]),
       dimnames = list(
         strain = 1:dms[5],
         strain = 1:dms[5]
@@ -152,68 +155,67 @@ default_parameters <- function(parname, dms, verbose=FALSE){
     )
   }
   if (parname == "progn_posttb") {
-    ans <- rep(0,dms[4]) #npost
+    ans <- rep(0, dms[4]) # npost
   }
   if (parname == "IRRstrain") {
-    ans <- rep(1, dms[5]) #nstrain
+    ans <- rep(1, dms[5]) # nstrain
   }
   if (parname == "IRRprotn") {
-    ans <- rep(1, dms[6]) #nprot
+    ans <- rep(1, dms[6]) # nprot
   }
   if (parname == "IRRnat") {
-    ans <- rep(1, dms[2]) #nnat
+    ans <- rep(1, dms[2]) # nnat
   }
-  if(parname %in% c("propinitE","propinitL","propinitA","propinitS","propinitT")){
+  if (parname %in%
+    c("propinitE", "propinitL", "propinitA", "propinitS", "propinitT")) {
     ## template
-    L <- 1-exp(-seq(from=2.5,by=5,length.out = length(OCA1::agz)) * 2.5e-3) #distribute by FOI flat prev ~10%
+    L <- 1 - exp(-seq(from = 2.5, by = 5, length.out = length(OCA1::agz)) * 2.5e-3) # distribute by FOI flat prev ~10%
     T <- array(1.0,
-               dim = c(length(OCA1::agz), 2, dms[2:6]),
-               dimnames = list(
-                 acat = OCA1::agz,
-                 sex = c("M", "F"),
-                 nativity = 1:dms[2],
-                 risk = 1:dms[3],
-                 post = 1:dms[4],
-                 strain = 1:dms[5],
-                 protn = 1:dms[6]
-               )
-               )
-    ELAST <- c(0.1-15e-5,0.9,5e-5,5e-5,5e-5) #props
+      dim = c(length(OCA1::agz), 2, dms[2:6]),
+      dimnames = list(
+        acat = OCA1::agz,
+        sex = c("M", "F"),
+        nativity = 1:dms[2],
+        risk = 1:dms[3],
+        post = 1:dms[4],
+        strain = 1:dms[5],
+        protn = 1:dms[6]
+      )
+    )
+    ELAST <- c(0.1 - 15e-5, 0.9, 5e-5, 5e-5, 5e-5) # props
     ## sum(ELAST) #check
-    if(parname == "propinitE"){
+    if (parname == "propinitE") {
       ans <- ELAST[1] * T
     }
-    if(parname == "propinitL"){
+    if (parname == "propinitL") {
       ans <- ELAST[2] * T
     }
-    if(parname == "propinitA"){
+    if (parname == "propinitA") {
       ans <- ELAST[3] * T
     }
-    if(parname == "propinitS"){
+    if (parname == "propinitS") {
       ans <- ELAST[4] * T
     }
-    if(parname == "propinitT"){
+    if (parname == "propinitT") {
       ans <- ELAST[5] * T
     }
   }
-  if(parname %in% names(OCA1::parms)){ #basic TB parameters
+  if (parname %in% names(OCA1::parms)) { # basic TB parameters
     ans <- OCA1::parms[[parname]]
   }
-  if(is.na(sum(ans))) stop("No default available for ",parname,"!\n") #sum to handle arrays
+  if (is.na(sum(ans))) stop("No default available for ", parname, "!\n") # sum to handle arrays
   ans
 }
 
 ## loops over to add missing parameters as default
-add_defaults_if_missing <- function(L, parnames, dms, verbose){
-  for(pname in parnames){
+add_defaults_if_missing <- function(L, parnames, dms, verbose) {
+  for (pname in parnames) {
     if (!pname %in% names(L)) {
       L[[pname]] <- default_parameters(pname, dms, verbose)
     } else {
-      known_parameters(pname,quiet=TRUE) #test exists
+      known_parameters(pname, quiet = TRUE) # test exists
       if (verbose) message("Using supplied value for ", pname, "...")
     }
   }
   L
 }
-
-

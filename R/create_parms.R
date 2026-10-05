@@ -1,6 +1,3 @@
-
-
-
 ##' @title Creates parameters for model
 ##' @param tc TODO
 ##' @param nnat TODO
@@ -13,7 +10,7 @@
 ##' @param postdata TODO
 ##' @param straindata TODO
 ##' @param protdata TODO
-##' @param tbparms list of TB parameters; any not supplied take defaults (see \code{known_parameters()}). Time-varying entries (one row per \code{tc}) include \code{CDR_raw}, \code{migr_TBD_raw}, \code{migr_TBI_raw} and \code{betat_raw} (a length \code{length(tc)} multiplier on the force of infection, default all ones). \code{IRRnat} (length \code{nnat}, default all ones) multiplies progression from both latent states by nativity class
+##' @param tbparms list of TB parameters; any not supplied take defaults (see \code{known_parameters()}). Time-varying entries (one row per \code{tc}) include \code{CDR_raw}, \code{migr_TBD_raw}, \code{migr_TBI_raw} and \code{betat_raw} (a length \code{length(tc)} multiplier on the force of infection, default all ones). \code{IRRnat} (length \code{nnat}, default all ones) multiplies progression from both latent states by nativity class. \code{progt_slow_raw} and \code{progt_fast_raw} (dimensions \code{length(tc)}, \code{nage}, \code{nnat}; default all ones) are time-varying multipliers on slow (reactivation) and fast progression by age and nativity class
 ##' @param verbose give more feedback
 ##' @return list of parameter for model
 ##' @author Pete Dodd
@@ -27,11 +24,11 @@ create_parms <- function(tc = 1970:2020,
                          protdata = list(),
                          tbparms = list(),
                          verbose = FALSE) {
-
   ## === key dims
   nage <- length(OCA1::agz) # number of ages
   ntimes <- length(tc) # number of time data points
   dms <- c(ntimes, nnat, nrisk, npost, nstrain, nprot) # dimensions, bar age/sex which are always fixed
+
 
   ## === create demographic parameters
   P <- create_demographic_parms(
@@ -53,7 +50,7 @@ create_parms <- function(tc = 1970:2020,
     "CDR_raw", "migr_TBD_raw", "migr_TBI_raw", "betat_raw",
     "BETAage", "BETAsex", "BETAnat", "BETArisk", "BETAstrain",
     "propinitE", "propinitL", "propinitA", "propinitS", "propinitT",
-    "IRRstrain", "IRRprotn", "IRRnat"
+    "IRRstrain", "IRRprotn", "IRRnat", "progt_slow_raw", "progt_fast_raw"
   )
   tbparnames <- c(tbparnames, xtra_tbparms)
   ## defaults:
@@ -75,13 +72,21 @@ create_parms <- function(tc = 1970:2020,
   )
   checks01 <- sapply(param_list, check_probabilities, checksum = FALSE)
   ## non-negativity for the transmission and progression multipliers
-  checks_nn <- c("betat_raw" = is.numeric(tbparms$betat_raw) &&
-                   all(tbparms$betat_raw >= 0),
-                 "IRRnat" = is.numeric(tbparms$IRRnat) &&
-                   all(tbparms$IRRnat >= 0))
+  checks_nn <- c(
+    "betat_raw" = is.numeric(tbparms$betat_raw) &&
+      all(tbparms$betat_raw >= 0),
+    "IRRnat" = is.numeric(tbparms$IRRnat) &&
+      all(tbparms$IRRnat >= 0),
+    "progt_slow_raw" = is.numeric(tbparms$progt_slow_raw) &&
+      all(tbparms$progt_slow_raw >= 0),
+    "progt_fast_raw" = is.numeric(tbparms$progt_fast_raw) &&
+      all(tbparms$progt_fast_raw >= 0)
+  )
   if (!all(checks_nn)) {
-    message(paste(names(checks_nn)[!checks_nn], collapse = ", "),
-            " must be numeric and non-negative.")
+    message(
+      paste(names(checks_nn)[!checks_nn], collapse = ", "),
+      " must be numeric and non-negative."
+    )
   }
   ## respond to all
   checks <- c(checks, checks01, checks_nn)
@@ -93,21 +98,21 @@ create_parms <- function(tc = 1970:2020,
 
   ## check dimension
   ## add in extra parms for dim checks:
-  for(nm in xtra_tbparms){
+  for (nm in xtra_tbparms) {
     param_list[[nm]] <- tbparms[[nm]]
   }
   checks <- check_dims(param_list, dms)
   if (all(checks)) {
     if (verbose) message("All TB input parameters dimensions were correct\n")
   } else {
-    message("TB parameters with dimension problems:", paste(names(param_list)[!checks],collapse = ", "))
+    message("TB parameters with dimension problems:", paste(names(param_list)[!checks], collapse = ", "))
   }
 
   ## --- complete TB initial states
   ## create new split pops
-  tbparms$popinitU <- P$popinit * (1-tbparms$propinitE-tbparms$propinitL-
-                                   tbparms$propinitA-tbparms$propinitS-tbparms$propinitT)
-  tbparms$popinitU[tbparms$popinitU<0] <- 0 #safety
+  tbparms$popinitU <- P$popinit * (1 - tbparms$propinitE - tbparms$propinitL -
+    tbparms$propinitA - tbparms$propinitS - tbparms$propinitT)
+  tbparms$popinitU[tbparms$popinitU < 0] <- 0 # safety
   tbparms$popinitE <- P$popinit * tbparms$propinitE
   tbparms$popinitL <- P$popinit * tbparms$propinitL
   tbparms$popinitA <- P$popinit * tbparms$propinitA
